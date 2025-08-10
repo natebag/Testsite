@@ -54,7 +54,7 @@ When all sub-tasks in a parent task are complete:
 
 ## Tasks
 
-- [ ] 1.0 Phantom Wallet Integration & Authentication **[Agent: web3-wallet-verifier]**
+- [x] 1.0 Phantom Wallet Integration & Authentication **[Agent: web3-wallet-verifier]**
   - [x] 1.1 Implement Phantom wallet detection and connection using @solana/wallet-adapter **[Agent: web3-wallet-verifier]**
   - [x] 1.2 Create Solana wallet address display with truncated format (ABC...XYZ) **[Agent: ui-production-builder]**
   - [x] 1.3 Build wallet session persistence using Solana wallet adapter context **[Agent: web3-wallet-verifier]**
@@ -65,14 +65,14 @@ When all sub-tasks in a parent task are complete:
   - [x] 1.8 Implement Solana message signing for user authentication **[Agent: web3-wallet-verifier]**
 
 - [ ] 2.0 SPL MLG Token Management System **[Agent: web3-wallet-verifier]**
-  - [ ] 2.1 Set up Solana RPC connection to SPL MLG token program **[Agent: web3-wallet-verifier]**
-  - [ ] 2.2 Implement real-time SPL token balance fetching using @solana/spl-token **[Agent: web3-wallet-verifier]**
-  - [ ] 2.3 Create SPL token burn transaction functionality for vote purchases **[Agent: web3-wallet-verifier]**
-  - [ ] 2.4 Build Solana transaction history tracking and display using transaction signatures **[Agent: web3-wallet-verifier]**
-  - [ ] 2.5 Implement daily SPL token earning through community actions **[Agent: web3-wallet-verifier]**
-  - [ ] 2.6 Add SPL token balance validation and SOL fee estimation for burn transactions **[Agent: web3-wallet-verifier]**
-  - [ ] 2.7 Create token UI components with SPL balance display and burn interface **[Agent: ui-production-builder]**
-  - [ ] 2.8 Handle associated token account creation for new users **[Agent: web3-wallet-verifier]**
+  - [x] 2.1 Set up Solana RPC connection to SPL MLG token program **[Agent: web3-wallet-verifier]**
+  - [x] 2.2 Implement real-time SPL token balance fetching using @solana/spl-token **[Agent: web3-wallet-verifier]**
+  - [x] 2.3 Create SPL token burn transaction functionality for vote purchases **[Agent: web3-wallet-verifier]**
+  - [x] 2.4 Build Solana transaction history tracking and display using transaction signatures **[Agent: web3-wallet-verifier]**
+  - [x] 2.5 Implement daily SPL token earning through community actions **[Agent: web3-wallet-verifier]**
+  - [x] 2.6 Add SPL token balance validation and SOL fee estimation for burn transactions **[Agent: web3-wallet-verifier]**
+  - [x] 2.7 Create token UI components with SPL balance display and burn interface **[Agent: ui-production-builder]**
+  - [x] 2.8 Handle associated token account creation for new users **[Agent: web3-wallet-verifier]**
 
 - [ ] 3.0 Solana Community Voting System Implementation **[Agent: web3-wallet-verifier]**
   - [ ] 3.1 Implement daily free vote allocation (1 per user per day) using Solana program state **[Agent: web3-wallet-verifier]**
