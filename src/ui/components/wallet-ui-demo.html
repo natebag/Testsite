@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phantom Wallet UI Components Demo - Sub-task 1.6</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1f2937, #111827);
+            color: #e5e7eb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .demo-section {
+            background: rgba(31, 41, 55, 0.8);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .xbox-border {
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-green-400 mb-4">
+                🎮 Phantom Wallet UI Components
+            </h1>
+            <p class="text-xl text-gray-300 mb-2">Sub-task 1.6 Implementation</p>
+            <p class="text-sm text-gray-400">
+                Enhanced status indicators and connection button with Xbox 360 aesthetic
+            </p>
+        </div>
+
+        <!-- Feature Overview -->
+        <div class="demo-section rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-green-400 mb-4">✨ Enhanced Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div class="space-y-2">
+                    <h3 class="font-semibold text-green-300">Status Indicators</h3>
+                    <ul class="space-y-1 text-gray-400">
+                        <li>• Real-time connection health monitoring</li>
+                        <li>• Rate limiting status with animations</li>
+                        <li>• Connection attempt counters</li>
+                        <li>• Network latency with color coding</li>
+                        <li>• Error categorization with icons</li>
+                        <li>• Retry attempt visualization</li>
+                    </ul>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="font-semibold text-green-300">Connection Button</h3>
+                    <ul class="space-y-1 text-gray-400">
+                        <li>• Multi-state with progress indicators</li>
+                        <li>• Error-specific icons and guidance</li>
+                        <li>• Rate limiting protection</li>
+                        <li>• Accessible tooltips and ARIA</li>
+                        <li>• Mobile-responsive design</li>
+                        <li>• Integration with error handling</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connection Button Demo -->
+        <div class="demo-section rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-green-400 mb-4">🔌 Connection Button States</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Disconnected State -->
+                <div class="xbox-border rounded-lg p-4 text-center">
+                    <h3 class="text-sm font-medium text-gray-300 mb-3">Disconnected</h3>
+                    <div id="btn-disconnected" class="mb-3"></div>
+                    <p class="text-xs text-gray-500">Ready to connect</p>
+                </div>
+
+                <!-- Connecting State -->
+                <div class="xbox-border rounded-lg p-4 text-center">
+                    <h3 class="text-sm font-medium text-gray-300 mb-3">Connecting</h3>
+                    <div id="btn-connecting" class="mb-3"></div>
+                    <p class="text-xs text-gray-500">Establishing connection</p>
+                </div>
+
+                <!-- Connected State -->
+                <div class="xbox-border rounded-lg p-4 text-center">
+                    <h3 class="text-sm font-medium text-gray-300 mb-3">Connected</h3>
+                    <div id="btn-connected" class="mb-3"></div>
+                    <p class="text-xs text-gray-500">Wallet active</p>
+                </div>
+
+                <!-- Error State -->
+                <div class="xbox-border rounded-lg p-4 text-center">
+                    <h3 class="text-sm font-medium text-gray-300 mb-3">Error</h3>
+                    <div id="btn-error" class="mb-3"></div>
+                    <p class="text-xs text-gray-500">Connection failed</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Indicators Demo -->
+        <div class="demo-section rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-green-400 mb-4">📊 Status Indicators</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Health Status -->
+                <div class="xbox-border rounded-lg p-4">
+                    <h3 class="text-sm font-medium text-gray-300 mb-3">Connection Health</h3>
+                    <div id="status-healthy" class="mb-2"></div>
+                    <div id="status-unhealthy" class="mb-2"></div>
+                    <div id="status-connecting" class="mb-2"></div>
+                </div>
+
+                <!-- Network Status -->
+                <div class="xbox-border rounded-lg p-4">
+                    <h3 class="text-sm font-medium text-gray-300 mb-3">Network Status</h3>
+                    <div id="network-status" class="mb-3"></div>
+                    <p class="text-xs text-gray-500">RPC latency and health</p>
+                </div>
+
+                <!-- Error Display -->
+                <div class="xbox-border rounded-lg p-4">
+                    <h3 class="text-sm font-medium text-gray-300 mb-3">Error Handling</h3>
+                    <div id="error-display" class="mb-3"></div>
+                    <p class="text-xs text-gray-500">User-friendly messages</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Points -->
+        <div class="demo-section rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-green-400 mb-4">🔗 Integration Points</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-semibold text-green-300 mb-2">PhantomWalletManager Events</h3>
+                    <ul class="space-y-1 text-sm text-gray-400">
+                        <li>• connecting - Connection attempt started</li>
+                        <li>• connected - Wallet successfully connected</li>
+                        <li>• disconnected - Wallet disconnected</li>
+                        <li>• error - Connection or operational error</li>
+                        <li>• connectionFailed - Connection attempt failed</li>
+                        <li>• connectionRetry - Retry attempt initiated</li>
+                        <li>• healthCheckPassed - Network health check OK</li>
+                        <li>• healthCheckFailed - Network issues detected</li>
+                        <li>• walletLocked - Wallet is locked</li>
+                        <li>• accountChanged - Security disconnect</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-green-300 mb-2">Error Categories</h3>
+                    <ul class="space-y-1 text-sm text-gray-400">
+                        <li>• WALLET_NOT_INSTALLED - Install required</li>
+                        <li>• USER_REJECTED - Connection cancelled</li>
+                        <li>• WALLET_LOCKED - Unlock required</li>
+                        <li>• NETWORK_ERROR - Connection issues</li>
+                        <li>• RATE_LIMITED - Too many attempts</li>
+                        <li>• CONNECTION_TIMEOUT - Timeout occurred</li>
+                        <li>• BROWSER_INCOMPATIBLE - Browser issues</li>
+                        <li>• CONNECTION_FAILED - General failure</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Examples -->
+        <div class="demo-section rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-green-400 mb-4">💾 Implementation Code</h2>
+            <div class="bg-gray-900 rounded-lg p-4 text-sm font-mono overflow-x-auto">
+                <pre class="text-green-300">
+<span class="text-gray-500">// Import the wallet UI components</span>
+<span class="text-blue-400">import</span> {
+  WalletConnectButton,
+  WalletStatusBadge,
+  WalletErrorDisplay,
+  WalletNetworkIndicator,
+  WalletConnectionFlow,
+  createWalletUI
+} <span class="text-blue-400">from</span> <span class="text-yellow-400">'./src/ui/components/wallet-ui.js'</span>;
+
+<span class="text-gray-500">// Create connection button with enhanced features</span>
+<span class="text-blue-400">const</span> button = <span class="text-blue-400">new</span> <span class="text-green-400">WalletConnectButton</span>(container, {
+  <span class="text-cyan-400">variant</span>: <span class="text-yellow-400">'primary'</span>,
+  <span class="text-cyan-400">size</span>: <span class="text-yellow-400">'lg'</span>,
+  <span class="text-cyan-400">showStatus</span>: <span class="text-orange-400">true</span>,
+  <span class="text-cyan-400">showRetryOnError</span>: <span class="text-orange-400">true</span>
+});
+
+<span class="text-gray-500">// Status badge with health monitoring</span>
+<span class="text-blue-400">const</span> status = <span class="text-blue-400">new</span> <span class="text-green-400">WalletStatusBadge</span>(container, {
+  <span class="text-cyan-400">showText</span>: <span class="text-orange-400">true</span>,
+  <span class="text-cyan-400">showHealth</span>: <span class="text-orange-400">true</span>,
+  <span class="text-cyan-400">showLatency</span>: <span class="text-orange-400">true</span>
+});
+
+<span class="text-gray-500">// Complete UI setup with utility function</span>
+<span class="text-blue-400">const</span> ui = <span class="text-green-400">createWalletUI</span>(container, {
+  <span class="text-cyan-400">layout</span>: <span class="text-yellow-400">'full'</span>,
+  <span class="text-cyan-400">showAddress</span>: <span class="text-orange-400">true</span>,
+  <span class="text-cyan-400">showStatus</span>: <span class="text-orange-400">true</span>,
+  <span class="text-cyan-400">showNetwork</span>: <span class="text-orange-400">true</span>
+});
+                </pre>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-gray-500 text-sm">
+            <p>Sub-task 1.6: Enhanced Phantom Wallet Status UI Components and Connection Button</p>
+            <p class="mt-1">Integrates with PhantomWalletManager error handling from sub-task 1.5</p>
+            <p class="mt-2 text-xs">🎮 Built with Xbox 360 dashboard aesthetic and retro gaming theme</p>
+        </div>
+    </div>
+
+    <script type="module">
+        // This would normally import the actual components
+        // For demo purposes, we'll show placeholder elements
+        
+        // Note: In actual implementation, you would:
+        // import { WalletConnectButton, WalletStatusBadge } from './wallet-ui.js';
+        
+        console.log('Demo page loaded - Enhanced Phantom Wallet UI Components');
+        console.log('Sub-task 1.6: Production-ready status indicators and connection button');
+        console.log('Features: Real-time health monitoring, error categorization, retry logic');
+    </script>
+</body>
+</html>

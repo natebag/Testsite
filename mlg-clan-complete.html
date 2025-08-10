@@ -1,0 +1,3279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLG.clan - Gaming Community Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .tile { 
+      transition: all 0.3s ease; 
+      background: linear-gradient(135deg, #065f46, #064e3b);
+      border: 1px solid #10b981;
+    }
+    .tile:hover { 
+      transform: scale(1.02); 
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+    .nav-link {
+      position: relative;
+      overflow: hidden;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -100%;
+      width: 100%;
+      height: 2px;
+      background: #10b981;
+      transition: left 0.3s ease;
+    }
+    .nav-link:hover::after {
+      left: 0;
+    }
+    .connect-btn {
+      background: linear-gradient(45deg, #10b981, #059669);
+      transition: all 0.3s ease;
+    }
+    .connect-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+    }
+    .xbox-green { color: #10b981; }
+    .profile-modal {
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(10px);
+    }
+    .pulse-glow {
+      animation: pulse-glow 2s infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.3); }
+      50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.6); }
+    }
+    .vault-glow {
+      background: linear-gradient(45deg, #8b5cf6, #3b82f6);
+      animation: vault-pulse 3s infinite;
+    }
+    @keyframes vault-pulse {
+      0%, 100% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); }
+      50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.6); }
+    }
+    .burn-effect {
+      background: linear-gradient(45deg, #dc2626, #f59e0b);
+      animation: burn-glow 2s infinite;
+    }
+    @keyframes burn-glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
+      50% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.7); }
+    }
+    .achievement-unlock {
+      animation: achievementPop 0.5s ease-out;
+    }
+    @keyframes achievementPop {
+      0% { transform: scale(0) rotate(180deg); opacity: 0; }
+      50% { transform: scale(1.2) rotate(0deg); }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+    .gamerscore-badge {
+      background: linear-gradient(45deg, #fbbf24, #f59e0b);
+      animation: scoreGlow 2s infinite;
+    }
+    @keyframes scoreGlow {
+      0%, 100% { box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
+      50% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.8); }
+    }
+    .video-container {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+    }
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .clan-tab.active {
+      color: #10b981;
+      border-color: #10b981;
+    }
+    .clan-card {
+      background: linear-gradient(135deg, #1f2937, #374151);
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+    .clan-card.red { border-color: #ef4444; }
+    .clan-card.blue { border-color: #3b82f6; }
+    .clan-card.purple { border-color: #8b5cf6; }
+    .clan-card.yellow { border-color: #eab308; }
+    .gamertag-display {
+      background: linear-gradient(45deg, #065f46, #064e3b);
+      border: 1px solid #10b981;
+    }
+    .user-menu {
+      position: relative;
+    }
+    .user-dropdown {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      margin-top: 0.5rem;
+      background: #1f2937;
+      border: 1px solid #10b981;
+      border-radius: 0.5rem;
+      padding: 0.5rem;
+      min-width: 200px;
+      z-index: 50;
+    }
+    .clan-tag {
+      font-weight: bold;
+      padding: 0 2px;
+    }
+    .clan-tag-purple { color: #8b5cf6; }
+    .clan-tag-red { color: #ef4444; }
+    .clan-tag-blue { color: #3b82f6; }
+    .clan-tag-yellow { color: #eab308; }
+    
+    /* Chat system styles */
+    .chat-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 350px;
+      height: 450px;
+      background: #1f2937;
+      border: 2px solid #10b981;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      transition: all 0.3s ease;
+    }
+    .chat-container.minimized {
+      height: 50px;
+    }
+    .chat-header {
+      background: linear-gradient(45deg, #065f46, #064e3b);
+      padding: 10px;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .chat-tabs {
+      display: flex;
+      gap: 10px;
+      padding: 5px 10px;
+      background: #374151;
+      border-bottom: 1px solid #4b5563;
+    }
+    .chat-tab {
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      position: relative;
+    }
+    .chat-tab.active {
+      background: #10b981;
+      color: black;
+    }
+    .chat-tab .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ef4444;
+      color: white;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+      background: #111827;
+      min-height: 0;
+    }
+    .chat-message {
+      margin-bottom: 10px;
+      padding: 5px 8px;
+      border-radius: 5px;
+      background: #1f2937;
+      font-size: 13px;
+      word-wrap: break-word;
+    }
+    .chat-message .author {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    .chat-message .time {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-left: 5px;
+    }
+    .chat-input-container {
+      padding: 10px;
+      border-top: 1px solid #4b5563;
+      display: flex;
+      gap: 5px;
+    }
+    .chat-input {
+      flex: 1;
+      background: #374151;
+      border: 1px solid #4b5563;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 13px;
+    }
+    .friend-request-item {
+      padding: 8px;
+      background: #1f2937;
+      border-radius: 5px;
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dao-proposal {
+      background: #1f2937;
+      border: 1px solid #4b5563;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+    }
+    .dao-vote-bar {
+      height: 20px;
+      background: #374151;
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+      margin: 10px 0;
+    }
+    .dao-vote-progress {
+      height: 100%;
+      background: linear-gradient(45deg, #10b981, #059669);
+      transition: width 0.3s ease;
+    }
+    .officer-badge {
+      background: linear-gradient(45deg, #f59e0b, #d97706);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: bold;
+      color: black;
+    }
+    .clickable-username {
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .clickable-username:hover {
+      text-decoration: underline;
+      opacity: 0.8;
+    }
+    .mlg-vote-btn {
+      background: linear-gradient(45deg, #f59e0b, #d97706);
+      animation: burn-glow 2s infinite;
+    }
+    .mlg-vote-btn:hover {
+      transform: scale(1.05);
+    }
+    /* Game selector styles */
+    .game-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #1f2937;
+      border: 1px solid #10b981;
+      border-radius: 0 0 8px 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 100;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+    .game-option {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .game-option:hover {
+      background: #374151;
+    }
+    .game-option img {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-right: 12px;
+    }
+    .game-option .game-name {
+      color: white;
+      font-size: 14px;
+    }
+    .recent-clips-section {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 10px;
+      background: #111827;
+    }
+    .clip-preview {
+      background: #1f2937;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .clip-preview:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-green-900 to-black text-white min-h-screen">
+  <!-- Header -->
+  <header class="p-6 border-b border-green-800">
+    <div class="flex justify-between items-center mb-4">
+      <div class="flex items-center space-x-4">
+        <h1 class="text-3xl font-bold xbox-green">MLG.clan</h1>
+        <div class="text-sm text-green-400 flex items-center space-x-2">
+          <span class="w-2 h-2 bg-green-400 rounded-full pulse-glow"></span>
+          <span>Online: <span id="online-count">1</span></span>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <!-- Friend requests indicator -->
+        <button id="friend-requests-btn" onclick="toggleChat('friends')" class="hidden relative">
+          <span class="text-xl">👥</span>
+          <span id="friend-request-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center hidden">0</span>
+        </button>
+        
+        <!-- MLG Tokens Display -->
+        <div id="mlg-tokens-display" class="hidden bg-yellow-900 px-3 py-1 rounded-lg">
+          🔥 <span id="mlg-tokens-value">100</span> MLG
+        </div>
+        
+        <!-- Logged in user display -->
+        <div id="user-display" class="hidden flex items-center space-x-3">
+          <div id="gamerscore-display" class="gamerscore-badge px-3 py-1 rounded-lg text-black font-bold">
+            🏆 <span id="gamerscore-value">0</span>G
+          </div>
+          <div class="user-menu">
+            <button onclick="toggleUserMenu()" class="gamertag-display px-4 py-2 rounded-lg flex items-center space-x-2 hover:border-green-400">
+              <span class="text-2xl">🎮</span>
+              <div class="text-left">
+                <div class="font-bold text-sm flex items-center">
+                  <span id="header-clan-tag"></span>
+                  <span id="header-gamertag">Gamertag</span>
+                </div>
+                <div class="text-xs text-gray-300" id="header-wallet">Wallet</div>
+              </div>
+              <span class="text-xs">▼</span>
+            </button>
+            <div id="user-dropdown" class="user-dropdown hidden">
+              <button onclick="showPage('profile')" class="w-full text-left px-3 py-2 hover:bg-gray-700 rounded">Profile</button>
+              <button onclick="showPage('achievements')" class="w-full text-left px-3 py-2 hover:bg-gray-700 rounded">Achievements</button>
+              <hr class="my-2 border-gray-600">
+              <button onclick="disconnectWallet()" class="w-full text-left px-3 py-2 hover:bg-red-700 rounded text-red-400">Disconnect</button>
+            </div>
+          </div>
+        </div>
+        <!-- Connect button (shown when not logged in) -->
+        <button id="connect-btn" class="connect-btn text-white px-6 py-2 rounded-lg font-semibold" onclick="connectWallet()">
+          Connect Wallet
+        </button>
+      </div>
+    </div>
+    <nav class="flex space-x-6">
+      <a href="#" class="nav-link text-white font-bold py-2 px-1" onclick="showPage('home')">Home</a>
+      <a href="#" class="nav-link text-green-400 hover:text-green-300 py-2 px-1" onclick="showPage('vote-vault')">Vote Vault</a>
+      <a href="#" class="nav-link text-green-400 hover:text-green-300 py-2 px-1" onclick="showPage('clan')">Clan</a>
+      <a href="#" class="nav-link text-green-400 hover:text-green-300 py-2 px-1" onclick="showPage('tournaments')">Tournaments</a>
+      <a href="#" class="nav-link text-green-400 hover:text-green-300 py-2 px-1" onclick="showPage('roster')">Roster</a>
+      <a href="#" class="nav-link text-green-400 hover:text-green-300 py-2 px-1" onclick="showPage('upload')">Upload</a>
+      <a href="#" class="nav-link text-green-400 hover:text-green-300 py-2 px-1" onclick="showPage('achievements')">Achievements</a>
+      <a href="#" class="nav-link text-green-400 hover:text-green-300 py-2 px-1" onclick="showPage('profile')">Profile</a>
+    </nav>
+  </header>
+
+  <!-- Home Page -->
+  <main id="home-page" class="page p-6">
+    <div class="mb-8">
+      <div class="tile p-6 rounded-lg">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-2xl font-bold xbox-green">🏆 Featured Showcase</h2>
+          <button onclick="cycleShowcase()" class="bg-green-600 hover:bg-green-500 px-3 py-1 rounded text-sm">
+            🔄 Cycle
+          </button>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div id="showcase-content" class="aspect-video bg-black rounded flex items-center justify-center">
+            <p class="text-gray-400">No clips available yet. Upload the first clip!</p>
+          </div>
+          <div class="space-y-4">
+            <div id="showcase-details">
+              <h3 class="text-xl font-bold mb-2">Welcome to MLG.clan</h3>
+              <p class="text-gray-300 mb-2">Connect your wallet and start uploading gaming clips!</p>
+            </div>
+            <div class="bg-gray-700 rounded-lg p-4">
+              <h4 class="font-bold mb-2 xbox-green">Activity Feed</h4>
+              <div id="activity-feed" class="space-y-2 text-sm max-h-48 overflow-y-auto">
+                <div class="flex items-center space-x-2">
+                  <span class="text-green-400">●</span>
+                  <span>Welcome to MLG.clan!</span>
+                  <span class="text-gray-400 text-xs">now</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="tile p-6 rounded-lg">
+        <h2 class="text-xl font-bold mb-4 xbox-green">🚀 Join the Clan</h2>
+        <p class="text-gray-300 mb-4">Connect your wallet to start uploading clips and voting!</p>
+        <button onclick="connectWallet()" class="bg-green-600 hover:bg-green-500 px-6 py-3 rounded-lg font-semibold w-full">
+          Join Now
+        </button>
+      </div>
+      
+      <div class="tile p-6 rounded-lg">
+        <h3 class="text-lg font-bold mb-3 xbox-green">📊 Stats</h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span>Clips:</span><span class="text-green-400" id="stats-clips">0</span></div>
+          <div class="flex justify-between"><span>Votes:</span><span class="text-green-400" id="stats-votes">0</span></div>
+          <div class="flex justify-between"><span>Users:</span><span class="text-green-400" id="stats-users">0</span></div>
+          <div class="flex justify-between"><span>Clans:</span><span class="text-purple-400" id="stats-clans">1</span></div>
+          <div class="flex justify-between"><span>Total Gamerscore:</span><span class="text-yellow-400" id="stats-gamerscore">0</span></div>
+        </div>
+      </div>
+      
+      <div class="tile p-6 rounded-lg">
+        <h3 class="text-lg font-bold mb-3 xbox-green">🎯 Your Limits</h3>
+        <div id="user-limits" class="space-y-2 text-sm">
+          <div class="flex justify-between"><span>Uploads Today:</span><span class="text-green-400" id="upload-limit">0/3</span></div>
+          <div class="flex justify-between"><span>Free Votes:</span><span class="text-green-400" id="free-votes">1/1</span></div>
+          <div class="flex justify-between"><span>Total Votes Today:</span><span class="text-green-400" id="total-votes-today">0/10</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Friends Feed -->
+    <div class="tile p-6 rounded-lg">
+      <h2 class="text-xl font-bold mb-4 xbox-green">👥 Friends Feed</h2>
+      <div id="friends-feed" class="space-y-4">
+        <p class="text-gray-400 text-center">Connect wallet and add friends to see their activity!</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Vote Vault Page -->
+  <main id="vote-vault-page" class="page p-6 hidden">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold xbox-green">Vote Vault</h1>
+      <div class="flex gap-3">
+        <input id="clip-search" type="text" placeholder="Search clips..." class="bg-gray-800 text-white px-4 py-2 rounded-lg" onkeyup="searchClips()">
+        <select id="sort-clips" onchange="sortClips()" class="bg-green-700 text-white p-2 rounded-lg">
+          <option value="votes-desc">Most Votes</option>
+          <option value="date-desc">Most Recent</option>
+          <option value="likes-desc">Most Liked</option>
+        </select>
+      </div>
+    </div>
+    <div id="clip-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <p class="text-gray-400 col-span-full text-center">No clips uploaded yet. Be the first!</p>
+    </div>
+  </main>
+
+  <!-- Achievements Page -->
+  <main id="achievements-page" class="page p-6 hidden">
+    <h1 class="text-2xl font-bold xbox-green mb-6">🏆 Achievements</h1>
+    
+    <div class="mb-6 tile p-6 rounded-lg">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-bold mb-2">Your Progress</h2>
+          <p class="text-gray-300">Unlock achievements to earn Gamerscore!</p>
+        </div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-yellow-400" id="achievement-score">0G</div>
+          <div class="text-sm text-gray-400">Total Gamerscore</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="achievements-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Achievements will be rendered here -->
+    </div>
+  </main>
+
+  <!-- Clan Page -->
+  <main id="clan-page" class="page p-6 hidden">
+    <h1 class="text-2xl font-bold xbox-green mb-6">MLG Clan Hub</h1>
+    
+    <div class="mb-6">
+      <nav class="flex space-x-8">
+        <button onclick="showClanTab('main')" class="clan-tab active text-lg font-medium py-2 px-1 border-b-2 border-green-500 text-green-400" id="main-clan-tab">
+          Main Clan
+        </button>
+        <button onclick="showClanTab('custom')" class="clan-tab text-lg font-medium py-2 px-1 border-b-2 border-transparent text-gray-400" id="custom-clan-tab">
+          Custom Clans
+        </button>
+      </nav>
+    </div>
+
+    <div id="main-clan-content">
+      <div class="tile p-6 rounded-lg">
+        <h2 class="text-xl font-bold xbox-green mb-4">[MLG] Major League Gaming</h2>
+        <div class="grid grid-cols-3 gap-4 text-center mb-6">
+          <div>
+            <div class="text-2xl font-bold text-green-400" id="clan-members">0</div>
+            <div class="text-sm text-gray-400">Members</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-blue-400" id="clan-clips">0</div>
+            <div class="text-sm text-gray-400">Clips</div>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-purple-400" id="clan-votes">0</div>
+            <div class="text-sm text-gray-400">Votes</div>
+          </div>
+        </div>
+        
+        <!-- Current Members List -->
+        <div class="mt-6">
+          <h3 class="text-lg font-bold mb-3 xbox-green">Current Members</h3>
+          <div id="main-clan-members" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="bg-gray-700 p-3 rounded text-center">
+              <div class="text-purple-500 font-bold text-sm mb-1">[MLG]</div>
+              <div class="font-bold text-sm">Connect wallet to see members</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="custom-clan-content" class="hidden">
+      <div class="mb-6">
+        <div class="tile p-6 rounded-lg">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold xbox-green">Custom Clans</h2>
+            <button onclick="showCreateClanModal()" class="burn-effect text-white px-6 py-3 rounded-lg font-semibold">
+              🔥 Create Clan
+            </button>
+          </div>
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div class="text-2xl font-bold text-orange-400" id="custom-clans-count">0</div>
+              <div class="text-sm text-gray-400">Custom Clans</div>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-purple-400" id="custom-clan-members">0</div>
+              <div class="text-sm text-gray-400">Custom Members</div>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-yellow-400">Free</div>
+              <div class="text-sm text-gray-400">Cost to Create</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="custom-clans-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="tile p-6 rounded-lg text-center">
+          <h3 class="font-bold text-gray-400 mb-2">No Custom Clans Yet</h3>
+          <p class="text-sm text-gray-500 mb-4">Be the first to create a custom clan!</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Clan Dashboard Page (for viewing specific clan) -->
+  <main id="clan-dashboard-page" class="page p-6 hidden">
+    <div id="clan-dashboard-content">
+      <!-- Dashboard content will be dynamically generated -->
+    </div>
+  </main>
+
+  <!-- Officer Management Modal -->
+  <div id="officer-modal" class="profile-modal fixed inset-0 z-[2000] hidden flex items-center justify-center p-4">
+    <div class="bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-6">
+          <h2 class="text-2xl font-bold xbox-green">Manage Officers</h2>
+          <button onclick="closeOfficerModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+        </div>
+        <div id="officer-management-content">
+          <!-- Content will be dynamically generated -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clan Settings Modal -->
+  <div id="clan-settings-modal" class="profile-modal fixed inset-0 z-[2000] hidden flex items-center justify-center p-4">
+    <div class="bg-gray-800 rounded-lg max-w-md w-full">
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-6">
+          <h2 class="text-2xl font-bold xbox-green">Clan Settings</h2>
+          <button onclick="closeClanSettingsModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+        </div>
+        <div id="clan-settings-content">
+          <!-- Content will be dynamically generated -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tournaments Page -->
+  <main id="tournaments-page" class="page p-6 hidden">
+    <h1 class="text-2xl font-bold xbox-green mb-6">🏆 Tournament Hub</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="tile p-6 rounded-lg">
+        <h2 class="text-xl font-bold mb-4">Weekly Clip Contest</h2>
+        <p class="text-gray-300 mb-4">Upload your best clips to compete for the weekly crown!</p>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span>Prize Pool:</span><span class="text-yellow-400">1000 MLG</span></div>
+          <div class="flex justify-between"><span>Entries:</span><span class="text-green-400">0</span></div>
+          <div class="flex justify-between"><span>Time Left:</span><span class="text-red-400">Coming Soon</span></div>
+        </div>
+      </div>
+      <div class="tile p-6 rounded-lg">
+        <h2 class="text-xl font-bold mb-4">Clan Wars</h2>
+        <p class="text-gray-300 mb-4">Compete with your clan for supremacy!</p>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span>Status:</span><span class="text-gray-400">Not Started</span></div>
+          <div class="flex justify-between"><span>Participating Clans:</span><span class="text-blue-400">0</span></div>
+          <div class="flex justify-between"><span>Next War:</span><span class="text-red-400">TBA</span></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Roster Page -->
+  <main id="roster-page" class="page p-6 hidden">
+    <h1 class="text-2xl font-bold xbox-green mb-6">Global Roster</h1>
+    <div class="mb-4">
+      <input type="text" id="roster-search" placeholder="Search players..." 
+             class="bg-gray-800 text-white px-4 py-2 rounded-lg w-full max-w-md"
+             onkeyup="filterRoster()">
+    </div>
+    <div class="tile p-6 rounded-lg">
+      <div id="roster-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <p class="text-gray-400 text-center py-8 col-span-full">No players yet. Connect your wallet to be the first!</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Upload Page -->
+  <main id="upload-page" class="page p-6 hidden">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-2xl font-bold xbox-green mb-6">Upload Clip</h1>
+      <form id="upload-form" class="tile p-6 rounded-lg">
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-2">Clip Title</label>
+          <input id="clip-title" type="text" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-green-600" required>
+        </div>
+        <div class="mb-4 relative">
+          <label class="block text-sm font-medium mb-2">Game</label>
+          <input id="clip-game" type="text" placeholder="Search for a game..." 
+                 class="w-full bg-gray-800 text-white p-3 rounded-lg border border-green-600" 
+                 autocomplete="off" required oninput="searchGames(this.value)" onfocus="showGameDropdown()">
+          <div id="game-dropdown" class="game-dropdown hidden">
+            <!-- Game suggestions will appear here -->
+          </div>
+        </div>
+        <div class="mb-6">
+          <label class="block text-sm font-medium mb-2">Video URL (YouTube, Twitch, etc.)</label>
+          <input id="clip-url" type="url" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-green-600" placeholder="https://youtube.com/watch?v=..." required>
+        </div>
+        <button type="submit" class="w-full bg-green-600 hover:bg-green-500 px-6 py-3 rounded-lg font-semibold">
+          Upload Clip
+        </button>
+      </form>
+      <p id="upload-status" class="mt-4 text-center"></p>
+    </div>
+  </main>
+
+  <!-- Profile Page -->
+  <main id="profile-page" class="page p-6 hidden">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-2xl font-bold xbox-green mb-6">My Profile</h1>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="tile p-6 rounded-lg">
+          <h2 class="text-lg font-bold xbox-green mb-4">Profile Info</h2>
+          <div id="profile-form-container">
+            <!-- This will be dynamically populated based on gamertag status -->
+          </div>
+        </div>
+        <div class="tile p-6 rounded-lg">
+          <h2 class="text-lg font-bold xbox-green mb-4">Profile Stats</h2>
+          <div class="text-center mb-4">
+            <div class="w-20 h-20 bg-green-600 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">🎮</div>
+            <div id="preview-clan-tag" class="text-lg font-bold mb-1"></div>
+            <h3 class="font-bold text-xl mb-2" id="preview-gamertag">Not Set</h3>
+            <p class="text-gray-300 mb-4" id="preview-bio">No bio set</p>
+            <div class="text-2xl font-bold text-yellow-400 mb-2" id="profile-gamerscore">0G</div>
+          </div>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span>Wallet:</span>
+              <span class="text-green-400 text-xs" id="profile-wallet">Not connected</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Friends:</span>
+              <span class="text-green-400" id="profile-friends">0</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Total Clips:</span>
+              <span class="text-purple-400" id="profile-clips">0</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Total Votes Received:</span>
+              <span class="text-orange-400" id="profile-votes">0</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Login Streak:</span>
+              <span class="text-red-400" id="profile-streak">0 days</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Friends Lists -->
+      <div class="tile p-6 rounded-lg mt-6">
+        <h3 class="text-lg font-bold xbox-green mb-4">Friends</h3>
+        <div id="friends-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-64 overflow-y-auto">
+          <p class="text-gray-400 text-sm col-span-full">No friends yet. Send friend requests to connect!</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- User Profile Modal (for viewing other users) -->
+  <div id="user-profile-modal" class="profile-modal fixed inset-0 z-[2000] hidden flex items-center justify-center p-4">
+    <div class="bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-6">
+          <h2 class="text-2xl font-bold xbox-green">Player Profile</h2>
+          <button onclick="closeUserProfileModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+        </div>
+        <div id="modal-profile-content">
+          <!-- Content will be dynamically generated -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Clan Modal -->
+  <div id="create-clan-modal" class="profile-modal fixed inset-0 z-[2000] hidden flex items-center justify-center p-4">
+    <div class="bg-gray-800 rounded-lg max-w-md w-full">
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-6">
+          <h2 class="text-2xl font-bold xbox-green">Create Custom Clan</h2>
+          <button onclick="closeCreateClanModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+        </div>
+        <form id="create-clan-form">
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">Clan Name</label>
+            <input id="clan-name" type="text" class="w-full bg-gray-700 text-white p-3 rounded-lg" required maxlength="10">
+            <p class="text-xs text-gray-400 mt-1">Max 10 characters</p>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">Description</label>
+            <textarea id="clan-description" class="w-full bg-gray-700 text-white p-3 rounded-lg h-20" required maxlength="100"></textarea>
+          </div>
+          <div class="mb-6">
+            <label class="block text-sm font-medium mb-2">Clan Color</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex items-center space-x-2">
+                <input type="radio" name="clan-color" value="red" class="text-red-500" checked>
+                <span class="clan-tag-red">[CLAN] Red</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="radio" name="clan-color" value="blue" class="text-blue-500">
+                <span class="clan-tag-blue">[CLAN] Blue</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="radio" name="clan-color" value="purple" class="text-purple-500">
+                <span class="clan-tag-purple">[CLAN] Purple</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="radio" name="clan-color" value="yellow" class="text-yellow-500">
+                <span class="clan-tag-yellow">[CLAN] Yellow</span>
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-green-600 hover:bg-green-500 px-6 py-3 rounded-lg font-semibold">
+            Create Clan
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat System -->
+  <div id="chat-container" class="chat-container hidden">
+    <div class="chat-header" onclick="toggleChatMinimize()">
+      <span class="font-bold">💬 MLG Chat</span>
+      <div class="flex gap-2">
+        <button onclick="event.stopPropagation(); closeChat()" class="text-red-400 hover:text-red-300">×</button>
+      </div>
+    </div>
+    <div id="chat-body">
+      <div class="chat-tabs">
+        <div class="chat-tab active" onclick="switchChatTab(event, 'trollbox')">Trollbox</div>
+        <div class="chat-tab" onclick="switchChatTab(event, 'clan')">Clan</div>
+        <div class="chat-tab" onclick="switchChatTab(event, 'friends')">
+          Friends
+          <span id="friends-badge" class="badge hidden">0</span>
+        </div>
+        <div class="chat-tab" onclick="switchChatTab(event, 'dm')">DM</div>
+      </div>
+      <div class="chat-messages">
+        <div id="trollbox-tab" class="chat-messages">
+          <div class="text-center text-gray-400 text-xs mb-2">Welcome to the Trollbox! Be respectful.</div>
+        </div>
+        <div id="clan-tab" class="chat-messages hidden">
+          <div class="text-center text-gray-400 text-xs">Join a custom clan to access clan chat</div>
+        </div>
+        <div id="friends-tab" class="chat-messages hidden">
+          <div class="mb-3">
+            <h4 class="text-sm font-bold mb-2">Friend Requests</h4>
+            <div id="friend-requests-list">
+              <p class="text-gray-400 text-xs">No pending requests</p>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold mb-2">Online Friends</h4>
+            <div id="friends-online-list">
+              <p class="text-gray-400 text-xs">No friends yet</p>
+            </div>
+          </div>
+        </div>
+        <div id="dm-tab" class="chat-messages hidden">
+          <div class="text-center text-gray-400 text-xs">Select a friend to start a DM</div>
+        </div>
+      </div>
+      <div class="chat-input-container">
+        <input id="chat-input" type="text" class="chat-input" placeholder="Type a message..." onkeydown="handleChatInput(event)">
+        <button onclick="sendMessage()" class="bg-green-600 hover:bg-green-500 px-3 py-1 rounded text-sm">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat Toggle Button (shown when chat is closed) -->
+  <button id="chat-toggle-btn" class="fixed bottom-5 right-5 bg-green-600 hover:bg-green-500 text-white p-3 rounded-full shadow-lg hidden" onclick="toggleChat()">
+    💬
+  </button>
+
+  <script>
+    // Global state with persistence
+    let currentWallet = null;
+    let userData = {};
+    let clips = [];
+    let users = new Map(); // Store all users by wallet address
+    let walletGamertags = new Map(); // Map wallet addresses to gamertags (permanent)
+    let customClans = new Map(); // Store custom clans
+    let showcaseMode = 0;
+    let achievements = {};
+    let userAchievements = {};
+    let activityLog = [];
+    let friendships = new Map(); // Store friend relationships
+    let friendRequests = new Map(); // Store pending friend requests
+    let chatMessages = {
+      trollbox: [],
+      clan: {},
+      dm: {}
+    };
+    let currentChatTab = 'trollbox';
+    let currentDMUser = null;
+    let chatMinimized = false;
+    let daoProposals = new Map(); // Store DAO proposals by clan
+    let dailyLimits = {}; // Store daily upload/vote limits
+    let lastLoginDate = null; // Track login streak
+    let loginStreak = 0;
+    let mlgTokens = {}; // Store MLG token balances per wallet
+
+    // Game database (simplified version, you could expand this)
+    const GAMES_DATABASE = [
+      { name: 'Fortnite', img: 'https://via.placeholder.com/40/7c3aed/fff?text=FN' },
+      { name: 'VALORANT', img: 'https://via.placeholder.com/40/ff4655/fff?text=VAL' },
+      { name: 'Call of Duty: Warzone', img: 'https://via.placeholder.com/40/000/fff?text=COD' },
+      { name: 'Apex Legends', img: 'https://via.placeholder.com/40/cc0000/fff?text=AL' },
+      { name: 'CS:GO 2', img: 'https://via.placeholder.com/40/de9b00/fff?text=CS2' },
+      { name: 'Overwatch 2', img: 'https://via.placeholder.com/40/f99e1a/fff?text=OW2' },
+      { name: 'Minecraft', img: 'https://via.placeholder.com/40/5d7c00/fff?text=MC' },
+      { name: 'League of Legends', img: 'https://via.placeholder.com/40/0596aa/fff?text=LOL' },
+      { name: 'Rocket League', img: 'https://via.placeholder.com/40/0088ff/fff?text=RL' },
+      { name: 'Rainbow Six Siege', img: 'https://via.placeholder.com/40/000/fff?text=R6' },
+      { name: 'Destiny 2', img: 'https://via.placeholder.com/40/545454/fff?text=D2' },
+      { name: 'Halo Infinite', img: 'https://via.placeholder.com/40/107c10/fff?text=HI' },
+      { name: 'PUBG: Battlegrounds', img: 'https://via.placeholder.com/40/f2a900/fff?text=PUBG' },
+      { name: 'Dota 2', img: 'https://via.placeholder.com/40/b32c20/fff?text=D2' },
+      { name: 'World of Warcraft', img: 'https://via.placeholder.com/40/0066cc/fff?text=WOW' },
+      { name: 'Genshin Impact', img: 'https://via.placeholder.com/40/fff/000?text=GI' },
+      { name: 'FIFA 24', img: 'https://via.placeholder.com/40/326295/fff?text=FIFA' },
+      { name: 'NBA 2K24', img: 'https://via.placeholder.com/40/c9082a/fff?text=2K' },
+      { name: 'Madden NFL 24', img: 'https://via.placeholder.com/40/013369/fff?text=NFL' },
+      { name: 'Street Fighter 6', img: 'https://via.placeholder.com/40/ff0000/fff?text=SF6' },
+      { name: 'Tekken 8', img: 'https://via.placeholder.com/40/000/fff?text=T8' },
+      { name: 'Mortal Kombat 1', img: 'https://via.placeholder.com/40/ffcc00/000?text=MK1' },
+      { name: 'Elden Ring', img: 'https://via.placeholder.com/40/d4af37/000?text=ER' },
+      { name: 'Diablo IV', img: 'https://via.placeholder.com/40/8b0000/fff?text=D4' },
+      { name: 'Starfield', img: 'https://via.placeholder.com/40/000080/fff?text=SF' },
+      { name: 'Baldur\'s Gate 3', img: 'https://via.placeholder.com/40/8b4513/fff?text=BG3' },
+      { name: 'Spider-Man 2', img: 'https://via.placeholder.com/40/e20e0e/fff?text=SM2' },
+      { name: 'Helldivers 2', img: 'https://via.placeholder.com/40/ffd700/000?text=HD2' },
+      { name: 'Palworld', img: 'https://via.placeholder.com/40/4169e1/fff?text=PW' },
+      { name: 'The Finals', img: 'https://via.placeholder.com/40/ff6b6b/fff?text=TF' }
+    ];
+
+    // Local storage keys
+    const STORAGE_KEYS = {
+      CURRENT_WALLET: 'mlg_current_wallet',
+      USER_DATA: 'mlg_user_data',
+      CLIPS: 'mlg_clips',
+      USERS: 'mlg_users',
+      WALLET_GAMERTAGS: 'mlg_wallet_gamertags',
+      CUSTOM_CLANS: 'mlg_custom_clans',
+      USER_ACHIEVEMENTS: 'mlg_user_achievements',
+      FRIENDSHIPS: 'mlg_friendships',
+      FRIEND_REQUESTS: 'mlg_friend_requests',
+      CHAT_MESSAGES: 'mlg_chat_messages',
+      DAO_PROPOSALS: 'mlg_dao_proposals',
+      DAILY_LIMITS: 'mlg_daily_limits',
+      LAST_LOGIN: 'mlg_last_login',
+      LOGIN_STREAK: 'mlg_login_streak',
+      MLG_TOKENS: 'mlg_tokens'
+    };
+
+    // Achievement definitions
+    const ACHIEVEMENTS = {
+      firstConnect: { id: 'firstConnect', name: 'Welcome!', desc: 'Connect your wallet', icon: '🎮', points: 10 },
+      firstUpload: { id: 'firstUpload', name: 'Content Creator', desc: 'Upload your first clip', icon: '📹', points: 20 },
+      firstVote: { id: 'firstVote', name: 'Democracy', desc: 'Cast your first vote', icon: '🗳️', points: 10 },
+      tenVotes: { id: 'tenVotes', name: 'Active Voter', desc: 'Cast 10 votes', icon: '✅', points: 30 },
+      fiveUploads: { id: 'fiveUploads', name: 'Clip Master', desc: 'Upload 5 clips', icon: '🎬', points: 50 },
+      hundredVotesReceived: { id: 'hundredVotesReceived', name: 'Popular', desc: 'Receive 100 total votes', icon: '⭐', points: 100 },
+      firstFriend: { id: 'firstFriend', name: 'Social Butterfly', desc: 'Add your first friend', icon: '👥', points: 10 },
+      tenFriends: { id: 'tenFriends', name: 'Influencer', desc: 'Have 10 friends', icon: '🌟', points: 50 },
+      createClan: { id: 'createClan', name: 'Founder', desc: 'Create a custom clan', icon: '🏰', points: 100 },
+      joinClan: { id: 'joinClan', name: 'Team Player', desc: 'Join a custom clan', icon: '🤝', points: 20 },
+      dailyStreak: { id: 'dailyStreak', name: 'Dedicated', desc: 'Login 7 days in a row', icon: '🔥', points: 70 },
+      topClip: { id: 'topClip', name: 'Viral', desc: 'Have a clip reach 50 votes', icon: '🚀', points: 150 },
+      clanOfficer: { id: 'clanOfficer', name: 'Leadership', desc: 'Become a clan officer', icon: '⚔️', points: 75 },
+      mlgVoter: { id: 'mlgVoter', name: 'Token Holder', desc: 'Cast your first MLG vote', icon: '🔥', points: 25 }
+    };
+
+    // Utility functions
+    function generateId() {
+      return Date.now().toString() + Math.random().toString(36).substr(2, 9);
+    }
+
+    function addActivity(message, time, walletAddress = null) {
+      activityLog.unshift({ message, time, wallet: walletAddress });
+      if (activityLog.length > 50) activityLog.pop();
+      updateActivityFeed();
+    }
+
+    function updateActivityFeed() {
+      const feed = document.getElementById('activity-feed');
+      if (!feed) return;
+      
+      feed.innerHTML = activityLog.slice(0, 10).map(activity => {
+        let message = activity.message;
+        
+        // If there's a wallet address and the message contains a gamertag, make it clickable
+        if (activity.wallet && users.has(activity.wallet)) {
+          const user = users.get(activity.wallet);
+          const gamertag = user.gamertag;
+          if (gamertag && message.includes(gamertag)) {
+            const clanInfo = getUserClanTag(activity.wallet);
+            message = message.replace(
+              gamertag, 
+              `<span class="${clanInfo.color} clickable-username" onclick="viewUserProfile('${activity.wallet}')">${gamertag}</span>`
+            );
+          }
+        }
+        
+        return `
+          <div class="flex items-center space-x-2">
+            <span class="text-green-400">●</span>
+            <span>${message}</span>
+            <span class="text-gray-400 text-xs">${activity.time}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Check and update login streak
+    function checkLoginStreak() {
+      const today = new Date().toDateString();
+      
+      if (lastLoginDate) {
+        const lastLogin = new Date(lastLoginDate);
+        const todayDate = new Date();
+        const diffTime = Math.abs(todayDate - lastLogin);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (lastLoginDate === today) {
+          // Already logged in today, no change
+          return;
+        } else if (diffDays === 1) {
+          // Consecutive day
+          loginStreak++;
+          if (loginStreak >= 7) {
+            unlockAchievement('dailyStreak');
+          }
+        } else {
+          // Streak broken
+          loginStreak = 1;
+        }
+      } else {
+        // First login
+        loginStreak = 1;
+      }
+      
+      lastLoginDate = today;
+      saveToStorage(STORAGE_KEYS.LAST_LOGIN, lastLoginDate);
+      saveToStorage(STORAGE_KEYS.LOGIN_STREAK, loginStreak);
+    }
+
+    // Check daily limits
+    function checkDailyLimits() {
+      const today = new Date().toDateString();
+      
+      if (!dailyLimits[currentWallet]) {
+        dailyLimits[currentWallet] = {};
+      }
+      
+      if (dailyLimits[currentWallet].date !== today) {
+        // Reset daily limits
+        dailyLimits[currentWallet] = {
+          date: today,
+          uploads: 0,
+          freeVotes: 0,
+          totalVotes: 0
+        };
+      }
+      
+      updateLimitsDisplay();
+      saveToStorage(STORAGE_KEYS.DAILY_LIMITS, dailyLimits);
+    }
+
+    function updateLimitsDisplay() {
+      if (!currentWallet) {
+        document.getElementById('upload-limit').textContent = '0/3';
+        document.getElementById('free-votes').textContent = '1/1';
+        document.getElementById('total-votes-today').textContent = '0/10';
+        return;
+      }
+      
+      const limits = dailyLimits[currentWallet] || { uploads: 0, freeVotes: 0, totalVotes: 0 };
+      document.getElementById('upload-limit').textContent = `${limits.uploads}/3`;
+      document.getElementById('free-votes').textContent = `${limits.freeVotes}/1`;
+      document.getElementById('total-votes-today').textContent = `${limits.totalVotes}/10`;
+    }
+
+    // Persistence functions
+    function saveToStorage(key, data) {
+      try {
+        const value = data instanceof Map ? Object.fromEntries(data) : data;
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (e) {
+        console.error('Failed to save to storage:', e);
+      }
+    }
+
+    function loadFromStorage(key, defaultValue = null) {
+      try {
+        const stored = localStorage.getItem(key);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          // Handle Maps
+          if (key === STORAGE_KEYS.USERS || key === STORAGE_KEYS.CUSTOM_CLANS || 
+              key === STORAGE_KEYS.WALLET_GAMERTAGS || key === STORAGE_KEYS.FRIENDSHIPS ||
+              key === STORAGE_KEYS.FRIEND_REQUESTS || key === STORAGE_KEYS.DAO_PROPOSALS) {
+            return new Map(Object.entries(parsed));
+          }
+          return parsed;
+        }
+      } catch (e) {
+        console.error('Failed to load from storage:', e);
+      }
+      return defaultValue || (key.includes('Map') ? new Map() : (key === STORAGE_KEYS.CLIPS ? [] : {}));
+    }
+
+    function saveAllData() {
+      saveToStorage(STORAGE_KEYS.CURRENT_WALLET, currentWallet);
+      saveToStorage(STORAGE_KEYS.USER_DATA, userData);
+      saveToStorage(STORAGE_KEYS.CLIPS, clips);
+      saveToStorage(STORAGE_KEYS.USERS, users);
+      saveToStorage(STORAGE_KEYS.WALLET_GAMERTAGS, walletGamertags);
+      saveToStorage(STORAGE_KEYS.CUSTOM_CLANS, customClans);
+      saveToStorage(STORAGE_KEYS.USER_ACHIEVEMENTS, userAchievements);
+      saveToStorage(STORAGE_KEYS.FRIENDSHIPS, friendships);
+      saveToStorage(STORAGE_KEYS.FRIEND_REQUESTS, friendRequests);
+      saveToStorage(STORAGE_KEYS.CHAT_MESSAGES, chatMessages);
+      saveToStorage(STORAGE_KEYS.DAO_PROPOSALS, daoProposals);
+      saveToStorage(STORAGE_KEYS.DAILY_LIMITS, dailyLimits);
+      saveToStorage(STORAGE_KEYS.MLG_TOKENS, mlgTokens);
+    }
+
+    function loadAllData() {
+      currentWallet = loadFromStorage(STORAGE_KEYS.CURRENT_WALLET);
+      userData = loadFromStorage(STORAGE_KEYS.USER_DATA, {});
+      clips = loadFromStorage(STORAGE_KEYS.CLIPS, []);
+      users = loadFromStorage(STORAGE_KEYS.USERS);
+      walletGamertags = loadFromStorage(STORAGE_KEYS.WALLET_GAMERTAGS);
+      customClans = loadFromStorage(STORAGE_KEYS.CUSTOM_CLANS);
+      userAchievements = loadFromStorage(STORAGE_KEYS.USER_ACHIEVEMENTS, {});
+      friendships = loadFromStorage(STORAGE_KEYS.FRIENDSHIPS);
+      friendRequests = loadFromStorage(STORAGE_KEYS.FRIEND_REQUESTS);
+      chatMessages = loadFromStorage(STORAGE_KEYS.CHAT_MESSAGES, { trollbox: [], clan: {}, dm: {} });
+      daoProposals = loadFromStorage(STORAGE_KEYS.DAO_PROPOSALS);
+      dailyLimits = loadFromStorage(STORAGE_KEYS.DAILY_LIMITS, {});
+      lastLoginDate = loadFromStorage(STORAGE_KEYS.LAST_LOGIN);
+      loginStreak = loadFromStorage(STORAGE_KEYS.LOGIN_STREAK, 0);
+      mlgTokens = loadFromStorage(STORAGE_KEYS.MLG_TOKENS, {});
+    }
+
+    // Get user's clan tag and color
+    function getUserClanTag(walletAddress) {
+      // Check if user is in a custom clan
+      for (let clan of customClans.values()) {
+        if (clan.members.includes(walletAddress)) {
+          return {
+            tag: `[${clan.name.toUpperCase()}]`,
+            color: `clan-tag-${clan.color}`
+          };
+        }
+      }
+      // Default MLG clan
+      return {
+        tag: '[MLG]',
+        color: 'clan-tag-purple'
+      };
+    }
+
+    // Page navigation
+    function showPage(pageId) {
+      // Hide all pages
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.add('hidden');
+      });
+      
+      // Show selected page
+      document.getElementById(`${pageId}-page`).classList.remove('hidden');
+      
+      // Update nav links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('text-white', 'font-bold');
+        link.classList.add('text-green-400');
+      });
+      
+      // Highlight current page (simplified approach)
+      const currentLink = document.querySelector(`[onclick="showPage('${pageId}')"]`);
+      if (currentLink) {
+        currentLink.classList.add('text-white', 'font-bold');
+        currentLink.classList.remove('text-green-400');
+      }
+      
+      // Load page-specific content
+      if (pageId === 'profile') {
+        loadProfile();
+      } else if (pageId === 'achievements') {
+        loadAchievements();
+      } else if (pageId === 'roster') {
+        loadRoster();
+      } else if (pageId === 'clan') {
+        updateClanDisplays();
+      } else if (pageId === 'vote-vault') {
+        renderClips();
+      }
+    }
+
+    // Mock wallet connection
+    async function connectWallet() {
+      try {
+        // Check if we already have a stored wallet
+        if (currentWallet && !userData.gamertag) {
+          // Wallet exists but no gamertag
+          showPage('profile');
+          alert('Please set your gamertag to continue.');
+          return;
+        }
+        
+        if (!currentWallet) {
+          // Generate a persistent wallet address
+          currentWallet = 'wallet_' + Math.random().toString(36).substr(2, 9);
+          
+          // Initialize MLG tokens for new wallet
+          mlgTokens[currentWallet] = 100; // Starting balance
+          
+          // Save wallet immediately
+          saveToStorage(STORAGE_KEYS.CURRENT_WALLET, currentWallet);
+          saveToStorage(STORAGE_KEYS.MLG_TOKENS, mlgTokens);
+        }
+        
+        // Check if this wallet has a saved gamertag
+        const savedGamertag = walletGamertags.get(currentWallet);
+        if (savedGamertag) {
+          userData.gamertag = savedGamertag;
+          // Load existing user data
+          const existingUser = users.get(currentWallet);
+          if (existingUser) {
+            userData = { ...existingUser };
+          }
+        }
+        
+        // Update online count
+        const onlineCountEl = document.getElementById('online-count');
+        onlineCountEl.textContent = parseInt(onlineCountEl.textContent) + 1;
+        
+        unlockAchievement('firstConnect');
+        addActivity('Connected wallet', 'now');
+        checkLoginStreak();
+        checkDailyLimits();
+        
+        updateHeaderDisplay();
+        updateStats();
+        saveAllData();
+        
+        if (!userData.gamertag) {
+          showPage('profile');
+          alert('Welcome! Please set your gamertag to continue.');
+        } else {
+          alert('Welcome back, ' + userData.gamertag + '!');
+        }
+      } catch (error) {
+        console.error('Connection failed:', error);
+        alert('Failed to connect wallet. This is a demo - wallet connection is simulated.');
+      }
+    }
+
+    function disconnectWallet() {
+      // Update online count
+      const onlineCountEl = document.getElementById('online-count');
+      const count = parseInt(onlineCountEl.textContent);
+      if (count > 0) {
+        onlineCountEl.textContent = count - 1;
+      }
+      
+      // Clear current session but keep wallet for reconnection
+      const walletToKeep = currentWallet;
+      currentWallet = null;
+      userData = {};
+      
+      // Save that we've disconnected
+      saveToStorage(STORAGE_KEYS.CURRENT_WALLET, null);
+      
+      updateHeaderDisplay();
+      updateStats();
+      showPage('home');
+      addActivity('Disconnected wallet', 'now');
+    }
+
+    // UI Update functions
+    function updateHeaderDisplay() {
+      const userDisplay = document.getElementById('user-display');
+      const connectBtn = document.getElementById('connect-btn');
+      const chatToggleBtn = document.getElementById('chat-toggle-btn');
+      const friendRequestsBtn = document.getElementById('friend-requests-btn');
+      const mlgTokensDisplay = document.getElementById('mlg-tokens-display');
+
+      if (currentWallet && userData.gamertag) {
+        // User is connected and has a gamertag
+        userDisplay.classList.remove('hidden');
+        connectBtn.classList.add('hidden');
+        chatToggleBtn.classList.remove('hidden');
+        friendRequestsBtn.classList.remove('hidden');
+        mlgTokensDisplay.classList.remove('hidden');
+        
+        // Get clan tag
+        const clanInfo = getUserClanTag(currentWallet);
+        
+        // Update user display info
+        document.getElementById('header-clan-tag').innerHTML = `<span class="${clanInfo.color} mr-1">${clanInfo.tag}</span>`;
+        document.getElementById('header-gamertag').textContent = userData.gamertag;
+        document.getElementById('header-wallet').textContent = `${currentWallet.slice(0, 6)}...${currentWallet.slice(-4)}`;
+        document.getElementById('gamerscore-value').textContent = userData.gamerscore || 0;
+        document.getElementById('mlg-tokens-value').textContent = mlgTokens[currentWallet] || 0;
+        
+        // Update friend request count
+        updateFriendRequestBadge();
+      } else if (currentWallet) {
+        // Connected but no gamertag - still show connect button
+        userDisplay.classList.add('hidden');
+        connectBtn.classList.remove('hidden');
+        connectBtn.textContent = 'Set Username';
+        connectBtn.onclick = () => showPage('profile');
+        chatToggleBtn.classList.add('hidden');
+        friendRequestsBtn.classList.add('hidden');
+        mlgTokensDisplay.classList.add('hidden');
+      } else {
+        // Not connected
+        userDisplay.classList.add('hidden');
+        connectBtn.classList.remove('hidden');
+        connectBtn.textContent = 'Connect Wallet';
+        connectBtn.onclick = connectWallet;
+        chatToggleBtn.classList.add('hidden');
+        friendRequestsBtn.classList.add('hidden');
+        mlgTokensDisplay.classList.add('hidden');
+      }
+    }
+
+    function toggleUserMenu() {
+      const dropdown = document.getElementById('user-dropdown');
+      dropdown.classList.toggle('hidden');
+      
+      // Close dropdown when clicking outside
+      if (!dropdown.classList.contains('hidden')) {
+        setTimeout(() => {
+          document.addEventListener('click', closeUserMenu);
+        }, 100);
+      }
+    }
+
+    function closeUserMenu(e) {
+      const dropdown = document.getElementById('user-dropdown');
+      const userMenu = document.querySelector('.user-menu');
+      if (!userMenu.contains(e.target)) {
+        dropdown.classList.add('hidden');
+        document.removeEventListener('click', closeUserMenu);
+      }
+    }
+
+    // Achievement system
+    function unlockAchievement(achievementId) {
+      if (!currentWallet || userAchievements[achievementId]) return;
+      
+      const achievement = ACHIEVEMENTS[achievementId];
+      if (!achievement) return;
+      
+      userAchievements[achievementId] = {
+        unlockedAt: new Date().toISOString(),
+        points: achievement.points
+      };
+      
+      // Update gamerscore
+      userData.gamerscore = (userData.gamerscore || 0) + achievement.points;
+      
+      // Show achievement notification
+      showAchievementNotification(achievement);
+      
+      // Update displays
+      updateHeaderDisplay();
+      
+      // Save progress
+      if (users.has(currentWallet)) {
+        const user = users.get(currentWallet);
+        user.gamerscore = userData.gamerscore;
+        users.set(currentWallet, user);
+      }
+      
+      addActivity(`${userData.gamertag || 'Player'} unlocked achievement: ${achievement.name}`, 'now', currentWallet);
+      saveAllData();
+    }
+
+    function showAchievementNotification(achievement) {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = 'achievement-unlock fixed top-4 right-4 bg-gradient-to-r from-yellow-600 to-yellow-500 text-black p-4 rounded-lg shadow-lg z-50 max-w-sm';
+      notification.innerHTML = `
+        <div class="flex items-center space-x-3">
+          <div class="text-2xl">${achievement.icon}</div>
+          <div>
+            <div class="font-bold">Achievement Unlocked!</div>
+            <div class="text-sm">${achievement.name}</div>
+            <div class="text-xs opacity-80">${achievement.desc} (+${achievement.points}G)</div>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Remove after 5 seconds
+      setTimeout(() => {
+        notification.remove();
+      }, 5000);
+    }
+
+    // Profile management
+    function loadProfile() {
+      updateProfileFormDisplay();
+      
+      if (!currentWallet) return;
+      
+      // Update preview display
+      const clanInfo = getUserClanTag(currentWallet);
+      document.getElementById('preview-clan-tag').innerHTML = `<span class="${clanInfo.color}">${clanInfo.tag}</span>`;
+      document.getElementById('preview-gamertag').textContent = userData.gamertag || 'Not Set';
+      document.getElementById('preview-bio').textContent = userData.bio || 'No bio set';
+      document.getElementById('profile-gamerscore').textContent = (userData.gamerscore || 0) + 'G';
+      document.getElementById('profile-wallet').textContent = `${currentWallet.slice(0, 6)}...${currentWallet.slice(-4)}`;
+      document.getElementById('profile-streak').textContent = `${loginStreak} days`;
+      
+      // Update stats
+      const myFriends = friendships.get(currentWallet) || [];
+      const myClips = clips.filter(c => c.uploader === currentWallet);
+      const myVotes = myClips.reduce((sum, clip) => sum + clip.votes, 0);
+      
+      document.getElementById('profile-friends').textContent = myFriends.length;
+      document.getElementById('profile-clips').textContent = myClips.length;
+      document.getElementById('profile-votes').textContent = myVotes;
+      
+      // Load friends list
+      loadFriendsList();
+    }
+
+    function loadFriendsList() {
+      const container = document.getElementById('friends-list');
+      if (!currentWallet) {
+        container.innerHTML = '<p class="text-gray-400 text-sm col-span-full">Connect wallet to see friends</p>';
+        return;
+      }
+      
+      const myFriends = friendships.get(currentWallet) || [];
+      
+      if (myFriends.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-sm col-span-full">No friends yet. Send friend requests to connect!</p>';
+        return;
+      }
+      
+      container.innerHTML = myFriends.map(friendWallet => {
+        const friend = users.get(friendWallet);
+        const clanInfo = getUserClanTag(friendWallet);
+        return `
+          <div class="bg-gray-700 p-3 rounded-lg">
+            <div class="text-center">
+              <div class="${clanInfo.color} text-sm font-bold mb-1">${clanInfo.tag}</div>
+              <div class="font-bold">${friend?.gamertag || 'Unknown'}</div>
+              <div class="text-xs text-gray-400">${friend?.gamerscore || 0}G</div>
+              <button onclick="viewUserProfile('${friendWallet}')" class="text-green-400 hover:text-green-300 text-xs mt-1">View Profile</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateProfileFormDisplay() {
+      const container = document.getElementById('profile-form-container');
+      
+      if (!currentWallet) {
+        container.innerHTML = `
+          <div class="text-center py-8">
+            <p class="text-gray-400 mb-4">Please connect your wallet to access your profile</p>
+            <button onclick="connectWallet()" class="bg-green-600 hover:bg-green-500 px-6 py-3 rounded-lg font-semibold">
+              Connect Wallet
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const existingGamertag = walletGamertags.get(currentWallet);
+      
+      if (existingGamertag) {
+        // Gamertag is locked for this wallet
+        container.innerHTML = `
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium mb-2">Gamertag (Locked)</label>
+              <div class="bg-gray-700 p-3 rounded-lg border border-gray-600">
+                <div class="font-bold text-lg">${existingGamertag}</div>
+                <div class="text-xs text-gray-400 mt-1">This gamertag is permanently linked to your wallet</div>
+              </div>
+            </div>
+            <form id="profile-form">
+              <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Bio</label>
+                <textarea id="bio" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-green-600 h-24">${userData.bio || ''}</textarea>
+              </div>
+              <button type="submit" class="bg-green-600 hover:bg-green-500 px-6 py-3 rounded-lg font-semibold">
+                Update Bio
+              </button>
+            </form>
+          </div>
+        `;
+        
+        // Add event listener for bio update
+        document.getElementById('profile-form')?.addEventListener('submit', handleBioUpdate);
+      } else {
+        // No gamertag set yet
+        container.innerHTML = `
+          <form id="profile-form">
+            <div class="bg-yellow-900 border border-yellow-600 p-3 rounded-lg mb-4">
+              <p class="text-yellow-200 text-sm">⚠️ Once you set your gamertag, it cannot be changed!</p>
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-2">Choose Your Gamertag</label>
+              <input id="gamertag" type="text" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-green-600" 
+                     minlength="3" maxlength="16" pattern="[a-zA-Z0-9_]+" required>
+              <p class="text-xs text-gray-400 mt-1">3-16 characters, letters, numbers, and underscores only</p>
+            </div>
+            <div class="mb-4">
+              <label class="block text-sm font-medium mb-2">Bio (Optional)</label>
+              <textarea id="bio" class="w-full bg-gray-800 text-white p-3 rounded-lg border border-green-600 h-24"></textarea>
+            </div>
+            <button type="submit" class="bg-green-600 hover:bg-green-500 px-6 py-3 rounded-lg font-semibold w-full">
+              Set Gamertag (Permanent)
+            </button>
+          </form>
+        `;
+        
+        // Add event listener for initial setup
+        document.getElementById('profile-form')?.addEventListener('submit', handleProfileSetup);
+      }
+    }
+
+    function handleProfileSetup(e) {
+      e.preventDefault();
+      
+      const gamertag = document.getElementById('gamertag').value.trim();
+      const bio = document.getElementById('bio').value.trim();
+      
+      if (!currentWallet) {
+        alert('Please connect your wallet first!');
+        return;
+      }
+      
+      // Check if gamertag is already taken
+      for (let [wallet, tag] of walletGamertags.entries()) {
+        if (tag.toLowerCase() === gamertag.toLowerCase() && wallet !== currentWallet) {
+          alert('This gamertag is already taken!');
+          return;
+        }
+      }
+      
+      // Save gamertag permanently
+      walletGamertags.set(currentWallet, gamertag);
+      userData.gamertag = gamertag;
+      userData.bio = bio;
+      
+      // Add to users map
+      users.set(currentWallet, {
+        gamertag,
+        bio,
+        gamerscore: userData.gamerscore || 0,
+        joinedAt: new Date().toISOString(),
+        totalClips: 0,
+        totalVotes: 0
+      });
+      
+      updateHeaderDisplay();
+      updateProfileFormDisplay();
+      saveAllData();
+      
+      alert('Profile created successfully!');
+      addActivity(`${gamertag} joined MLG.clan!`, 'now', currentWallet);
+    }
+
+    function handleBioUpdate(e) {
+      e.preventDefault();
+      
+      const bio = document.getElementById('bio').value.trim();
+      
+      userData.bio = bio;
+      
+      // Update in users map
+      if (users.has(currentWallet)) {
+        const user = users.get(currentWallet);
+        user.bio = bio;
+        users.set(currentWallet, user);
+      }
+      
+      loadProfile();
+      saveAllData();
+      
+      alert('Bio updated successfully!');
+    }
+
+    // Achievements page
+    function loadAchievements() {
+      const container = document.getElementById('achievements-grid');
+      const scoreElement = document.getElementById('achievement-score');
+      
+      const totalScore = userData.gamerscore || 0;
+      scoreElement.textContent = totalScore + 'G';
+      
+      container.innerHTML = Object.values(ACHIEVEMENTS).map(achievement => {
+        const isUnlocked = userAchievements[achievement.id];
+        const unlockedClass = isUnlocked ? 'bg-gradient-to-br from-yellow-600 to-yellow-500' : 'bg-gray-800';
+        const textClass = isUnlocked ? 'text-black' : 'text-gray-400';
+        
+        return `
+          <div class="${unlockedClass} p-6 rounded-lg ${isUnlocked ? 'achievement-unlock' : ''}">
+            <div class="text-center mb-4">
+              <div class="text-4xl mb-3">${achievement.icon}</div>
+              <h3 class="font-bold text-lg mb-2 ${textClass}">${achievement.name}</h3>
+              <p class="text-sm ${textClass} mb-3">${achievement.desc}</p>
+              <div class="font-bold ${textClass}">+${achievement.points}G</div>
+            </div>
+            ${isUnlocked ? `
+              <div class="text-center text-xs text-black opacity-75">
+                Unlocked ${new Date(isUnlocked.unlockedAt).toLocaleDateString()}
+              </div>
+            ` : `
+              <div class="text-center text-xs text-gray-500">
+                Not unlocked yet
+              </div>
+            `}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Roster page
+    function loadRoster() {
+      const container = document.getElementById('roster-list');
+      
+      if (users.size === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-center py-8 col-span-full">No players yet. Connect your wallet to be the first!</p>';
+        return;
+      }
+      
+      const userArray = Array.from(users.entries())
+        .map(([wallet, user]) => ({ wallet, ...user }))
+        .sort((a, b) => (b.gamerscore || 0) - (a.gamerscore || 0));
+      
+      container.innerHTML = userArray.map((user, index) => {
+        const clanInfo = getUserClanTag(user.wallet);
+        const rankEmoji = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🎮';
+        
+        return `
+          <div class="bg-gray-700 p-4 rounded-lg text-center hover:bg-gray-600 cursor-pointer" onclick="viewUserProfile('${user.wallet}')">
+            <div class="text-2xl mb-2">${rankEmoji}</div>
+            <div class="${clanInfo.color} text-sm font-bold mb-1">${clanInfo.tag}</div>
+            <h3 class="font-bold mb-2">${user.gamertag}</h3>
+            <div class="text-yellow-400 font-bold mb-1">${user.gamerscore || 0}G</div>
+            <div class="text-xs text-gray-400">
+              <div>Clips: ${user.totalClips || 0}</div>
+              <div>Votes: ${user.totalVotes || 0}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterRoster() {
+      const searchTerm = document.getElementById('roster-search').value.toLowerCase();
+      const items = document.querySelectorAll('#roster-list > div');
+      
+      items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // Game selection system
+    function searchGames(searchTerm) {
+      const dropdown = document.getElementById('game-dropdown');
+      
+      if (!searchTerm) {
+        showAllGames();
+        return;
+      }
+      
+      const filtered = GAMES_DATABASE.filter(game => 
+        game.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      
+      if (filtered.length === 0) {
+        dropdown.innerHTML = `
+          <div class="game-option">
+            <span class="game-name">No games found. Using custom: "${searchTerm}"</span>
+          </div>
+        `;
+      } else {
+        dropdown.innerHTML = filtered.map(game => `
+          <div class="game-option" onclick="selectGame('${game.name}')">
+            <img src="${game.img}" alt="${game.name}">
+            <span class="game-name">${game.name}</span>
+          </div>
+        `).join('');
+      }
+      
+      dropdown.classList.remove('hidden');
+    }
+
+    function showGameDropdown() {
+      showAllGames();
+    }
+
+    function showAllGames() {
+      const dropdown = document.getElementById('game-dropdown');
+      dropdown.innerHTML = GAMES_DATABASE.map(game => `
+        <div class="game-option" onclick="selectGame('${game.name}')">
+          <img src="${game.img}" alt="${game.name}">
+          <span class="game-name">${game.name}</span>
+        </div>
+      `).join('');
+      dropdown.classList.remove('hidden');
+    }
+
+    function selectGame(gameName) {
+      document.getElementById('clip-game').value = gameName;
+      document.getElementById('game-dropdown').classList.add('hidden');
+    }
+
+    // Hide game dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const gameInput = document.getElementById('clip-game');
+      const dropdown = document.getElementById('game-dropdown');
+      if (gameInput && !gameInput.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    // Clip system
+    function handleUpload(e) {
+      e.preventDefault();
+      
+      if (!currentWallet || !userData.gamertag) {
+        alert('Please connect your wallet and set a gamertag first!');
+        return;
+      }
+      
+      // Check daily upload limit
+      if (dailyLimits[currentWallet]?.uploads >= 3) {
+        alert('You have reached your daily upload limit (3 clips per day)!');
+        return;
+      }
+      
+      const title = document.getElementById('clip-title').value.trim();
+      const game = document.getElementById('clip-game').value.trim();
+      const url = document.getElementById('clip-url').value.trim();
+      
+      if (!title || !game || !url) {
+        alert('Please fill in all fields!');
+        return;
+      }
+      
+      // Create new clip
+      const clip = {
+        id: generateId(),
+        title,
+        game,
+        url: convertToEmbedUrl(url),
+        uploader: currentWallet,
+        uploaderGamertag: userData.gamertag,
+        timestamp: new Date().toISOString(),
+        votes: 0,
+        likes: 0,
+        voters: [],
+        likers: []
+      };
+      
+      clips.unshift(clip);
+      
+      // Update daily limits
+      if (!dailyLimits[currentWallet]) {
+        dailyLimits[currentWallet] = { uploads: 0, freeVotes: 0, totalVotes: 0 };
+      }
+      dailyLimits[currentWallet].uploads++;
+      updateLimitsDisplay();
+      
+      // Update user stats
+      if (users.has(currentWallet)) {
+        const user = users.get(currentWallet);
+        user.totalClips = (user.totalClips || 0) + 1;
+        users.set(currentWallet, user);
+      }
+      
+      // Check achievements
+      const userClipCount = clips.filter(c => c.uploader === currentWallet).length;
+      if (userClipCount === 1) unlockAchievement('firstUpload');
+      if (userClipCount === 5) unlockAchievement('fiveUploads');
+      
+      // Clear form
+      document.getElementById('upload-form').reset();
+      
+      addActivity(`${userData.gamertag} uploaded "${title}" for ${game}`, 'now', currentWallet);
+      updateStats();
+      saveAllData();
+      
+      alert('Clip uploaded successfully!');
+      
+      // Show the clip in showcase if it's the first one
+      if (clips.length === 1) {
+        cycleShowcase();
+      }
+    }
+
+    function convertToEmbedUrl(url) {
+      // Convert YouTube URLs to embed format
+      if (url.includes('youtube.com/watch?v=')) {
+        const videoId = url.split('v=')[1].split('&')[0];
+        return `https://www.youtube.com/embed/${videoId}`;
+      } else if (url.includes('youtu.be/')) {
+        const videoId = url.split('youtu.be/')[1].split('?')[0];
+        return `https://www.youtube.com/embed/${videoId}`;
+      } else if (url.includes('twitch.tv/videos/')) {
+        const videoId = url.split('videos/')[1].split('?')[0];
+        return `https://player.twitch.tv/?video=${videoId}&parent=${window.location.hostname}`;
+      }
+      
+      // For other URLs, return as-is (could add more platforms)
+      return url;
+    }
+
+    function renderClips() {
+      const grid = document.getElementById('clip-grid');
+      if (clips.length === 0) {
+        grid.innerHTML = '<p class="text-gray-400 col-span-full text-center">No clips uploaded yet. Be the first!</p>';
+        return;
+      }
+      
+      const searchTerm = document.getElementById('clip-search')?.value.toLowerCase() || '';
+      const filteredClips = searchTerm ? 
+        clips.filter(clip => 
+          clip.title.toLowerCase().includes(searchTerm) ||
+          clip.game.toLowerCase().includes(searchTerm) ||
+          clip.uploaderGamertag.toLowerCase().includes(searchTerm)
+        ) : clips;
+      
+      if (filteredClips.length === 0) {
+        grid.innerHTML = '<p class="text-gray-400 col-span-full text-center">No clips found matching your search.</p>';
+        return;
+      }
+      
+      grid.innerHTML = filteredClips.map(clip => {
+        const uploader = users.get(clip.uploader);
+        const clanInfo = getUserClanTag(clip.uploader);
+        const hasVoted = clip.voters.includes(currentWallet);
+        const hasLiked = clip.likers.includes(currentWallet);
+        const limits = dailyLimits[currentWallet] || { uploads: 0, freeVotes: 0, totalVotes: 0 };
+        const canVoteFree = !hasVoted && limits.freeVotes < 1 && limits.totalVotes < 10;
+        const canVoteMLG = !hasVoted && limits.totalVotes < 10 && (mlgTokens[currentWallet] || 0) > 0;
+        
+        return `
+          <div class="tile p-4 rounded-lg">
+            <h3 class="font-bold mb-2">${clip.title}</h3>
+            <p class="text-sm text-gray-400 mb-1">${clip.game}</p>
+            <p class="text-xs text-green-400 mb-2">
+              by <span class="${clanInfo.color} cursor-pointer hover:underline" onclick="viewUserProfile('${clip.uploader}')">${clanInfo.tag} ${clip.uploaderGamertag}</span>
+            </p>
+            <div class="flex justify-between items-center text-sm mb-3">
+              <span>Votes: ${clip.votes}</span>
+              <span>Likes: ${clip.likes}</span>
+            </div>
+            <div class="flex gap-2 flex-wrap">
+              <a href="${clip.url}" target="_blank" class="text-green-400 hover:text-green-300 text-sm underline">Watch</a>
+              ${currentWallet && clip.uploader !== currentWallet ? `
+                ${canVoteFree ? `
+                  <button onclick="voteClip('${clip.id}', false)" class="text-blue-400 hover:text-blue-300 text-sm">
+                    👍 Free Vote
+                  </button>
+                ` : ''}
+                ${canVoteMLG ? `
+                  <button onclick="voteClip('${clip.id}', true)" class="mlg-vote-btn px-2 py-1 rounded text-xs text-black font-bold">
+                    🔥 MLG Vote
+                  </button>
+                ` : ''}
+                ${hasVoted ? '<span class="text-gray-400 text-sm">✓ Voted</span>' : ''}
+              ` : ''}
+              <button onclick="likeClip('${clip.id}')" class="text-red-400 hover:text-red-300 text-sm">
+                ❤️ ${hasLiked ? 'Liked' : 'Like'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function searchClips() {
+      renderClips();
+    }
+
+    function voteClip(clipId, useMLG) {
+      if (!currentWallet || !userData.gamertag) {
+        alert('Please connect wallet and set gamertag to vote!');
+        return;
+      }
+      
+      const clip = clips.find(c => c.id === clipId);
+      if (!clip) return;
+      
+      if (clip.uploader === currentWallet) {
+        alert('You cannot vote for your own clip!');
+        return;
+      }
+      
+      if (clip.voters.includes(currentWallet)) {
+        alert('You have already voted for this clip!');
+        return;
+      }
+      
+      // Check daily vote limits
+      const limits = dailyLimits[currentWallet] || { uploads: 0, freeVotes: 0, totalVotes: 0 };
+      
+      if (limits.totalVotes >= 10) {
+        alert('You have reached your daily vote limit (10 votes per day)!');
+        return;
+      }
+      
+      if (useMLG) {
+        // Check MLG token balance
+        if ((mlgTokens[currentWallet] || 0) < 1) {
+          alert('You don\'t have enough MLG tokens!');
+          return;
+        }
+        
+        // Deduct MLG token
+        mlgTokens[currentWallet]--;
+        updateHeaderDisplay();
+        
+        // First MLG vote achievement
+        if (!userAchievements['mlgVoter']) {
+          unlockAchievement('mlgVoter');
+        }
+      } else {
+        // Check free vote limit
+        if (limits.freeVotes >= 1) {
+          alert('You have already used your free vote today! Use MLG tokens to vote more.');
+          return;
+        }
+        dailyLimits[currentWallet].freeVotes++;
+      }
+      
+      clip.votes++;
+      clip.voters.push(currentWallet);
+      dailyLimits[currentWallet].totalVotes++;
+      updateLimitsDisplay();
+      
+      // Update uploader stats
+      if (users.has(clip.uploader)) {
+        const user = users.get(clip.uploader);
+        user.totalVotes = (user.totalVotes || 0) + 1;
+        users.set(clip.uploader, user);
+        
+        // Check for viral achievement
+        if (user.totalVotes >= 100) {
+          // This would unlock for the uploader when they're online
+          addActivity(`${clip.uploaderGamertag} reached 100 total votes!`, 'now');
+        }
+      }
+      
+      // Achievement checks
+      const voterVoteCount = clips.reduce((sum, c) => sum + (c.voters.includes(currentWallet) ? 1 : 0), 0);
+      if (voterVoteCount === 1) unlockAchievement('firstVote');
+      if (voterVoteCount === 10) unlockAchievement('tenVotes');
+      
+      // Check if clip reached 50 votes (viral achievement for uploader)
+      if (clip.votes >= 50 && clip.uploader === currentWallet) {
+        unlockAchievement('topClip');
+        addActivity(`${clip.uploaderGamertag}'s clip "${clip.title}" went viral!`, 'now', clip.uploader);
+      }
+      
+      const voteType = useMLG ? 'MLG vote' : 'vote';
+      addActivity(`${userData.gamertag} ${voteType}d for "${clip.title}"`, 'now', currentWallet);
+      renderClips();
+      updateStats();
+      saveAllData();
+    }
+
+    function likeClip(clipId) {
+      if (!currentWallet || !userData.gamertag) {
+        alert('Please connect wallet and set gamertag to like!');
+        return;
+      }
+      
+      const clip = clips.find(c => c.id === clipId);
+      if (!clip) return;
+      
+      if (clip.likers.includes(currentWallet)) {
+        // Unlike
+        clip.likes--;
+        clip.likers = clip.likers.filter(w => w !== currentWallet);
+      } else {
+        // Like
+        clip.likes++;
+        clip.likers.push(currentWallet);
+      }
+      
+      renderClips();
+      saveAllData();
+    }
+
+    function sortClips() {
+      const sortBy = document.getElementById('sort-clips').value;
+      
+      switch (sortBy) {
+        case 'votes-desc':
+          clips.sort((a, b) => b.votes - a.votes);
+          break;
+        case 'date-desc':
+          clips.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+          break;
+        case 'likes-desc':
+          clips.sort((a, b) => b.likes - a.likes);
+          break;
+      }
+      
+      renderClips();
+    }
+
+    function cycleShowcase() {
+      if (clips.length === 0) return;
+      
+      const clip = clips[showcaseMode % clips.length];
+      const content = document.getElementById('showcase-content');
+      const details = document.getElementById('showcase-details');
+      
+      const clanInfo = getUserClanTag(clip.uploader);
+      
+      // Update showcase content
+      if (clip.url.includes('youtube.com/embed/') || clip.url.includes('player.twitch.tv')) {
+        content.innerHTML = `
+          <div class="video-container">
+            <iframe src="${clip.url}" frameborder="0" allowfullscreen></iframe>
+          </div>
+        `;
+      } else {
+        content.innerHTML = `
+          <div class="bg-black rounded flex items-center justify-center h-full">
+            <a href="${clip.url}" target="_blank" class="text-green-400 hover:text-green-300 underline">
+              View Clip: ${clip.title}
+            </a>
+          </div>
+        `;
+      }
+      
+      // Update details
+      details.innerHTML = `
+        <h3 class="text-xl font-bold mb-2">${clip.title}</h3>
+        <p class="text-gray-300 mb-2">Game: ${clip.game}</p>
+        <p class="text-sm text-green-400 mb-2">
+          by <span class="${clanInfo.color} cursor-pointer hover:underline" onclick="viewUserProfile('${clip.uploader}')">${clanInfo.tag} ${clip.uploaderGamertag}</span>
+        </p>
+        <div class="flex space-x-4 text-sm">
+          <span>👍 ${clip.votes}</span>
+          <span>❤️ ${clip.likes}</span>
+        </div>
+      `;
+      
+      showcaseMode = (showcaseMode + 1) % clips.length;
+    }
+
+    // Update stats
+    function updateStats() {
+      document.getElementById('stats-clips').textContent = clips.length;
+      document.getElementById('stats-users').textContent = users.size;
+      document.getElementById('stats-votes').textContent = clips.reduce((sum, clip) => sum + clip.votes, 0);
+      document.getElementById('stats-clans').textContent = customClans.size + 1;
+      document.getElementById('stats-gamerscore').textContent = Array.from(users.values()).reduce((sum, user) => sum + (user.gamerscore || 0), 0);
+      
+      // Update clan stats
+      const clanClips = clips.filter(c => c.uploader === currentWallet || users.get(c.uploader));
+      document.getElementById('clan-clips').textContent = clanClips.length;
+      document.getElementById('clan-votes').textContent = clanClips.reduce((sum, clip) => sum + clip.votes, 0);
+    }
+
+    // Update friends feed
+    function updateFriendsFeed() {
+      const container = document.getElementById('friends-feed');
+      
+      if (!currentWallet) {
+        container.innerHTML = '<p class="text-gray-400 text-center">Connect wallet and add friends to see their activity!</p>';
+        return;
+      }
+      
+      const myFriends = friendships.get(currentWallet) || [];
+      
+      if (myFriends.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-center">Add friends to see their activity here!</p>';
+        return;
+      }
+      
+      // Get recent clips from friends
+      const friendClips = clips.filter(clip => myFriends.includes(clip.uploader))
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 5);
+      
+      if (friendClips.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-center">No recent activity from friends</p>';
+        return;
+      }
+      
+      container.innerHTML = friendClips.map(clip => {
+        const friend = users.get(clip.uploader);
+        const clanInfo = getUserClanTag(clip.uploader);
+        
+        return `
+          <div class="bg-gray-800 p-4 rounded-lg">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center space-x-2">
+                <span class="text-2xl">🎮</span>
+                <div>
+                  <span class="${clanInfo.color} font-bold cursor-pointer hover:underline" onclick="viewUserProfile('${clip.uploader}')">${clanInfo.tag} ${friend?.gamertag}</span>
+                  <span class="text-gray-400 text-sm"> uploaded</span>
+                </div>
+              </div>
+              <span class="text-xs text-gray-400">recently</span>
+            </div>
+            <h4 class="font-bold mb-1">${clip.title}</h4>
+            <p class="text-sm text-gray-400 mb-2">${clip.game}</p>
+            <div class="flex justify-between items-center">
+              <div class="text-sm">
+                <span class="mr-3">👍 ${clip.votes}</span>
+                <span>❤️ ${clip.likes}</span>
+              </div>
+              <a href="${clip.url}" target="_blank" class="text-green-400 hover:text-green-300 text-sm">Watch →</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Clan management functions
+    function showClanTab(tab) {
+      // Update tab styles
+      document.getElementById('main-clan-tab').classList.remove('active', 'text-green-400', 'border-green-500');
+      document.getElementById('custom-clan-tab').classList.remove('active', 'text-green-400', 'border-green-500');
+      document.getElementById('main-clan-tab').classList.add('text-gray-400', 'border-transparent');
+      document.getElementById('custom-clan-tab').classList.add('text-gray-400', 'border-transparent');
+      
+      document.getElementById(`${tab}-clan-tab`).classList.add('active', 'text-green-400', 'border-green-500');
+      document.getElementById(`${tab}-clan-tab`).classList.remove('text-gray-400', 'border-transparent');
+      
+      // Show/hide content
+      document.getElementById('main-clan-content').classList.toggle('hidden', tab !== 'main');
+      document.getElementById('custom-clan-content').classList.toggle('hidden', tab !== 'custom');
+      
+      if (tab === 'custom') {
+        updateCustomClansDisplay();
+      } else {
+        updateMainClanDisplay();
+      }
+    }
+
+    function updateMainClanDisplay() {
+      const membersContainer = document.getElementById('main-clan-members');
+      const memberCount = document.getElementById('clan-members');
+      
+      if (users.size === 0) {
+        membersContainer.innerHTML = `
+          <div class="bg-gray-700 p-3 rounded text-center">
+            <div class="text-purple-500 font-bold text-sm mb-1">[MLG]</div>
+            <div class="font-bold text-sm">Connect wallet to see members</div>
+          </div>
+        `;
+        memberCount.textContent = '0';
+        return;
+      }
+      
+      const mlgMembers = Array.from(users.entries()).filter(([wallet]) => {
+        // Check if user is NOT in a custom clan
+        for (let clan of customClans.values()) {
+          if (clan.members.includes(wallet)) return false;
+        }
+        return true;
+      });
+      
+      memberCount.textContent = mlgMembers.length;
+      
+      membersContainer.innerHTML = mlgMembers.map(([wallet, user]) => `
+        <div class="bg-gray-700 p-3 rounded text-center hover:bg-gray-600 cursor-pointer" onclick="viewUserProfile('${wallet}')">
+          <div class="text-purple-500 font-bold text-sm mb-1">[MLG]</div>
+          <div class="font-bold text-sm">${user.gamertag}</div>
+          <div class="text-xs text-gray-400">${user.gamerscore || 0}G</div>
+        </div>
+      `).join('');
+    }
+
+    function updateCustomClansDisplay() {
+      const container = document.getElementById('custom-clans-list');
+      const countElement = document.getElementById('custom-clans-count');
+      const membersElement = document.getElementById('custom-clan-members');
+      
+      countElement.textContent = customClans.size;
+      
+      let totalCustomMembers = 0;
+      for (let clan of customClans.values()) {
+        totalCustomMembers += clan.members.length;
+      }
+      membersElement.textContent = totalCustomMembers;
+      
+      if (customClans.size === 0) {
+        container.innerHTML = `
+          <div class="tile p-6 rounded-lg text-center">
+            <h3 class="font-bold text-gray-400 mb-2">No Custom Clans Yet</h3>
+            <p class="text-sm text-gray-500 mb-4">Be the first to create a custom clan!</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = Array.from(customClans.values()).map(clan => `
+        <div class="clan-card ${clan.color} p-6 rounded-lg">
+          <div class="text-center mb-4">
+            <h3 class="font-bold text-xl mb-2 clan-tag-${clan.color}">[${clan.name.toUpperCase()}]</h3>
+            <p class="text-sm text-gray-300 mb-3">${clan.description}</p>
+            <div class="grid grid-cols-2 gap-3 text-center mb-4">
+              <div>
+                <div class="font-bold text-lg">${clan.members.length}</div>
+                <div class="text-xs text-gray-400">Members</div>
+              </div>
+              <div>
+                <div class="font-bold text-lg">${clan.treasury || 0}</div>
+                <div class="text-xs text-gray-400">Treasury</div>
+              </div>
+            </div>
+          </div>
+          <div class="flex gap-2 justify-center">
+            ${currentWallet && clan.members.includes(currentWallet) ? 
+              `<button onclick="openClanDashboard('${clan.id}')" class="bg-green-600 hover:bg-green-500 px-4 py-2 rounded text-sm font-semibold">
+                Dashboard
+              </button>
+              <button onclick="leaveClan('${clan.id}')" class="bg-red-600 hover:bg-red-500 px-4 py-2 rounded text-sm">
+                Leave
+              </button>` :
+              `<button onclick="joinClan('${clan.id}')" class="bg-green-600 hover:bg-green-500 px-4 py-2 rounded text-sm font-semibold">
+                Join Clan
+              </button>`
+            }
+            <button onclick="viewClanInfo('${clan.id}')" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded text-sm">
+              View Info
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateClanDisplays() {
+      updateMainClanDisplay();
+      updateCustomClansDisplay();
+    }
+
+    function showCreateClanModal() {
+      if (!currentWallet) {
+        alert('Please connect your wallet first!');
+        return;
+      }
+      if (!userData.gamertag) {
+        alert('Please set your gamertag first!');
+        showPage('profile');
+        return;
+      }
+      document.getElementById('create-clan-modal').classList.remove('hidden');
+    }
+
+    function closeCreateClanModal() {
+      document.getElementById('create-clan-modal').classList.add('hidden');
+    }
+
+    function createClan(name, description, color) {
+      if (!currentWallet || !userData.gamertag) {
+        alert('Please set your gamertag first!');
+        return false;
+      }
+
+      // Check if clan name is taken
+      const upperName = name.toUpperCase();
+      for (let clan of customClans.values()) {
+        if (clan.name.toUpperCase() === upperName) {
+          alert('Clan name already taken!');
+          return false;
+        }
+      }
+
+      const clanId = generateId();
+      const newClan = {
+        id: clanId,
+        name: name,
+        description: description,
+        color: color,
+        creator: userData.gamertag,
+        creatorWallet: currentWallet,
+        members: [currentWallet],
+        officers: [],
+        clips: 0,
+        votes: 0,
+        treasury: 0,
+        created: new Date().toISOString()
+      };
+
+      customClans.set(clanId, newClan);
+      unlockAchievement('createClan');
+      addActivity(`${userData.gamertag} created clan [${name.toUpperCase()}]`, 'now', currentWallet);
+      saveAllData();
+      updateClanDisplays();
+      updateHeaderDisplay(); // Update clan tag in header
+      return true;
+    }
+
+    function joinClan(clanId) {
+      if (!currentWallet) {
+        alert('Please connect your wallet first!');
+        return;
+      }
+
+      if (!userData.gamertag) {
+        alert('Please set your gamertag first!');
+        showPage('profile');
+        return;
+      }
+
+      // Check if already in a custom clan
+      for (let clan of customClans.values()) {
+        if (clan.members.includes(currentWallet)) {
+          alert('You must leave your current clan first!');
+          return;
+        }
+      }
+
+      const clan = customClans.get(clanId);
+      if (clan && !clan.members.includes(currentWallet)) {
+        clan.members.push(currentWallet);
+        unlockAchievement('joinClan');
+        addActivity(`${userData.gamertag} joined clan [${clan.name.toUpperCase()}]`, 'now', currentWallet);
+        saveAllData();
+        updateClanDisplays();
+        updateHeaderDisplay(); // Update clan tag in header
+        alert(`Successfully joined [${clan.name.toUpperCase()}] clan!`);
+      }
+    }
+
+    function leaveClan(clanId) {
+      if (!currentWallet) return;
+
+      const clan = customClans.get(clanId);
+      if (clan) {
+        if (clan.creatorWallet === currentWallet) {
+          if (!confirm('You are the owner! Leaving will disband the clan. Continue?')) {
+            return;
+          }
+          customClans.delete(clanId);
+          addActivity(`Disbanded clan [${clan.name.toUpperCase()}]`, 'now');
+        } else {
+          clan.members = clan.members.filter(member => member !== currentWallet);
+          clan.officers = clan.officers?.filter(officer => officer !== currentWallet) || [];
+          addActivity(`Left clan [${clan.name.toUpperCase()}]`, 'now');
+        }
+        saveAllData();
+        updateClanDisplays();
+        updateHeaderDisplay(); // Update clan tag in header
+      }
+    }
+
+    function openClanDashboard(clanId) {
+      const clan = customClans.get(clanId);
+      if (!clan) return;
+      
+      const isOwner = clan.creatorWallet === currentWallet;
+      const isOfficer = clan.officers?.includes(currentWallet);
+      
+      document.getElementById('clan-dashboard-content').innerHTML = `
+        <div class="max-w-4xl mx-auto">
+          <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold clan-tag-${clan.color}">[${clan.name.toUpperCase()}] Dashboard</h1>
+            <button onclick="showPage('clan')" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded">
+              ← Back to Clans
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div class="tile p-6 rounded-lg">
+              <h3 class="font-bold mb-3">Clan Stats</h3>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between"><span>Members:</span><span class="text-green-400">${clan.members.length}</span></div>
+                <div class="flex justify-between"><span>Officers:</span><span class="text-blue-400">${clan.officers?.length || 0}/2</span></div>
+                <div class="flex justify-between"><span>Treasury:</span><span class="text-yellow-400">${clan.treasury || 0}</span></div>
+                <div class="flex justify-between"><span>Created:</span><span class="text-gray-400">${new Date(clan.created).toLocaleDateString()}</span></div>
+              </div>
+            </div>
+            
+            <div class="tile p-6 rounded-lg">
+              <h3 class="font-bold mb-3">Management</h3>
+              <div class="space-y-2">
+                ${isOwner ? `
+                  <button onclick="showManageOfficers('${clanId}')" class="w-full bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded text-sm">
+                    Manage Officers
+                  </button>
+                  <button onclick="showClanSettings('${clanId}')" class="w-full bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded text-sm">
+                    Clan Settings
+                  </button>
+                ` : ''}
+                ${isOwner || isOfficer ? `
+                  <button onclick="toggleChat('clan')" class="w-full bg-green-600 hover:bg-green-500 px-4 py-2 rounded text-sm">
+                    Open Clan Chat
+                  </button>
+                ` : ''}
+              </div>
+            </div>
+            
+            <div class="tile p-6 rounded-lg">
+              <h3 class="font-bold mb-3">Quick Actions</h3>
+              <div class="space-y-2">
+                <button onclick="showPage('upload')" class="w-full bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded text-sm">
+                  Upload Clip
+                </button>
+                <button onclick="showPage('vote-vault')" class="w-full bg-orange-600 hover:bg-orange-500 px-4 py-2 rounded text-sm">
+                  Vote on Clips
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="tile p-6 rounded-lg">
+            <h3 class="font-bold mb-4">Clan Members</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              ${clan.members.map(memberWallet => {
+                const member = users.get(memberWallet);
+                const isOwnerMember = memberWallet === clan.creatorWallet;
+                const isOfficerMember = clan.officers?.includes(memberWallet);
+                
+                return `
+                  <div class="bg-gray-700 p-3 rounded-lg text-center">
+                    <div class="text-2xl mb-2">🎮</div>
+                    <div class="font-bold">${member?.gamertag || 'Unknown'}</div>
+                    <div class="text-xs text-gray-400 mb-2">${member?.gamerscore || 0}G</div>
+                    ${isOwnerMember ? '<div class="text-xs bg-yellow-600 text-black px-2 py-1 rounded font-bold">OWNER</div>' : ''}
+                    ${isOfficerMember && !isOwnerMember ? '<div class="officer-badge">OFFICER</div>' : ''}
+                    ${isOwner && !isOwnerMember ? `
+                      <button onclick="kickFromClan('${clanId}', '${memberWallet}')" class="text-red-400 hover:text-red-300 text-xs mt-2">
+                        Kick
+                      </button>
+                    ` : ''}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+      
+      showPage('clan-dashboard');
+    }
+
+    function kickFromClan(clanId, memberWallet) {
+      if (!confirm('Are you sure you want to kick this member?')) return;
+      
+      const clan = customClans.get(clanId);
+      if (clan) {
+        clan.members = clan.members.filter(m => m !== memberWallet);
+        clan.officers = clan.officers?.filter(o => o !== memberWallet) || [];
+        saveAllData();
+        openClanDashboard(clanId);
+        addActivity(`Kicked member from clan`, 'now');
+      }
+    }
+
+    function showManageOfficers(clanId) {
+      const clan = customClans.get(clanId);
+      if (!clan || clan.creatorWallet !== currentWallet) return;
+      
+      const modal = document.getElementById('officer-modal');
+      const content = document.getElementById('officer-management-content');
+      
+      const eligibleMembers = clan.members.filter(m => m !== currentWallet && !clan.officers?.includes(m));
+      
+      content.innerHTML = `
+        <div class="mb-4">
+          <h3 class="font-bold mb-2">Current Officers (${clan.officers?.length || 0}/2)</h3>
+          ${clan.officers?.length ? clan.officers.map(officerWallet => {
+            const officer = users.get(officerWallet);
+            return `
+              <div class="bg-gray-700 p-3 rounded mb-2 flex justify-between items-center">
+                <span>${officer?.gamertag || 'Unknown'}</span>
+                <button onclick="removeOfficer('${clanId}', '${officerWallet}')" class="bg-red-600 hover:bg-red-500 px-3 py-1 rounded text-sm">
+                  Remove
+                </button>
+              </div>
+            `;
+          }).join('') : '<p class="text-gray-400 text-sm">No officers appointed</p>'}
+        </div>
+        
+        ${clan.officers?.length < 2 && eligibleMembers.length > 0 ? `
+          <div>
+            <h3 class="font-bold mb-2">Appoint New Officer</h3>
+            <div class="space-y-2">
+              ${eligibleMembers.map(memberWallet => {
+                const member = users.get(memberWallet);
+                return `
+                  <div class="bg-gray-700 p-3 rounded flex justify-between items-center">
+                    <span>${member?.gamertag || 'Unknown'}</span>
+                    <button onclick="appointOfficer('${clanId}', '${memberWallet}')" class="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded text-sm">
+                      Appoint
+                    </button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        ` : ''}
+      `;
+      
+      modal.classList.remove('hidden');
+    }
+
+    function closeOfficerModal() {
+      document.getElementById('officer-modal').classList.add('hidden');
+    }
+
+    function appointOfficer(clanId, memberWallet) {
+      const clan = customClans.get(clanId);
+      if (clan && clan.officers?.length < 2) {
+        if (!clan.officers) clan.officers = [];
+        clan.officers.push(memberWallet);
+        
+        // Check if the user is online to give them the achievement
+        if (memberWallet === currentWallet) {
+          unlockAchievement('clanOfficer');
+        }
+        
+        saveAllData();
+        showManageOfficers(clanId);
+        addActivity(`Appointed new officer in clan`, 'now');
+      }
+    }
+
+    function removeOfficer(clanId, officerWallet) {
+      const clan = customClans.get(clanId);
+      if (clan) {
+        clan.officers = clan.officers.filter(o => o !== officerWallet);
+        saveAllData();
+        showManageOfficers(clanId);
+        addActivity(`Removed officer from clan`, 'now');
+      }
+    }
+
+    function showClanSettings(clanId) {
+      const clan = customClans.get(clanId);
+      if (!clan || clan.creatorWallet !== currentWallet) return;
+      
+      const modal = document.getElementById('clan-settings-modal');
+      const content = document.getElementById('clan-settings-content');
+      
+      content.innerHTML = `
+        <form onsubmit="updateClanSettings(event, '${clanId}')">
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">Clan Description</label>
+            <textarea id="edit-clan-description" class="w-full bg-gray-700 text-white p-3 rounded-lg h-20" maxlength="100">${clan.description}</textarea>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium mb-2">Clan Color</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex items-center space-x-2">
+                <input type="radio" name="edit-clan-color" value="red" ${clan.color === 'red' ? 'checked' : ''}>
+                <span class="clan-tag-red">[${clan.name.toUpperCase()}] Red</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="radio" name="edit-clan-color" value="blue" ${clan.color === 'blue' ? 'checked' : ''}>
+                <span class="clan-tag-blue">[${clan.name.toUpperCase()}] Blue</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="radio" name="edit-clan-color" value="purple" ${clan.color === 'purple' ? 'checked' : ''}>
+                <span class="clan-tag-purple">[${clan.name.toUpperCase()}] Purple</span>
+              </label>
+              <label class="flex items-center space-x-2">
+                <input type="radio" name="edit-clan-color" value="yellow" ${clan.color === 'yellow' ? 'checked' : ''}>
+                <span class="clan-tag-yellow">[${clan.name.toUpperCase()}] Yellow</span>
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-green-600 hover:bg-green-500 px-6 py-3 rounded-lg font-semibold">
+            Save Changes
+          </button>
+        </form>
+      `;
+      
+      modal.classList.remove('hidden');
+    }
+
+    function closeClanSettingsModal() {
+      document.getElementById('clan-settings-modal').classList.add('hidden');
+    }
+
+    function updateClanSettings(event, clanId) {
+      event.preventDefault();
+      
+      const clan = customClans.get(clanId);
+      if (!clan) return;
+      
+      clan.description = document.getElementById('edit-clan-description').value.trim();
+      clan.color = document.querySelector('input[name="edit-clan-color"]:checked').value;
+      
+      saveAllData();
+      closeClanSettingsModal();
+      openClanDashboard(clanId);
+      updateHeaderDisplay();
+      addActivity('Updated clan settings', 'now');
+    }
+
+    function viewClanInfo(clanId) {
+      const clan = customClans.get(clanId);
+      if (!clan) return;
+      
+      alert(`Clan: [${clan.name.toUpperCase()}]\nDescription: ${clan.description}\nMembers: ${clan.members.length}\nCreated: ${new Date(clan.created).toLocaleDateString()}\nCreator: ${clan.creator}`);
+    }
+
+    // User Profile Modal with recent clips
+    function viewUserProfile(walletAddress) {
+      // Don't open profile modal for self - redirect to profile page instead
+      if (walletAddress === currentWallet) {
+        showPage('profile');
+        return;
+      }
+      
+      const user = users.get(walletAddress);
+      if (!user) {
+        console.error('User not found for wallet:', walletAddress);
+        return;
+      }
+      
+      const clanInfo = getUserClanTag(walletAddress);
+      const isFriend = friendships.get(currentWallet)?.includes(walletAddress);
+      const hasPendingRequest = friendRequests.get(walletAddress)?.includes(currentWallet);
+      const hasSentRequest = friendRequests.get(currentWallet)?.includes(walletAddress);
+      
+      // Get user's recent clips
+      const userClips = clips.filter(c => c.uploader === walletAddress)
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 5);
+      
+      const modalContent = document.getElementById('modal-profile-content');
+      modalContent.innerHTML = `
+        <div class="text-center mb-6">
+          <div class="w-24 h-24 bg-green-600 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl">🎮</div>
+          <div class="${clanInfo.color} text-xl font-bold mb-2">${clanInfo.tag}</div>
+          <h3 class="text-2xl font-bold mb-2">${user.gamertag}</h3>
+          <p class="text-gray-300 mb-3">${user.bio || 'No bio set'}</p>
+          <div class="text-3xl font-bold text-yellow-400">${user.gamerscore || 0}G</div>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="bg-gray-700 p-3 rounded text-center">
+            <div class="text-2xl font-bold text-purple-400">${user.totalClips || 0}</div>
+            <div class="text-sm text-gray-400">Clips</div>
+          </div>
+          <div class="bg-gray-700 p-3 rounded text-center">
+            <div class="text-2xl font-bold text-orange-400">${user.totalVotes || 0}</div>
+            <div class="text-sm text-gray-400">Votes Received</div>
+          </div>
+        </div>
+        
+        ${userClips.length > 0 ? `
+          <div class="mb-6">
+            <h4 class="font-bold mb-3 xbox-green">Recent Clips</h4>
+            <div class="recent-clips-section">
+              ${userClips.map(clip => `
+                <div class="clip-preview">
+                  <div class="flex justify-between items-start mb-2">
+                    <div>
+                      <h5 class="font-bold text-sm">${clip.title}</h5>
+                      <p class="text-xs text-gray-400">${clip.game}</p>
+                    </div>
+                    <span class="text-xs text-gray-400">${new Date(clip.timestamp).toLocaleDateString()}</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <div class="text-xs">
+                      <span class="mr-3">👍 ${clip.votes}</span>
+                      <span>❤️ ${clip.likes}</span>
+                    </div>
+                    <a href="${clip.url}" target="_blank" class="text-green-400 hover:text-green-300 text-xs">Watch</a>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+        
+        ${currentWallet && walletAddress !== currentWallet ? `
+          <div class="text-center">
+            ${isFriend ? 
+              '<span class="text-green-400 font-bold">✓ Friends</span>' :
+              (hasPendingRequest ? 
+                '<span class="text-yellow-400">Friend request pending</span>' :
+                (hasSentRequest ?
+                  `<div>
+                    <span class="text-yellow-400 block mb-2">Sent you a friend request</span>
+                    <button onclick="acceptFriendRequest('${walletAddress}')" class="bg-green-600 hover:bg-green-500 px-4 py-2 rounded mr-2">Accept</button>
+                    <button onclick="rejectFriendRequest('${walletAddress}')" class="bg-red-600 hover:bg-red-500 px-4 py-2 rounded">Reject</button>
+                  </div>` :
+                  `<button onclick="sendFriendRequest('${walletAddress}')" class="bg-green-600 hover:bg-green-500 px-6 py-3 rounded-lg font-semibold">
+                    Send Friend Request
+                  </button>`
+                )
+              )
+            }
+          </div>
+        ` : walletAddress === currentWallet ? '<div class="text-center text-gray-400">This is your profile</div>' : ''}
+      `;
+      
+      document.getElementById('user-profile-modal').classList.remove('hidden');
+    }
+
+    function closeUserProfileModal() {
+      document.getElementById('user-profile-modal').classList.add('hidden');
+    }
+
+    // Friend System
+    function sendFriendRequest(targetWallet) {
+      if (!currentWallet || !userData.gamertag) {
+        alert('Please connect wallet and set gamertag first!');
+        return;
+      }
+      
+      if (targetWallet === currentWallet) {
+        alert("You can't send a friend request to yourself!");
+        return;
+      }
+      
+      // Check if already friends
+      const currentFriends = friendships.get(currentWallet) || [];
+      if (currentFriends.includes(targetWallet)) {
+        alert('You are already friends!');
+        return;
+      }
+      
+      // Check if request already sent
+      const pendingRequests = friendRequests.get(targetWallet) || [];
+      if (pendingRequests.includes(currentWallet)) {
+        alert('Friend request already sent!');
+        return;
+      }
+      
+      // Add friend request
+      pendingRequests.push(currentWallet);
+      friendRequests.set(targetWallet, pendingRequests);
+      
+      const targetUser = users.get(targetWallet);
+      addActivity(`${userData.gamertag} sent friend request to ${targetUser?.gamertag || 'user'}`, 'now', currentWallet);
+      saveAllData();
+      
+      // Update UI
+      closeUserProfileModal();
+      updateFriendRequestBadge();
+      
+      alert('Friend request sent!');
+    }
+
+    function acceptFriendRequest(requesterWallet) {
+      if (!currentWallet) return;
+      
+      // Remove from pending requests
+      const myRequests = friendRequests.get(currentWallet) || [];
+      const updatedRequests = myRequests.filter(w => w !== requesterWallet);
+      friendRequests.set(currentWallet, updatedRequests);
+      
+      // Add to friendships (bidirectional)
+      const myFriends = friendships.get(currentWallet) || [];
+      const theirFriends = friendships.get(requesterWallet) || [];
+      
+      myFriends.push(requesterWallet);
+      theirFriends.push(currentWallet);
+      
+      friendships.set(currentWallet, myFriends);
+      friendships.set(requesterWallet, theirFriends);
+      
+      // Achievement check
+      if (myFriends.length === 1) {
+        unlockAchievement('firstFriend');
+      }
+      if (myFriends.length >= 10) {
+        unlockAchievement('tenFriends');
+      }
+      
+      const requesterUser = users.get(requesterWallet);
+      addActivity(`${userData.gamertag} accepted friend request from ${requesterUser?.gamertag || 'user'}`, 'now', currentWallet);
+      saveAllData();
+      
+      updateFriendRequestBadge();
+      renderFriendRequests();
+      updateFriendsFeed();
+      loadProfile();
+      closeUserProfileModal();
+    }
+
+    function rejectFriendRequest(requesterWallet) {
+      if (!currentWallet) return;
+      
+      const myRequests = friendRequests.get(currentWallet) || [];
+      const updatedRequests = myRequests.filter(w => w !== requesterWallet);
+      friendRequests.set(currentWallet, updatedRequests);
+      
+      saveAllData();
+      updateFriendRequestBadge();
+      renderFriendRequests();
+      closeUserProfileModal();
+    }
+
+    function updateFriendRequestBadge() {
+      if (!currentWallet) return;
+      
+      const myRequests = friendRequests.get(currentWallet) || [];
+      const count = myRequests.length;
+      
+      const badge = document.getElementById('friend-request-count');
+      const friendsBadge = document.getElementById('friends-badge');
+      
+      if (count > 0) {
+        badge.textContent = count;
+        badge.classList.remove('hidden');
+        if (friendsBadge) {
+          friendsBadge.textContent = count;
+          friendsBadge.classList.remove('hidden');
+        }
+      } else {
+        badge.classList.add('hidden');
+        if (friendsBadge) {
+          friendsBadge.classList.add('hidden');
+        }
+      }
+    }
+
+    function renderFriendRequests() {
+      const container = document.getElementById('friend-requests-list');
+      if (!container) return;
+      
+      const myRequests = friendRequests.get(currentWallet) || [];
+      
+      if (myRequests.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-xs">No pending requests</p>';
+        return;
+      }
+      
+      container.innerHTML = myRequests.map(requesterWallet => {
+        const requester = users.get(requesterWallet);
+        return `
+          <div class="friend-request-item">
+            <div>
+              <div class="font-bold text-sm">${requester?.gamertag || 'Unknown'}</div>
+              <div class="text-xs text-gray-400">${requester?.gamerscore || 0}G</div>
+            </div>
+            <div class="flex gap-1">
+              <button onclick="acceptFriendRequest('${requesterWallet}')" class="bg-green-600 hover:bg-green-500 px-2 py-1 rounded text-xs">
+                ✓
+              </button>
+              <button onclick="rejectFriendRequest('${requesterWallet}')" class="bg-red-600 hover:bg-red-500 px-2 py-1 rounded text-xs">
+                ×
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Chat System
+    function toggleChat(tab = null) {
+      const container = document.getElementById('chat-container');
+      const toggleBtn = document.getElementById('chat-toggle-btn');
+      
+      if (container.classList.contains('hidden')) {
+        container.classList.remove('hidden');
+        toggleBtn.classList.add('hidden');
+        chatMinimized = false;
+        if (tab) {
+          switchChatTab(null, tab);
+        }
+      } else {
+        container.classList.add('hidden');
+        toggleBtn.classList.remove('hidden');
+      }
+    }
+
+    function closeChat() {
+      document.getElementById('chat-container').classList.add('hidden');
+      document.getElementById('chat-toggle-btn').classList.remove('hidden');
+    }
+
+    function toggleChatMinimize() {
+      const container = document.getElementById('chat-container');
+      const body = document.getElementById('chat-body');
+      
+      chatMinimized = !chatMinimized;
+      
+      if (chatMinimized) {
+        container.classList.add('minimized');
+        body.classList.add('hidden');
+      } else {
+        container.classList.remove('minimized');
+        body.classList.remove('hidden');
+      }
+    }
+
+    function switchChatTab(event, tab) {
+      currentChatTab = tab;
+      
+      // Update tab styles
+      document.querySelectorAll('.chat-tab').forEach(t => t.classList.remove('active'));
+      if (event && event.target) {
+        event.target.classList.add('active');
+      } else {
+        // Find tab by text content
+        document.querySelectorAll('.chat-tab').forEach(t => {
+          if (t.textContent.toLowerCase().includes(tab.toLowerCase())) {
+            t.classList.add('active');
+          }
+        });
+      }
+      
+      // Hide all tab contents
+      document.getElementById('trollbox-tab').classList.add('hidden');
+      document.getElementById('clan-tab').classList.add('hidden');
+      document.getElementById('friends-tab').classList.add('hidden');
+      document.getElementById('dm-tab').classList.add('hidden');
+      
+      // Show selected tab
+      document.getElementById(`${tab}-tab`).classList.remove('hidden');
+      
+      // Update input visibility
+      const inputContainer = document.querySelector('.chat-input-container');
+      if (tab === 'friends') {
+        inputContainer.classList.add('hidden');
+        renderFriendRequests();
+        renderOnlineFriends();
+      } else {
+        inputContainer.classList.remove('hidden');
+      }
+      
+      // Load messages for the tab
+      if (tab === 'trollbox') {
+        renderTrollboxMessages();
+      } else if (tab === 'clan') {
+        renderClanMessages();
+      } else if (tab === 'dm') {
+        if (currentDMUser) {
+          renderDMMessages(currentDMUser);
+        } else {
+          renderDMList();
+        }
+      }
+    }
+
+    function renderTrollboxMessages() {
+      const container = document.getElementById('trollbox-tab');
+      const messages = chatMessages.trollbox || [];
+      
+      container.innerHTML = '<div class="text-center text-gray-400 text-xs mb-2">Welcome to the Trollbox! Be respectful.</div>';
+      
+      messages.slice(-50).forEach(msg => {
+        // Use authorWallet if available, otherwise try to find it
+        let authorWallet = msg.authorWallet;
+        if (!authorWallet) {
+          for (let [wallet, user] of users.entries()) {
+            if (user.gamertag === msg.author) {
+              authorWallet = wallet;
+              break;
+            }
+          }
+        }
+        
+        container.innerHTML += `
+          <div class="chat-message">
+            <span class="author ${msg.clanColor}">${msg.clanTag}</span>
+            <span class="author ${authorWallet ? 'cursor-pointer hover:underline' : ''}" ${authorWallet ? `onclick="viewUserProfile('${authorWallet}')"` : ''}>${msg.author}:</span>
+            <span>${msg.text}</span>
+            <span class="time">${msg.time}</span>
+          </div>
+        `;
+      });
+      
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function renderClanMessages() {
+      const container = document.getElementById('clan-tab');
+      
+      // Find user's clan
+      let userClan = null;
+      for (let clan of customClans.values()) {
+        if (clan.members.includes(currentWallet)) {
+          userClan = clan;
+          break;
+        }
+      }
+      
+      if (!userClan) {
+        container.innerHTML = '<div class="text-center text-gray-400 text-xs">Join a custom clan to access clan chat</div>';
+        return;
+      }
+      
+      const messages = chatMessages.clan[userClan.id] || [];
+      
+      container.innerHTML = `<div class="text-center text-gray-400 text-xs mb-2">[${userClan.name.toUpperCase()}] Clan Chat</div>`;
+      
+      messages.slice(-50).forEach(msg => {
+        // Use authorWallet if available, otherwise try to find it
+        let authorWallet = msg.authorWallet;
+        if (!authorWallet) {
+          for (let [wallet, user] of users.entries()) {
+            if (user.gamertag === msg.author) {
+              authorWallet = wallet;
+              break;
+            }
+          }
+        }
+        
+        container.innerHTML += `
+          <div class="chat-message">
+            <span class="author ${authorWallet ? 'cursor-pointer hover:underline' : ''}" ${authorWallet ? `onclick="viewUserProfile('${authorWallet}')"` : ''}>${msg.author}:</span>
+            <span>${msg.text}</span>
+            <span class="time">${msg.time}</span>
+          </div>
+        `;
+      });
+      
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function renderOnlineFriends() {
+      const container = document.getElementById('friends-online-list');
+      const myFriends = friendships.get(currentWallet) || [];
+      
+      if (myFriends.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-xs">No friends yet</p>';
+        return;
+      }
+      
+      container.innerHTML = myFriends.map(friendWallet => {
+        const friend = users.get(friendWallet);
+        const clanInfo = getUserClanTag(friendWallet);
+        return `
+          <div class="friend-request-item cursor-pointer hover:bg-gray-700" onclick="startDM('${friendWallet}')">
+            <div class="flex items-center space-x-2">
+              <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+              <div>
+                <div class="font-bold text-sm">
+                  <span class="${clanInfo.color}">${clanInfo.tag}</span>
+                  ${friend?.gamertag || 'Unknown'}
+                </div>
+              </div>
+            </div>
+            <button onclick="event.stopPropagation(); startDM('${friendWallet}')" class="text-blue-400 hover:text-blue-300 text-xs">
+              Message
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function startDM(targetWallet) {
+      currentDMUser = targetWallet;
+      switchChatTab(null, 'dm');
+      renderDMMessages(targetWallet);
+    }
+
+    function renderDMMessages(targetWallet) {
+      const user = users.get(targetWallet);
+      const container = document.getElementById('dm-tab');
+      
+      const dmKey1 = `${currentWallet}-${targetWallet}`;
+      const dmKey2 = `${targetWallet}-${currentWallet}`;
+      const messages = chatMessages.dm[dmKey1] || chatMessages.dm[dmKey2] || [];
+      
+      container.innerHTML = `
+        <div class="border-b border-gray-600 p-2 mb-2">
+          <button onclick="switchChatTab(null, 'friends')" class="text-blue-400 hover:text-blue-300 text-xs">← Back</button>
+          <div class="font-bold text-center">DM with ${user?.gamertag || 'Unknown'}</div>
+        </div>
+        <div class="chat-messages flex-1 overflow-y-auto" id="dm-messages-container">
+          ${messages.map(msg => `
+            <div class="chat-message ${msg.sender === currentWallet ? 'text-right' : ''}">
+              <span class="author">${msg.sender === currentWallet ? 'You' : user?.gamertag}:</span>
+              <span>${msg.text}</span>
+              <span class="time">${msg.time}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      const msgContainer = document.getElementById('dm-messages-container');
+      if (msgContainer) {
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+      }
+    }
+
+    function renderDMList() {
+      const container = document.getElementById('dm-tab');
+      container.innerHTML = '<div class="text-center text-gray-400 text-xs">Select a friend to start a DM</div>';
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chat-input');
+      const text = input.value.trim();
+      
+      if (!text || !currentWallet || !userData.gamertag) return;
+      
+      const now = new Date();
+      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      
+      if (currentChatTab === 'trollbox') {
+        const clanInfo = getUserClanTag(currentWallet);
+        chatMessages.trollbox.push({
+          author: userData.gamertag,
+          authorWallet: currentWallet,
+          clanTag: clanInfo.tag,
+          clanColor: clanInfo.color,
+          text: text,
+          time: time
+        });
+        renderTrollboxMessages();
+      } else if (currentChatTab === 'clan') {
+        // Find user's clan
+        let userClan = null;
+        for (let clan of customClans.values()) {
+          if (clan.members.includes(currentWallet)) {
+            userClan = clan;
+            break;
+          }
+        }
+        
+        if (userClan) {
+          if (!chatMessages.clan[userClan.id]) {
+            chatMessages.clan[userClan.id] = [];
+          }
+          chatMessages.clan[userClan.id].push({
+            author: userData.gamertag,
+            authorWallet: currentWallet,
+            text: text,
+            time: time
+          });
+          renderClanMessages();
+        }
+      } else if (currentChatTab === 'dm' && currentDMUser) {
+        const dmKey = `${currentWallet}-${currentDMUser}`;
+        if (!chatMessages.dm[dmKey]) {
+          chatMessages.dm[dmKey] = [];
+        }
+        chatMessages.dm[dmKey].push({
+          sender: currentWallet,
+          text: text,
+          time: time
+        });
+        renderDMMessages(currentDMUser);
+      }
+      
+      input.value = '';
+      saveAllData();
+    }
+
+    function handleChatInput(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    }
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', () => {
+      // Load saved data
+      loadAllData();
+      
+      // Update UI based on loaded data
+      if (currentWallet) {
+        // Load user data from saved users
+        const savedUser = users.get(currentWallet);
+        if (savedUser) {
+          userData = { ...savedUser };
+        }
+        
+        updateHeaderDisplay();
+        checkDailyLimits();
+        
+        // Update gamerscore display
+        const gamerscore = userData.gamerscore || 0;
+        document.getElementById('gamerscore-value').textContent = gamerscore;
+        if (document.getElementById('achievement-score')) {
+          document.getElementById('achievement-score').textContent = gamerscore + 'G';
+        }
+        if (document.getElementById('profile-gamerscore')) {
+          document.getElementById('profile-gamerscore').textContent = gamerscore + 'G';
+        }
+        
+        // Update online count
+        const onlineCountEl = document.getElementById('online-count');
+        onlineCountEl.textContent = users.size || 1;
+      }
+      
+      // Update stats
+      updateStats();
+      
+      // Show home page
+      showPage('home');
+      addActivity('Welcome to MLG.clan!', 'now');
+      
+      // Auto-cycle showcase if clips exist
+      if (clips.length > 0) {
+        setInterval(cycleShowcase, 10000); // Auto cycle every 10 seconds
+        cycleShowcase(); // Show first clip immediately
+      }
+      
+      // Add form event listeners
+      const uploadForm = document.getElementById('upload-form');
+      if (uploadForm) {
+        uploadForm.addEventListener('submit', handleUpload);
+      }
+      
+      const createClanForm = document.getElementById('create-clan-form');
+      if (createClanForm) {
+        createClanForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          
+          const name = document.getElementById('clan-name').value.trim();
+          const description = document.getElementById('clan-description').value.trim();
+          const color = document.querySelector('input[name="clan-color"]:checked')?.value;
+          
+          if (!name || !description || !color) {
+            alert('Please fill in all fields!');
+            return;
+          }
+          
+          if (createClan(name, description, color)) {
+            closeCreateClanModal();
+            createClanForm.reset();
+            showClanTab('custom');
+          }
+        });
+      }
+      
+      // Initialize chat system
+      if (!chatMessages.trollbox) chatMessages.trollbox = [];
+      if (!chatMessages.clan) chatMessages.clan = {};
+      if (!chatMessages.dm) chatMessages.dm = {};
+      
+      // Add some welcome messages to trollbox
+      if (chatMessages.trollbox.length === 0) {
+        chatMessages.trollbox.push({
+          author: 'System',
+          clanTag: '[MLG]',
+          clanColor: 'clan-tag-purple',
+          text: 'Welcome to MLG.clan Trollbox!',
+          time: '00:00'
+        });
+      }
+      
+      // Update friend requests on load
+      updateFriendRequestBadge();
+      updateFriendsFeed();
+      
+      // Reset daily limits at midnight
+      setInterval(() => {
+        const now = new Date();
+        if (now.getHours() === 0 && now.getMinutes() === 0) {
+          checkDailyLimits();
+        }
+      }, 60000); // Check every minute
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solana Network Validation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .test-section {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .test-section h3 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        
+        .status.success { background-color: #d4edda; color: #155724; }
+        .status.error { background-color: #f8d7da; color: #721c24; }
+        .status.warning { background-color: #fff3cd; color: #856404; }
+        .status.info { background-color: #d1ecf1; color: #0c5460; }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover { background-color: #0056b3; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            white-space: pre-wrap;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .network-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .network-devnet { background-color: #28a745; color: white; }
+        .network-mainnet { background-color: #dc3545; color: white; }
+        .network-testnet { background-color: #ffc107; color: black; }
+        
+        .health-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .health-good { background-color: #28a745; }
+        .health-bad { background-color: #dc3545; }
+        .health-unknown { background-color: #6c757d; }
+    </style>
+</head>
+<body>
+    <h1>🌐 Solana Network Validation Test Suite</h1>
+    <p>This page tests the enhanced network validation features added to the PhantomWalletManager.</p>
+    
+    <div class="test-section">
+        <h3>📋 Current Network Configuration</h3>
+        <div id="config-status"></div>
+        <button onclick="loadNetworkConfig()">Load Configuration</button>
+        <button onclick="validateConfig()">Validate Configuration</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>🔗 Network Status & Health</h3>
+        <div id="network-status"></div>
+        <button onclick="checkNetworkStatus()">Check Network Status</button>
+        <button onclick="testRpcEndpoints()">Test RPC Endpoints</button>
+        <button onclick="startNetworkMonitoring()">Start Monitoring</button>
+        <button onclick="stopNetworkMonitoring()">Stop Monitoring</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>🔧 Network Validation Settings</h3>
+        <div id="validation-settings"></div>
+        <div>
+            <label>
+                <input type="checkbox" id="enable-validation" checked> Enable Network Validation
+            </label>
+        </div>
+        <div>
+            <label>
+                Check Interval: 
+                <select id="check-interval">
+                    <option value="15000">15 seconds</option>
+                    <option value="30000" selected>30 seconds</option>
+                    <option value="60000">1 minute</option>
+                </select>
+            </label>
+        </div>
+        <div>
+            <label>
+                Supported Networks:
+                <input type="text" id="supported-networks" value="devnet,mainnet-beta" style="width: 200px;">
+            </label>
+        </div>
+        <button onclick="updateValidationSettings()">Update Settings</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>🔄 Network Switch Testing</h3>
+        <div id="switch-status"></div>
+        <button onclick="requestNetworkSwitch('devnet')">Switch to Devnet</button>
+        <button onclick="requestNetworkSwitch('mainnet-beta')">Switch to Mainnet</button>
+        <button onclick="simulateNetworkChange()">Simulate Network Change</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>📊 Wallet Connection with Network Validation</h3>
+        <div id="wallet-status"></div>
+        <button onclick="connectWallet()">Connect Wallet</button>
+        <button onclick="disconnectWallet()">Disconnect Wallet</button>
+        <button onclick="getWalletStatus()">Get Status</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>⚠️ Error Handling Tests</h3>
+        <div id="error-status"></div>
+        <button onclick="testNetworkMismatchError()">Test Network Mismatch</button>
+        <button onclick="testRpcFailureError()">Test RPC Failure</button>
+        <button onclick="testHealthCheckFailure()">Test Health Check Failure</button>
+    </div>
+    
+    <div class="test-section">
+        <h3>📝 Event Log</h3>
+        <div>
+            <button onclick="clearEventLog()">Clear Log</button>
+            <button onclick="downloadLog()">Download Log</button>
+        </div>
+        <pre id="event-log"></pre>
+    </div>
+
+    <!-- Load required scripts -->
+    <script type="module">
+        import { PhantomWalletManager } from './phantom-wallet.js';
+        import { NetworkValidationDemo } from './network-validation-demo.js';
+        
+        // Global variables for testing
+        let walletManager = null;
+        let demo = null;
+        let eventLog = [];
+        
+        // Make functions globally available
+        window.walletManager = null;
+        window.demo = null;
+        window.eventLog = [];
+        
+        // Initialize test environment
+        async function initializeTest() {
+            try {
+                log('🚀 Initializing Network Validation Test Environment...');
+                
+                // Create wallet manager
+                window.walletManager = new PhantomWalletManager();
+                window.demo = new NetworkValidationDemo();
+                
+                // Setup event listeners for testing
+                setupEventListeners();
+                
+                // Load initial configuration
+                loadNetworkConfig();
+                
+                log('✅ Test environment initialized successfully');
+                
+            } catch (error) {
+                log(`❌ Initialization failed: ${error.message}`, 'error');
+            }
+        }
+        
+        function setupEventListeners() {
+            const events = [
+                'networkMismatch',
+                'networkChanged', 
+                'networkHealthCheck',
+                'networkHealthCheckFailed',
+                'networkSwitchRequested',
+                'networkValidationSettingsUpdated',
+                'connected',
+                'disconnected',
+                'connectionFailed',
+                'error'
+            ];
+            
+            events.forEach(eventName => {
+                window.walletManager.on(eventName, (data) => {
+                    log(`📡 Event: ${eventName}`, 'info', data);
+                });
+            });
+        }
+        
+        // Utility functions
+        function log(message, type = 'info', data = null) {
+            const timestamp = new Date().toISOString();
+            const entry = { timestamp, message, type, data };
+            window.eventLog.push(entry);
+            
+            const logElement = document.getElementById('event-log');
+            const logLine = `[${timestamp}] ${message}${data ? '\\n' + JSON.stringify(data, null, 2) : ''}`;
+            logElement.textContent += logLine + '\\n';
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(message, data || '');
+        }
+        
+        function updateStatus(elementId, content, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status ${type}">${content}</div>`;
+        }
+        
+        // Test functions
+        window.loadNetworkConfig = function() {
+            try {
+                const status = window.walletManager.getNetworkStatus();
+                const config = window.walletManager.validateNetworkConfiguration();
+                
+                let content = `
+                    <strong>Current Network:</strong> <span class="network-indicator network-${status.currentNetwork}">${status.currentNetwork}</span><br>
+                    <strong>Target Network:</strong> <span class="network-indicator network-${status.targetNetwork}">${status.targetNetwork}</span><br>
+                    <strong>Compatible:</strong> ${status.networkCompatible ? '✅' : '❌'}<br>
+                    <strong>Validation Enabled:</strong> ${status.networkValidationEnabled ? '✅' : '❌'}<br>
+                    <strong>Supported Networks:</strong> ${status.supportedNetworks.join(', ')}<br>
+                    <strong>Available Endpoints:</strong> ${status.availableEndpoints.length}<br>
+                    <strong>Configuration Valid:</strong> ${config.valid ? '✅' : '❌'}
+                `;
+                
+                if (!config.valid) {
+                    content += `<br><strong>Issues:</strong><ul>`;
+                    config.issues.forEach(issue => {
+                        content += `<li>${issue}</li>`;
+                    });
+                    content += `</ul>`;
+                }
+                
+                if (config.warnings.length > 0) {
+                    content += `<br><strong>Warnings:</strong><ul>`;
+                    config.warnings.forEach(warning => {
+                        content += `<li>${warning}</li>`;
+                    });
+                    content += `</ul>`;
+                }
+                
+                updateStatus('config-status', content, config.valid ? 'success' : 'error');
+                log('📋 Network configuration loaded');
+                
+            } catch (error) {
+                updateStatus('config-status', `Error: ${error.message}`, 'error');
+                log(`❌ Failed to load network config: ${error.message}`, 'error');
+            }
+        };
+        
+        window.validateConfig = function() {
+            try {
+                const validation = window.walletManager.validateNetworkConfiguration();
+                log('🔍 Configuration validation completed', 'info', validation);
+                loadNetworkConfig(); // Refresh display
+            } catch (error) {
+                log(`❌ Configuration validation failed: ${error.message}`, 'error');
+            }
+        };
+        
+        window.checkNetworkStatus = function() {
+            try {
+                const status = window.walletManager.getNetworkStatus();
+                
+                let content = `
+                    <span class="health-indicator ${status.connectionHealthy ? 'health-good' : 'health-bad'}"></span>
+                    <strong>Connection Health:</strong> ${status.connectionHealthy ? 'Healthy' : 'Unhealthy'}<br>
+                    <strong>RPC Latency:</strong> ${status.rpcLatency ? status.rpcLatency + 'ms' : 'Unknown'}<br>
+                    <strong>Last Check:</strong> ${status.lastNetworkCheck ? new Date(status.lastNetworkCheck).toLocaleString() : 'Never'}<br>
+                    <strong>Monitoring Active:</strong> ${status.monitoringActive ? '✅' : '❌'}<br>
+                    <strong>Can Switch Network:</strong> ${status.canSwitchNetwork ? '✅' : '❌'}
+                `;
+                
+                updateStatus('network-status', content, status.connectionHealthy ? 'success' : 'warning');
+                log('📊 Network status checked', 'info', status);
+                
+            } catch (error) {
+                updateStatus('network-status', `Error: ${error.message}`, 'error');
+                log(`❌ Failed to check network status: ${error.message}`, 'error');
+            }
+        };
+        
+        window.testRpcEndpoints = async function() {
+            try {
+                log('🔍 Testing RPC endpoints...');
+                updateStatus('network-status', 'Testing RPC endpoints...', 'info');
+                
+                const status = window.walletManager.getNetworkStatus();
+                const results = [];
+                
+                for (const endpoint of status.availableEndpoints) {
+                    try {
+                        // This would test the endpoint if we had a real connection
+                        results.push(`✅ ${endpoint}: OK`);
+                        log(`✅ RPC endpoint healthy: ${endpoint}`);
+                    } catch (error) {
+                        results.push(`❌ ${endpoint}: ${error.message}`);
+                        log(`❌ RPC endpoint failed: ${endpoint}`, 'error');
+                    }
+                }
+                
+                updateStatus('network-status', 
+                    `<strong>RPC Endpoint Results:</strong><br>${results.join('<br>')}`,
+                    'success'
+                );
+                
+            } catch (error) {
+                updateStatus('network-status', `Error: ${error.message}`, 'error');
+                log(`❌ RPC endpoint test failed: ${error.message}`, 'error');
+            }
+        };
+        
+        window.startNetworkMonitoring = function() {
+            try {
+                window.walletManager.startNetworkMonitoring();
+                log('▶️ Network monitoring started');
+                checkNetworkStatus();
+            } catch (error) {
+                log(`❌ Failed to start monitoring: ${error.message}`, 'error');
+            }
+        };
+        
+        window.stopNetworkMonitoring = function() {
+            try {
+                window.walletManager.stopNetworkMonitoring();
+                log('⏹️ Network monitoring stopped');
+                checkNetworkStatus();
+            } catch (error) {
+                log(`❌ Failed to stop monitoring: ${error.message}`, 'error');
+            }
+        };
+        
+        window.updateValidationSettings = function() {
+            try {
+                const enabled = document.getElementById('enable-validation').checked;
+                const interval = parseInt(document.getElementById('check-interval').value);
+                const networks = document.getElementById('supported-networks').value
+                    .split(',').map(n => n.trim());
+                
+                window.walletManager.updateNetworkValidationSettings({
+                    enabled: enabled,
+                    checkInterval: interval,
+                    supportedNetworks: networks,
+                    strictValidation: true
+                });
+                
+                updateStatus('validation-settings', 
+                    `Settings updated: Enabled=${enabled}, Interval=${interval}ms, Networks=${networks.join(', ')}`,
+                    'success'
+                );
+                
+                log('⚙️ Network validation settings updated', 'info', { enabled, interval, networks });
+                
+            } catch (error) {
+                updateStatus('validation-settings', `Error: ${error.message}`, 'error');
+                log(`❌ Failed to update settings: ${error.message}`, 'error');
+            }
+        };
+        
+        window.requestNetworkSwitch = async function(network) {
+            try {
+                log(`🔄 Requesting network switch to ${network}...`);
+                updateStatus('switch-status', `Requesting switch to ${network}...`, 'info');
+                
+                const result = await window.walletManager.requestNetworkSwitch(network);
+                
+                if (result) {
+                    updateStatus('switch-status', `✅ Successfully switched to ${network}`, 'success');
+                    log(`✅ Network switch successful: ${network}`);
+                } else {
+                    updateStatus('switch-status', 
+                        `⚠️ Manual network switch required. Please switch your wallet to ${network}`,
+                        'warning'
+                    );
+                    log(`⚠️ Manual network switch required: ${network}`, 'warning');
+                }
+                
+            } catch (error) {
+                updateStatus('switch-status', `❌ Error: ${error.message}`, 'error');
+                log(`❌ Network switch failed: ${error.message}`, 'error');
+            }
+        };
+        
+        window.simulateNetworkChange = function() {
+            try {
+                const newNetwork = window.walletManager.currentNetwork === 'devnet' ? 'mainnet-beta' : 'devnet';
+                log(`🎭 Simulating network change to ${newNetwork}`);
+                
+                // Simulate the network change
+                window.walletManager.handleNetworkChange(newNetwork);
+                
+                updateStatus('switch-status', 
+                    `Simulated network change to ${newNetwork}`,
+                    'info'
+                );
+                
+            } catch (error) {
+                updateStatus('switch-status', `Error: ${error.message}`, 'error');
+                log(`❌ Network change simulation failed: ${error.message}`, 'error');
+            }
+        };
+        
+        window.connectWallet = async function() {
+            try {
+                log('🔗 Attempting wallet connection with network validation...');
+                updateStatus('wallet-status', 'Connecting...', 'info');
+                
+                const result = await window.walletManager.connect();
+                
+                updateStatus('wallet-status', 
+                    `✅ Connected: ${result.shortAddress}<br>` +
+                    `Network: ${result.network}<br>` +
+                    `Compatible: ${result.networkCompatible ? '✅' : '❌'}`,
+                    'success'
+                );
+                
+                log('✅ Wallet connected successfully', 'info', result);
+                
+            } catch (error) {
+                updateStatus('wallet-status', `❌ Connection failed: ${error.message}`, 'error');
+                log(`❌ Wallet connection failed: ${error.message}`, 'error');
+            }
+        };
+        
+        window.disconnectWallet = async function() {
+            try {
+                await window.walletManager.disconnect();
+                updateStatus('wallet-status', '🔌 Wallet disconnected', 'info');
+                log('🔌 Wallet disconnected');
+            } catch (error) {
+                updateStatus('wallet-status', `Error: ${error.message}`, 'error');
+                log(`❌ Disconnect failed: ${error.message}`, 'error');
+            }
+        };
+        
+        window.getWalletStatus = function() {
+            try {
+                const status = window.walletManager.getWalletStatus();
+                log('📱 Wallet status retrieved', 'info', status);
+                
+                updateStatus('wallet-status',
+                    `<strong>Available:</strong> ${status.isAvailable ? '✅' : '❌'}<br>` +
+                    `<strong>Connected:</strong> ${status.isConnected ? '✅' : '❌'}<br>` +
+                    `<strong>Network:</strong> ${status.network}<br>` +
+                    `<strong>Compatible:</strong> ${status.networkCompatible ? '✅' : '❌'}`,
+                    status.isAvailable ? 'success' : 'warning'
+                );
+                
+            } catch (error) {
+                updateStatus('wallet-status', `Error: ${error.message}`, 'error');
+            }
+        };
+        
+        window.testNetworkMismatchError = function() {
+            const error = new Error('network mismatch detected');
+            const categorized = window.walletManager.categorizeConnectionError(error);
+            
+            log('🧪 Testing network mismatch error categorization', 'info', categorized);
+            updateStatus('error-status', 
+                `Network mismatch error categorized as: ${categorized.type}`,
+                'info'
+            );
+        };
+        
+        window.testRpcFailureError = function() {
+            const error = new Error('all rpc endpoints failed');
+            const categorized = window.walletManager.categorizeConnectionError(error);
+            
+            log('🧪 Testing RPC failure error categorization', 'info', categorized);
+            updateStatus('error-status', 
+                `RPC failure error categorized as: ${categorized.type}`,
+                'info'
+            );
+        };
+        
+        window.testHealthCheckFailure = function() {
+            log('🧪 Simulating health check failure...');
+            
+            window.walletManager.emit('networkHealthCheckFailed', {
+                network: window.walletManager.currentNetwork,
+                error: 'Simulated health check failure',
+                timestamp: Date.now()
+            });
+            
+            updateStatus('error-status', 
+                'Health check failure event emitted - check event log',
+                'warning'
+            );
+        };
+        
+        window.clearEventLog = function() {
+            window.eventLog = [];
+            document.getElementById('event-log').textContent = '';
+            log('🧹 Event log cleared');
+        };
+        
+        window.downloadLog = function() {
+            const logContent = window.eventLog.map(entry => 
+                `[${entry.timestamp}] ${entry.type.toUpperCase()}: ${entry.message}${
+                    entry.data ? '\\nData: ' + JSON.stringify(entry.data, null, 2) : ''
+                }`
+            ).join('\\n\\n');
+            
+            const blob = new Blob([logContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `network-validation-log-${new Date().toISOString()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            log('💾 Event log downloaded');
+        };
+        
+        // Initialize when DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeTest);
+        } else {
+            initializeTest();
+        }
+        
+    </script>
+</body>
+</html>

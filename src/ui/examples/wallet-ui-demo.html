@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLG.clan Wallet UI Components Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+      min-height: 100vh;
+    }
+    .demo-section {
+      background: rgba(31, 41, 55, 0.5);
+      backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+  <div class="container mx-auto px-4 py-8">
+    <header class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-green-400 mb-2">MLG.clan Wallet UI</h1>
+      <p class="text-gray-400">Comprehensive Phantom Wallet Integration Components</p>
+    </header>
+
+    <!-- Full Connection Flow Demo -->
+    <section class="demo-section rounded-xl border border-gray-700 p-8 mb-8">
+      <h2 class="text-2xl font-semibold text-green-300 mb-4">Complete Connection Flow</h2>
+      <p class="text-gray-400 mb-6">Full-featured wallet connection flow with all status indicators, error handling, and retry functionality.</p>
+      <div id="full-flow-demo" class="max-w-md mx-auto"></div>
+    </section>
+
+    <!-- Compact UI Demo -->
+    <section class="demo-section rounded-xl border border-gray-700 p-8 mb-8">
+      <h2 class="text-2xl font-semibold text-green-300 mb-4">Compact Wallet UI</h2>
+      <p class="text-gray-400 mb-6">Streamlined interface with connection button and status indicator.</p>
+      <div id="compact-demo" class="max-w-md mx-auto"></div>
+    </section>
+
+    <!-- Individual Components Grid -->
+    <section class="demo-section rounded-xl border border-gray-700 p-8 mb-8">
+      <h2 class="text-2xl font-semibold text-green-300 mb-6">Individual Components</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Connection Button Variants -->
+        <div class="bg-gray-800 rounded-lg p-4">
+          <h3 class="text-lg font-medium text-green-300 mb-3">Connection Buttons</h3>
+          <div class="space-y-3">
+            <div id="primary-button"></div>
+            <div id="secondary-button"></div>
+            <div id="hero-button"></div>
+          </div>
+        </div>
+
+        <!-- Status Indicators -->
+        <div class="bg-gray-800 rounded-lg p-4">
+          <h3 class="text-lg font-medium text-green-300 mb-3">Status Indicators</h3>
+          <div class="space-y-3">
+            <div id="status-badge"></div>
+            <div id="status-indicator"></div>
+            <div id="network-indicator"></div>
+          </div>
+        </div>
+
+        <!-- Address Display -->
+        <div class="bg-gray-800 rounded-lg p-4">
+          <h3 class="text-lg font-medium text-green-300 mb-3">Address Display</h3>
+          <div class="space-y-3">
+            <div id="address-display"></div>
+            <div id="address-with-balance"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Error Display Demo -->
+    <section class="demo-section rounded-xl border border-gray-700 p-8 mb-8">
+      <h2 class="text-2xl font-semibold text-green-300 mb-4">Error Display</h2>
+      <p class="text-gray-400 mb-6">Comprehensive error handling with user-friendly messages and retry options.</p>
+      <div class="space-y-4">
+        <div class="flex gap-4 flex-wrap">
+          <button onclick="simulateError('WALLET_NOT_INSTALLED')" 
+                  class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded">
+            Simulate Not Installed
+          </button>
+          <button onclick="simulateError('USER_REJECTED')" 
+                  class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded">
+            Simulate User Rejected
+          </button>
+          <button onclick="simulateError('NETWORK_ERROR')" 
+                  class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded">
+            Simulate Network Error
+          </button>
+          <button onclick="simulateError('CONNECTION_TIMEOUT')" 
+                  class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded">
+            Simulate Timeout
+          </button>
+        </div>
+        <div id="error-demo" class="max-w-md"></div>
+      </div>
+    </section>
+
+    <!-- Usage Instructions -->
+    <section class="demo-section rounded-xl border border-gray-700 p-8">
+      <h2 class="text-2xl font-semibold text-green-300 mb-4">Usage Examples</h2>
+      <div class="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+        <pre class="text-sm text-gray-300"><code>// Full Connection Flow
+import { createWalletUI } from './wallet-ui.js';
+
+const walletUI = createWalletUI(container, {
+  layout: 'full',
+  showErrors: true,
+  showNetwork: true
+});
+
+// Compact Layout
+const compactUI = createWalletUI(container, {
+  layout: 'compact',
+  showStatus: true
+});
+
+// Individual Components
+import { 
+  WalletConnectButton, 
+  WalletErrorDisplay, 
+  WalletStatusBadge 
+} from './wallet-ui.js';
+
+const connectButton = new WalletConnectButton(container, {
+  variant: 'primary',
+  size: 'lg',
+  showRetryOnError: true
+});
+
+const errorDisplay = new WalletErrorDisplay(container, {
+  showRetryButton: true,
+  showDetailsButton: true
+});
+
+const statusBadge = new WalletStatusBadge(container, {
+  showText: true,
+  showHealth: true
+});</code></pre>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
+    // This would normally import from the actual files
+    console.log('MLG.clan Wallet UI Demo Loaded');
+    
+    // Mock wallet manager for demo purposes
+    window.mockWalletManager = {
+      isConnected: false,
+      isConnecting: false,
+      error: null,
+      
+      connect: async function() {
+        this.isConnecting = true;
+        this.updateUI();
+        
+        // Simulate connection delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Simulate success/failure randomly
+        if (Math.random() > 0.3) {
+          this.isConnected = true;
+          this.isConnecting = false;
+          this.error = null;
+        } else {
+          this.isConnecting = false;
+          this.error = {
+            type: 'CONNECTION_FAILED',
+            message: 'Failed to connect to Phantom wallet'
+          };
+        }
+        this.updateUI();
+      },
+      
+      disconnect: function() {
+        this.isConnected = false;
+        this.isConnecting = false;
+        this.error = null;
+        this.updateUI();
+      },
+      
+      updateUI: function() {
+        // Update demo UI based on state
+        document.querySelectorAll('.demo-status').forEach(el => {
+          el.textContent = this.isConnected ? 'Connected' : 
+                          this.isConnecting ? 'Connecting...' :
+                          this.error ? 'Error' : 'Disconnected';
+          el.className = `demo-status px-2 py-1 rounded text-sm ${
+            this.isConnected ? 'bg-green-600 text-white' :
+            this.isConnecting ? 'bg-yellow-600 text-white' :
+            this.error ? 'bg-red-600 text-white' :
+            'bg-gray-600 text-white'
+          }`;
+        });
+      }
+    };
+    
+    // Simulate error function
+    window.simulateError = function(errorType) {
+      const errors = {
+        WALLET_NOT_INSTALLED: {
+          type: 'WALLET_NOT_INSTALLED',
+          title: 'Phantom Wallet Not Found',
+          message: 'Please install Phantom wallet from phantom.app and refresh this page.',
+          action: 'Install Phantom',
+          actionUrl: 'https://phantom.app'
+        },
+        USER_REJECTED: {
+          type: 'USER_REJECTED',
+          title: 'Connection Cancelled',
+          message: 'You cancelled the wallet connection. Click "Connect Wallet" to try again.',
+          action: 'Try Again'
+        },
+        NETWORK_ERROR: {
+          type: 'NETWORK_ERROR',
+          title: 'Network Connection Error',
+          message: 'Unable to connect to the Solana network. Please check your internet connection.',
+          action: 'Check Connection'
+        },
+        CONNECTION_TIMEOUT: {
+          type: 'CONNECTION_TIMEOUT',
+          title: 'Connection Timeout',
+          message: 'The connection took too long. Please check your internet connection and try again.',
+          action: 'Retry Connection'
+        }
+      };
+      
+      const error = errors[errorType];
+      console.log('Simulating error:', error);
+      
+      // In a real implementation, this would trigger the error display component
+      alert(`Simulated Error: ${error.title}\n${error.message}`);
+    };
+    
+    // Initialize demo components (placeholder)
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add demo status indicators
+      const containers = ['#full-flow-demo', '#compact-demo', '#primary-button', '#status-badge'];
+      containers.forEach(selector => {
+        const container = document.querySelector(selector);
+        if (container) {
+          const statusEl = document.createElement('div');
+          statusEl.className = 'demo-status px-2 py-1 rounded text-sm bg-gray-600 text-white inline-block';
+          statusEl.textContent = 'Demo Component';
+          container.appendChild(statusEl);
+        }
+      });
+      
+      // Initial UI update
+      window.mockWalletManager.updateUI();
+    });
+  </script>
+</body>
+</html>
