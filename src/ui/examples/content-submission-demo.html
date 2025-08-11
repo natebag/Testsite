@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLG.clan Content Submission Form - Demo</title>
+  <meta name="description" content="Interactive demo of the MLG.clan content submission form with Xbox 360 retro aesthetic">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAA">
+  
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #111827;
+      color: #ffffff;
+      line-height: 1.5;
+    }
+    
+    /* Demo Header */
+    .demo-header {
+      background: linear-gradient(135deg, #065f46, #064e3b);
+      border-bottom: 2px solid #10b981;
+      padding: 24px 0;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+    
+    .demo-header h1 {
+      color: #10b981;
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0 0 8px 0;
+    }
+    
+    .demo-header p {
+      color: #d1d5db;
+      font-size: 1.125rem;
+      margin: 0;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Demo Controls */
+    .demo-controls {
+      max-width: 1200px;
+      margin: 0 auto 32px auto;
+      padding: 0 24px;
+    }
+    
+    .demo-control-panel {
+      background: linear-gradient(135deg, #065f46, #064e3b);
+      border: 1px solid #10b981;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .demo-control-panel h3 {
+      color: #10b981;
+      margin: 0 0 16px 0;
+      font-size: 1.25rem;
+    }
+    
+    .demo-controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    
+    .demo-control {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .demo-control label {
+      color: #d1d5db;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .demo-control select,
+    .demo-control input[type="range"] {
+      padding: 8px;
+      background: #374151;
+      border: 1px solid #4b5563;
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 0.875rem;
+    }
+    
+    .demo-control input[type="range"] {
+      padding: 0;
+      height: 32px;
+    }
+    
+    .demo-button {
+      background: linear-gradient(45deg, #10b981, #059669);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.875rem;
+    }
+    
+    .demo-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+    
+    .demo-button-secondary {
+      background: #374151;
+      color: #d1d5db;
+      border: 1px solid #4b5563;
+    }
+    
+    .demo-button-secondary:hover {
+      border-color: #10b981;
+      color: #10b981;
+    }
+    
+    /* Form Container */
+    .form-demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    
+    /* Status Messages */
+    .demo-status {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      max-width: 300px;
+      z-index: 1000;
+    }
+    
+    .demo-status-message {
+      background: #065f46;
+      border: 1px solid #10b981;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      color: #ffffff;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+    
+    .demo-status-message.success {
+      background: #064e3b;
+      border-color: #10b981;
+    }
+    
+    .demo-status-message.error {
+      background: #7f1d1d;
+      border-color: #ef4444;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    /* Loading Spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #4b5563;
+      border-radius: 50%;
+      border-top-color: #10b981;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .demo-header h1 {
+        font-size: 2rem;
+      }
+      
+      .demo-controls-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .demo-controls {
+        padding: 0 16px;
+      }
+      
+      .form-demo-container {
+        padding: 0 16px;
+      }
+    }
+    
+    /* Skip Link for Accessibility */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 6px;
+      background: #10b981;
+      color: white;
+      padding: 8px;
+      text-decoration: none;
+      transition: top 0.3s;
+      z-index: 1001;
+    }
+    
+    .skip-link:focus {
+      top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip Navigation -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <!-- Demo Header -->
+  <header class="demo-header">
+    <h1>🎮 MLG.clan Content Submission Form</h1>
+    <p>Interactive demo showcasing the production-ready content submission form with Xbox 360 retro aesthetic</p>
+  </header>
+  
+  <!-- Demo Controls -->
+  <div class="demo-controls">
+    <div class="demo-control-panel">
+      <h3>Demo Controls</h3>
+      <div class="demo-controls-grid">
+        <div class="demo-control">
+          <label for="content-type-select">Content Type</label>
+          <select id="content-type-select">
+            <option value="clips">Gaming Clips</option>
+            <option value="screenshots">Screenshots</option>
+            <option value="guides">Strategy Guides</option>
+            <option value="reviews">Game Reviews</option>
+          </select>
+        </div>
+        
+        <div class="demo-control">
+          <label for="uploads-remaining">Uploads Remaining</label>
+          <input type="range" id="uploads-remaining" min="0" max="3" value="2" step="1">
+          <span id="uploads-remaining-value">2/3</span>
+        </div>
+        
+        <div class="demo-control">
+          <label>Demo Actions</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="demo-button" id="fill-sample-data">Fill Sample Data</button>
+            <button class="demo-button demo-button-secondary" id="show-validation">Show Validation</button>
+          </div>
+        </div>
+        
+        <div class="demo-control">
+          <label>Simulation Controls</label>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="demo-button demo-button-secondary" id="simulate-upload">Simulate Upload</button>
+            <button class="demo-button demo-button-secondary" id="reset-form">Reset Form</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Feature Highlights -->
+    <div class="demo-control-panel">
+      <h3>✨ Key Features</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; color: #d1d5db;">
+        <div>
+          <strong style="color: #10b981;">📁 File Upload</strong>
+          <ul style="margin: 8px 0 0 16px; font-size: 0.875rem;">
+            <li>Drag & drop support</li>
+            <li>Real-time progress tracking</li>
+            <li>File type validation</li>
+            <li>Size limit enforcement</li>
+          </ul>
+        </div>
+        <div>
+          <strong style="color: #10b981;">⚡ Real-time Validation</strong>
+          <ul style="margin: 8px 0 0 16px; font-size: 0.875rem;">
+            <li>Live character counters</li>
+            <li>Pattern validation</li>
+            <li>Error state animations</li>
+            <li>Success feedback</li>
+          </ul>
+        </div>
+        <div>
+          <strong style="color: #10b981;">🎮 Xbox Aesthetic</strong>
+          <ul style="margin: 8px 0 0 16px; font-size: 0.875rem;">
+            <li>Blade-style navigation</li>
+            <li>Authentic Xbox green</li>
+            <li>Smooth animations</li>
+            <li>Retro dashboard feel</li>
+          </ul>
+        </div>
+        <div>
+          <strong style="color: #10b981;">♿ Accessibility</strong>
+          <ul style="margin: 8px 0 0 16px; font-size: 0.875rem;">
+            <li>WCAG 2.1 AA compliant</li>
+            <li>Screen reader support</li>
+            <li>Keyboard navigation</li>
+            <li>High contrast focus</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Status Messages -->
+  <div class="demo-status">
+    <div class="demo-status-message success" id="success-message"></div>
+    <div class="demo-status-message error" id="error-message"></div>
+  </div>
+  
+  <!-- Main Content -->
+  <main id="main-content" class="form-demo-container">
+    <div id="content-submission-form"></div>
+  </main>
+  
+  <!-- Footer -->
+  <footer style="text-align: center; padding: 48px 24px; color: #6b7280; border-top: 1px solid #374151; margin-top: 48px;">
+    <p>MLG.clan Content Submission Form Demo | Built with ❤️ by Claude Code</p>
+    <p style="font-size: 0.875rem; margin-top: 8px;">
+      Features: Xbox 360 Aesthetic • Real-time Validation • Drag & Drop Upload • Mobile Responsive • Accessibility Compliant
+    </p>
+  </footer>
+  
+  <!-- JavaScript -->
+  <script type="module">
+    // Import the content submission form (in a real implementation)
+    // import { createContentSubmissionForm } from '../components/content-submission-form.js';
+    
+    // Mock implementation for demo purposes
+    class MockContentSubmissionForm {
+      constructor(options = {}) {
+        this.options = options;
+        this.formState = {
+          contentType: 'clips',
+          files: [],
+          metadata: {
+            title: '',
+            description: '',
+            game: '',
+            platform: 'xbox',
+            category: '',
+            tags: [],
+            visibility: 'public',
+            allowComments: true,
+            allowDownloads: false
+          }
+        };
+        this.dailyLimits = { uploads: 1, totalUploads: 3 };
+      }
+      
+      async initialize(wallet, connection) {
+        console.log('Form initialized with wallet:', wallet);
+        return true;
+      }
+      
+      createContentSubmissionForm(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return null;
+        
+        // Generate the form HTML (simplified for demo)
+        container.innerHTML = this.generateDemoFormHTML();
+        this.setupDemoEventListeners(container);
+        
+        return {
+          element: container,
+          validate: () => this.validateForm(),
+          submit: () => this.submitForm(),
+          reset: () => this.resetForm()
+        };
+      }
+      
+      generateDemoFormHTML() {
+        return `
+          <div class="content-submission-container" style="background: #111827; color: #ffffff;">
+            <!-- Header -->
+            <header class="submission-header" style="text-align: center; margin-bottom: 32px;">
+              <h1 class="submission-title" style="color: #10b981; font-size: 2.5rem; font-weight: 800; margin-bottom: 8px;">📤 Submit Content</h1>
+              <p class="submission-subtitle" style="color: #d1d5db; font-size: 1.125rem; margin-bottom: 16px;">Share your epic gaming moments with the MLG.clan community</p>
+              <div class="upload-limits-indicator" style="display: inline-block; background: linear-gradient(135deg, #065f46, #064e3b); border: 1px solid #10b981; border-radius: 12px; padding: 8px 16px;">
+                <span class="limits-text" style="font-size: 0.875rem; color: #d1d5db;">
+                  <span id="uploads-remaining-display" style="color: #10b981;">2/3</span> uploads remaining today
+                </span>
+              </div>
+            </header>
+
+            <!-- Content Type Selector -->
+            <section class="content-type-selector" style="margin-bottom: 32px;">
+              <div class="blade-container" style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                <div class="blade-item active" data-content-type="clips" style="display: flex; flex-direction: column; align-items: center; padding: 20px 24px; min-width: 180px; background: linear-gradient(135deg, #065f46, #064e3b); border: 2px solid #10b981; border-radius: 12px; cursor: pointer; text-align: center; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); animation: bladeGlow 3s ease-in-out infinite;">
+                  <div class="blade-icon" style="font-size: 2rem; margin-bottom: 8px;">🎮</div>
+                  <div class="blade-label" style="color: #10b981; font-weight: 600; font-size: 1rem; margin-bottom: 4px;">Gaming Clips</div>
+                  <div class="blade-description" style="color: #9ca3af; font-size: 0.75rem;">Short gameplay videos</div>
+                </div>
+                
+                <div class="blade-item" data-content-type="screenshots" style="display: flex; flex-direction: column; align-items: center; padding: 20px 24px; min-width: 180px; background: #374151; border: 2px solid transparent; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.3s ease;">
+                  <div class="blade-icon" style="font-size: 2rem; margin-bottom: 8px;">📸</div>
+                  <div class="blade-label" style="color: #d1d5db; font-weight: 600; font-size: 1rem; margin-bottom: 4px;">Screenshots</div>
+                  <div class="blade-description" style="color: #9ca3af; font-size: 0.75rem;">Game screenshots</div>
+                </div>
+                
+                <div class="blade-item" data-content-type="guides" style="display: flex; flex-direction: column; align-items: center; padding: 20px 24px; min-width: 180px; background: #374151; border: 2px solid transparent; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.3s ease;">
+                  <div class="blade-icon" style="font-size: 2rem; margin-bottom: 8px;">📖</div>
+                  <div class="blade-label" style="color: #d1d5db; font-weight: 600; font-size: 1rem; margin-bottom: 4px;">Strategy Guides</div>
+                  <div class="blade-description" style="color: #9ca3af; font-size: 0.75rem;">Tutorial content</div>
+                </div>
+                
+                <div class="blade-item" data-content-type="reviews" style="display: flex; flex-direction: column; align-items: center; padding: 20px 24px; min-width: 180px; background: #374151; border: 2px solid transparent; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.3s ease;">
+                  <div class="blade-icon" style="font-size: 2rem; margin-bottom: 8px;">⭐</div>
+                  <div class="blade-label" style="color: #d1d5db; font-weight: 600; font-size: 1rem; margin-bottom: 4px;">Game Reviews</div>
+                  <div class="blade-description" style="color: #9ca3af; font-size: 0.75rem;">Game analysis</div>
+                </div>
+              </div>
+            </section>
+
+            <form class="submission-form">
+              <!-- File Upload Zone -->
+              <section class="upload-section" style="background: linear-gradient(135deg, #065f46, #064e3b); border: 1px solid #10b981; border-radius: 12px; padding: 24px; margin-bottom: 32px; transition: all 0.3s ease;">
+                <h3 style="color: #10b981; font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">📁 Upload Files</h3>
+                
+                <div class="upload-dropzone" id="demo-dropzone" style="border: 3px dashed #4b5563; border-radius: 12px; padding: 48px 24px; text-align: center; cursor: pointer; transition: all 0.3s ease; background: rgba(55, 65, 81, 0.3);">
+                  <div style="font-size: 3rem; margin-bottom: 16px; color: #9ca3af;">📁</div>
+                  <h4 style="color: #ffffff; margin: 0 0 8px 0;">Drop files here or click to browse</h4>
+                  <p style="color: #d1d5db; margin: 0 0 4px 0;">Supported formats: MP4, MOV, JPG, PNG, GIF</p>
+                  <p style="color: #9ca3af; font-size: 0.875rem;">Max size: 100MB per file</p>
+                  <input type="file" id="demo-file-input" style="display: none;" multiple accept="video/*,image/*">
+                </div>
+                
+                <div class="upload-progress" id="demo-progress" style="margin-top: 16px; display: none;">
+                  <div style="width: 100%; height: 8px; background: #374151; border-radius: 4px; overflow: hidden; margin-bottom: 8px;">
+                    <div id="demo-progress-fill" style="height: 100%; background: linear-gradient(45deg, #10b981, #34d399); border-radius: 4px; transition: width 0.3s ease; width: 0%;"></div>
+                  </div>
+                  <div id="demo-progress-text" style="font-size: 0.875rem; color: #d1d5db; text-align: center;">Uploading... 0%</div>
+                </div>
+                
+                <div class="uploaded-files" id="demo-uploaded-files" style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px;"></div>
+              </section>
+
+              <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+                <!-- Form Fields -->
+                <div style="display: flex; flex-direction: column; gap: 24px;">
+                  <!-- Primary Information -->
+                  <section style="background: linear-gradient(135deg, #065f46, #064e3b); border: 1px solid #10b981; border-radius: 12px; padding: 24px;">
+                    <h3 style="color: #10b981; font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">📝 Content Details</h3>
+                    
+                    <div style="margin-bottom: 20px; position: relative;">
+                      <label style="font-size: 0.875rem; font-weight: 600; color: #d1d5db; margin-bottom: 8px; display: block;">Title *</label>
+                      <input type="text" id="demo-title" placeholder="Amazing clutch play..." maxlength="100" required style="width: 100%; background: #374151; border: 2px solid transparent; border-radius: 8px; padding: 12px 16px; color: #ffffff; font-size: 1rem; transition: all 0.3s ease;">
+                      <div id="demo-title-counter" style="font-size: 0.75rem; color: #9ca3af; text-align: right; margin-top: 4px;">0/100</div>
+                      <div id="demo-title-error" style="display: none; color: #ef4444; font-size: 0.875rem; margin-top: 4px; padding: 4px 8px; background: rgba(239, 68, 68, 0.1); border-radius: 4px; border-left: 3px solid #ef4444;"></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px; position: relative;">
+                      <label style="font-size: 0.875rem; font-weight: 600; color: #d1d5db; margin-bottom: 8px; display: block;">Description</label>
+                      <textarea id="demo-description" placeholder="Describe your epic gaming moment..." maxlength="500" rows="4" style="width: 100%; background: #374151; border: 2px solid transparent; border-radius: 8px; padding: 12px 16px; color: #ffffff; font-size: 1rem; transition: all 0.3s ease; resize: vertical; min-height: 100px;"></textarea>
+                      <div id="demo-description-counter" style="font-size: 0.75rem; color: #9ca3af; text-align: right; margin-top: 4px;">0/500</div>
+                    </div>
+                  </section>
+
+                  <!-- Game Selection -->
+                  <section style="background: linear-gradient(135deg, #065f46, #064e3b); border: 1px solid #10b981; border-radius: 12px; padding: 24px;">
+                    <h3 style="color: #10b981; font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">🎮 Game Information</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                      <label style="font-size: 0.875rem; font-weight: 600; color: #d1d5db; margin-bottom: 8px; display: block;">Game *</label>
+                      <input type="text" id="demo-game-search" placeholder="Search for a game..." required style="width: 100%; background: #374151; border: 2px solid transparent; border-radius: 8px; padding: 12px 16px; color: #ffffff; font-size: 1rem; transition: all 0.3s ease;">
+                      <div id="demo-game-error" style="display: none; color: #ef4444; font-size: 0.875rem; margin-top: 4px; padding: 4px 8px; background: rgba(239, 68, 68, 0.1); border-radius: 4px; border-left: 3px solid #ef4444;"></div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                      <label style="font-size: 0.875rem; font-weight: 600; color: #d1d5db; margin-bottom: 8px; display: block;">Platform</label>
+                      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px;">
+                        <div class="platform-option selected" data-platform="xbox" style="display: flex; flex-direction: column; align-items: center; padding: 12px 16px; border: 2px solid #10b981; background: rgba(16, 185, 129, 0.2); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; min-width: 80px;">
+                          <div style="font-size: 1.5rem; margin-bottom: 4px;">🎮</div>
+                          <span>Xbox</span>
+                        </div>
+                        <div class="platform-option" data-platform="playstation" style="display: flex; flex-direction: column; align-items: center; padding: 12px 16px; border: 2px solid #4b5563; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; min-width: 80px;">
+                          <div style="font-size: 1.5rem; margin-bottom: 4px;">🎮</div>
+                          <span>PlayStation</span>
+                        </div>
+                        <div class="platform-option" data-platform="pc" style="display: flex; flex-direction: column; align-items: center; padding: 12px 16px; border: 2px solid #4b5563; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; min-width: 80px;">
+                          <div style="font-size: 1.5rem; margin-bottom: 4px;">💻</div>
+                          <span>PC</span>
+                        </div>
+                        <div class="platform-option" data-platform="mobile" style="display: flex; flex-direction: column; align-items: center; padding: 12px 16px; border: 2px solid #4b5563; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; min-width: 80px;">
+                          <div style="font-size: 1.5rem; margin-bottom: 4px;">📱</div>
+                          <span>Mobile</span>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <!-- Tags -->
+                  <section style="background: linear-gradient(135deg, #065f46, #064e3b); border: 1px solid #10b981; border-radius: 12px; padding: 24px;">
+                    <h3 style="color: #10b981; font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">🏷️ Categories & Tags</h3>
+                    
+                    <div style="margin-bottom: 20px;">
+                      <label style="font-size: 0.875rem; font-weight: 600; color: #d1d5db; margin-bottom: 8px; display: block;">Content Category</label>
+                      <select id="demo-category" style="width: 100%; background: #374151; border: 2px solid transparent; border-radius: 8px; padding: 12px 16px; color: #ffffff; font-size: 1rem; transition: all 0.3s ease;">
+                        <option value="">Select category...</option>
+                        <option value="highlights">⚡ Highlights</option>
+                        <option value="gameplay">🎮 Full Gameplay</option>
+                        <option value="tutorials">📚 Tutorials</option>
+                        <option value="funny">😂 Funny Moments</option>
+                        <option value="competitive">🏆 Competitive</option>
+                        <option value="speedrun">⚡ Speedrun</option>
+                      </select>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                      <label style="font-size: 0.875rem; font-weight: 600; color: #d1d5db; margin-bottom: 8px; display: block;">Tags</label>
+                      <input type="text" id="demo-tag-input" placeholder="Add tags (e.g. clutch, headshot)">
+                      <div id="demo-selected-tags" style="display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; min-height: 32px; padding: 4px 0;"></div>
+                      <div style="font-size: 0.75rem; color: #9ca3af; text-align: right; margin-bottom: 12px;" id="demo-tag-counter">0/10</div>
+                      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <span class="suggestion-tag" data-tag="clutch" style="background: rgba(75, 85, 99, 0.8); color: #d1d5db; padding: 4px 12px; border-radius: 16px; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent;">clutch</span>
+                        <span class="suggestion-tag" data-tag="headshot" style="background: rgba(75, 85, 99, 0.8); color: #d1d5db; padding: 4px 12px; border-radius: 16px; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent;">headshot</span>
+                        <span class="suggestion-tag" data-tag="epic" style="background: rgba(75, 85, 99, 0.8); color: #d1d5db; padding: 4px 12px; border-radius: 16px; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent;">epic</span>
+                        <span class="suggestion-tag" data-tag="funny" style="background: rgba(75, 85, 99, 0.8); color: #d1d5db; padding: 4px 12px; border-radius: 16px; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent;">funny</span>
+                        <span class="suggestion-tag" data-tag="skilled" style="background: rgba(75, 85, 99, 0.8); color: #d1d5db; padding: 4px 12px; border-radius: 16px; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent;">skilled</span>
+                        <span class="suggestion-tag" data-tag="competitive" style="background: rgba(75, 85, 99, 0.8); color: #d1d5db; padding: 4px 12px; border-radius: 16px; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease; border: 1px solid transparent;">competitive</span>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+
+              <!-- Submission Actions -->
+              <section style="background: linear-gradient(135deg, #065f46, #064e3b); border: 1px solid #10b981; border-radius: 12px; padding: 24px; margin-top: 32px; text-align: center;">
+                <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px;">
+                  <button type="button" id="demo-save-draft" style="background: #374151; color: #d1d5db; border: 2px solid #4b5563; border-radius: 8px; padding: 12px 24px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px;">
+                    💾 Save Draft
+                  </button>
+                  <button type="button" id="demo-preview" style="background: #374151; color: #d1d5db; border: 2px solid #4b5563; border-radius: 8px; padding: 12px 24px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px;">
+                    👁️ Preview Post
+                  </button>
+                  <button type="submit" id="demo-submit" style="background: linear-gradient(45deg, #10b981, #059669); color: white; border: none; border-radius: 8px; padding: 14px 28px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px;">
+                    🚀 Submit Content
+                  </button>
+                </div>
+              </section>
+            </form>
+            
+            <style>
+              @keyframes bladeGlow {
+                0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+                50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.7); }
+              }
+              
+              .blade-item:hover {
+                transform: translateY(-3px);
+                border-color: #10b981 !important;
+                box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+              }
+              
+              .blade-item:hover .blade-label {
+                color: #10b981;
+              }
+              
+              .upload-dropzone:hover {
+                border-color: #10b981 !important;
+                background: rgba(16, 185, 129, 0.1) !important;
+                transform: scale(1.02);
+              }
+              
+              .platform-option:hover {
+                border-color: #10b981 !important;
+                transform: translateY(-2px);
+              }
+              
+              .suggestion-tag:hover {
+                background: #10b981 !important;
+                color: white !important;
+                transform: translateY(-1px);
+              }
+              
+              input:focus, textarea:focus, select:focus {
+                outline: none !important;
+                border-color: #10b981 !important;
+                box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important;
+                transform: translateY(-1px);
+              }
+              
+              button:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4) !important;
+              }
+              
+              .demo-button-secondary:hover {
+                border-color: #10b981 !important;
+                color: #10b981 !important;
+                transform: translateY(-1px) !important;
+              }
+            </style>
+          </div>
+        `;
+      }
+      
+      setupDemoEventListeners(container) {
+        // Content type blade selection
+        const blades = container.querySelectorAll('.blade-item');
+        blades.forEach(blade => {
+          blade.addEventListener('click', () => {
+            blades.forEach(b => {
+              b.classList.remove('active');
+              b.style.background = '#374151';
+              b.style.borderColor = 'transparent';
+              b.style.boxShadow = 'none';
+              b.style.animation = 'none';
+              const label = b.querySelector('.blade-label');
+              if (label) label.style.color = '#d1d5db';
+            });
+            
+            blade.classList.add('active');
+            blade.style.background = 'linear-gradient(135deg, #065f46, #064e3b)';
+            blade.style.borderColor = '#10b981';
+            blade.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.4)';
+            blade.style.animation = 'bladeGlow 3s ease-in-out infinite';
+            const label = blade.querySelector('.blade-label');
+            if (label) label.style.color = '#10b981';
+            
+            this.formState.contentType = blade.dataset.contentType;
+            this.showMessage('Content type selected: ' + blade.dataset.contentType, 'success');
+          });
+        });
+        
+        // Platform selection
+        const platforms = container.querySelectorAll('.platform-option');
+        platforms.forEach(platform => {
+          platform.addEventListener('click', () => {
+            platforms.forEach(p => {
+              p.classList.remove('selected');
+              p.style.borderColor = '#4b5563';
+              p.style.background = 'transparent';
+            });
+            
+            platform.classList.add('selected');
+            platform.style.borderColor = '#10b981';
+            platform.style.background = 'rgba(16, 185, 129, 0.2)';
+            
+            this.formState.metadata.platform = platform.dataset.platform;
+          });
+        });
+        
+        // Character counters
+        const titleInput = container.querySelector('#demo-title');
+        const titleCounter = container.querySelector('#demo-title-counter');
+        const descInput = container.querySelector('#demo-description');
+        const descCounter = container.querySelector('#demo-description-counter');
+        
+        if (titleInput && titleCounter) {
+          titleInput.addEventListener('input', () => {
+            const length = titleInput.value.length;
+            titleCounter.textContent = `${length}/100`;
+            this.formState.metadata.title = titleInput.value;
+            
+            if (length > 90) {
+              titleCounter.style.color = '#ef4444';
+            } else {
+              titleCounter.style.color = '#9ca3af';
+            }
+          });
+        }
+        
+        if (descInput && descCounter) {
+          descInput.addEventListener('input', () => {
+            const length = descInput.value.length;
+            descCounter.textContent = `${length}/500`;
+            this.formState.metadata.description = descInput.value;
+            
+            if (length > 450) {
+              descCounter.style.color = '#ef4444';
+            } else {
+              descCounter.style.color = '#9ca3af';
+            }
+          });
+        }
+        
+        // Tag system
+        const tagInput = container.querySelector('#demo-tag-input');
+        const selectedTags = container.querySelector('#demo-selected-tags');
+        const tagCounter = container.querySelector('#demo-tag-counter');
+        const suggestionTags = container.querySelectorAll('.suggestion-tag');
+        
+        if (tagInput) {
+          tagInput.style.cssText = 'width: 100%; background: #374151; border: 2px solid transparent; border-radius: 8px; padding: 12px 16px; color: #ffffff; font-size: 1rem; transition: all 0.3s ease;';
+          
+          tagInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ',') {
+              e.preventDefault();
+              const tag = tagInput.value.trim();
+              if (tag && this.formState.metadata.tags.length < 10) {
+                this.addTag(tag, selectedTags, tagCounter);
+                tagInput.value = '';
+              }
+            }
+          });
+        }
+        
+        suggestionTags.forEach(tag => {
+          tag.addEventListener('click', () => {
+            const tagText = tag.dataset.tag;
+            if (this.formState.metadata.tags.length < 10) {
+              this.addTag(tagText, selectedTags, tagCounter);
+            }
+          });
+        });
+        
+        // File upload
+        const dropzone = container.querySelector('#demo-dropzone');
+        const fileInput = container.querySelector('#demo-file-input');
+        
+        if (dropzone && fileInput) {
+          dropzone.addEventListener('click', () => fileInput.click());
+          
+          fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            this.handleFiles(files, container);
+          });
+          
+          dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = '#10b981';
+            dropzone.style.background = 'rgba(16, 185, 129, 0.1)';
+            dropzone.style.transform = 'scale(1.02)';
+          });
+          
+          dropzone.addEventListener('dragleave', () => {
+            dropzone.style.borderColor = '#4b5563';
+            dropzone.style.background = 'rgba(55, 65, 81, 0.3)';
+            dropzone.style.transform = 'scale(1)';
+          });
+          
+          dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = '#4b5563';
+            dropzone.style.background = 'rgba(55, 65, 81, 0.3)';
+            dropzone.style.transform = 'scale(1)';
+            
+            const files = Array.from(e.dataTransfer.files);
+            this.handleFiles(files, container);
+          });
+        }
+        
+        // Form submission
+        const form = container.querySelector('.submission-form');
+        const submitBtn = container.querySelector('#demo-submit');
+        const saveDraftBtn = container.querySelector('#demo-save-draft');
+        const previewBtn = container.querySelector('#demo-preview');
+        
+        if (form) {
+          form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.simulateSubmission(container);
+          });
+        }
+        
+        if (saveDraftBtn) {
+          saveDraftBtn.addEventListener('click', () => {
+            this.showMessage('Draft saved successfully! 💾', 'success');
+          });
+        }
+        
+        if (previewBtn) {
+          previewBtn.addEventListener('click', () => {
+            this.showMessage('Preview functionality would open a modal with formatted content preview', 'success');
+          });
+        }
+      }
+      
+      addTag(tag, container, counter) {
+        if (this.formState.metadata.tags.includes(tag)) return;
+        
+        this.formState.metadata.tags.push(tag);
+        
+        const tagElement = document.createElement('div');
+        tagElement.style.cssText = 'background: #10b981; color: white; padding: 4px 12px; border-radius: 16px; font-size: 0.875rem; display: flex; align-items: center; gap: 8px; animation: tagAppear 0.3s ease;';
+        tagElement.innerHTML = `
+          ${tag}
+          <span style="cursor: pointer; font-weight: bold; opacity: 0.8; padding: 2px 4px; border-radius: 50%; transition: all 0.2s ease;" onclick="this.parentElement.remove()">×</span>
+        `;
+        
+        container.appendChild(tagElement);
+        
+        if (counter) {
+          counter.textContent = `${this.formState.metadata.tags.length}/10`;
+          if (this.formState.metadata.tags.length >= 9) {
+            counter.style.color = '#ef4444';
+          } else {
+            counter.style.color = '#9ca3af';
+          }
+        }
+        
+        // Add remove functionality
+        const removeBtn = tagElement.querySelector('span');
+        removeBtn.addEventListener('click', () => {
+          const index = this.formState.metadata.tags.indexOf(tag);
+          if (index > -1) {
+            this.formState.metadata.tags.splice(index, 1);
+            if (counter) {
+              counter.textContent = `${this.formState.metadata.tags.length}/10`;
+              counter.style.color = '#9ca3af';
+            }
+          }
+        });
+        
+        removeBtn.addEventListener('mouseenter', () => {
+          removeBtn.style.opacity = '1';
+          removeBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+        });
+        
+        removeBtn.addEventListener('mouseleave', () => {
+          removeBtn.style.opacity = '0.8';
+          removeBtn.style.background = 'transparent';
+        });
+      }
+      
+      handleFiles(files, container) {
+        const uploadedFiles = container.querySelector('#demo-uploaded-files');
+        
+        files.forEach(file => {
+          const fileElement = document.createElement('div');
+          fileElement.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 12px; background: #374151; border-radius: 8px; border: 1px solid #4b5563;';
+          
+          const fileIcon = file.type.startsWith('video/') ? '🎬' : 
+                          file.type.startsWith('image/') ? '🖼️' : '📄';
+          
+          fileElement.innerHTML = `
+            <div style="width: 48px; height: 48px; border-radius: 6px; background: #4b5563; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">${fileIcon}</div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="color: #ffffff; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${file.name}</div>
+              <div style="color: #9ca3af; font-size: 0.875rem;">${this.formatFileSize(file.size)}</div>
+            </div>
+            <button type="button" style="width: 32px; height: 32px; border: none; background: #4b5563; color: #9ca3af; border-radius: 4px; cursor: pointer; font-size: 1.25rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;" onclick="this.parentElement.remove()">×</button>
+          `;
+          
+          // Add hover effect to remove button
+          const removeBtn = fileElement.querySelector('button');
+          removeBtn.addEventListener('mouseenter', () => {
+            removeBtn.style.background = '#ef4444';
+            removeBtn.style.color = 'white';
+          });
+          removeBtn.addEventListener('mouseleave', () => {
+            removeBtn.style.background = '#4b5563';
+            removeBtn.style.color = '#9ca3af';
+          });
+          
+          uploadedFiles.appendChild(fileElement);
+          this.formState.files.push(file);
+        });
+        
+        this.showMessage(`${files.length} file(s) added successfully!`, 'success');
+      }
+      
+      formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      }
+      
+      validateForm() {
+        let isValid = true;
+        const errors = [];
+        
+        if (!this.formState.metadata.title.trim()) {
+          errors.push('Title is required');
+          isValid = false;
+        }
+        
+        if (!this.formState.metadata.game.trim()) {
+          errors.push('Game selection is required');
+          isValid = false;
+        }
+        
+        if (this.formState.files.length === 0) {
+          errors.push('At least one file is required');
+          isValid = false;
+        }
+        
+        if (!isValid) {
+          this.showMessage(`Validation failed: ${errors.join(', ')}`, 'error');
+        }
+        
+        return isValid;
+      }
+      
+      async simulateSubmission(container) {
+        const submitBtn = container.querySelector('#demo-submit');
+        const progressBar = container.querySelector('#demo-progress');
+        const progressFill = container.querySelector('#demo-progress-fill');
+        const progressText = container.querySelector('#demo-progress-text');
+        
+        if (!this.validateForm()) return;
+        
+        // Show progress
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="loading-spinner"></div>Uploading...';
+        progressBar.style.display = 'block';
+        
+        // Simulate upload progress
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += Math.random() * 15;
+          if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            
+            // Submission complete
+            submitBtn.innerHTML = '✅ Completed';
+            progressBar.style.display = 'none';
+            
+            this.showMessage('Content submitted successfully! 🎉', 'success');
+            
+            // Reset after delay
+            setTimeout(() => {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = '🚀 Submit Content';
+              this.resetForm();
+            }, 2000);
+          }
+          
+          if (progressFill) progressFill.style.width = `${Math.round(progress)}%`;
+          if (progressText) progressText.textContent = `Uploading... ${Math.round(progress)}%`;
+        }, 200);
+      }
+      
+      resetForm() {
+        this.formState = {
+          contentType: 'clips',
+          files: [],
+          metadata: {
+            title: '', description: '', game: '', platform: 'xbox',
+            category: '', tags: [], visibility: 'public',
+            allowComments: true, allowDownloads: false
+          }
+        };
+        
+        // Reset UI would go here in real implementation
+        this.showMessage('Form reset to initial state', 'success');
+      }
+      
+      showMessage(message, type = 'success') {
+        const messageElement = document.getElementById(type === 'success' ? 'success-message' : 'error-message');
+        if (messageElement) {
+          messageElement.textContent = message;
+          messageElement.style.display = 'block';
+          
+          setTimeout(() => {
+            messageElement.style.display = 'none';
+          }, 4000);
+        }
+      }
+    }
+    
+    // Initialize the demo
+    let demoForm;
+    
+    async function initializeDemo() {
+      try {
+        demoForm = new MockContentSubmissionForm({
+          onSubmit: (result) => {
+            console.log('Demo form submitted:', result);
+          },
+          onError: (error) => {
+            console.error('Demo form error:', error);
+          }
+        });
+        
+        await demoForm.initialize({ connected: true }, {});
+        const component = demoForm.createContentSubmissionForm('content-submission-form');
+        
+        console.log('Demo form initialized successfully');
+        
+      } catch (error) {
+        console.error('Failed to initialize demo form:', error);
+      }
+    }
+    
+    // Demo control handlers
+    document.getElementById('content-type-select').addEventListener('change', (e) => {
+      const blade = document.querySelector(`[data-content-type="${e.target.value}"]`);
+      if (blade) blade.click();
+    });
+    
+    document.getElementById('uploads-remaining').addEventListener('input', (e) => {
+      const value = e.target.value;
+      document.getElementById('uploads-remaining-value').textContent = `${value}/3`;
+      const display = document.getElementById('uploads-remaining-display');
+      if (display) display.textContent = `${value}/3`;
+    });
+    
+    document.getElementById('fill-sample-data').addEventListener('click', () => {
+      if (demoForm) {
+        const titleInput = document.getElementById('demo-title');
+        const descInput = document.getElementById('demo-description');
+        const gameInput = document.getElementById('demo-game-search');
+        const categorySelect = document.getElementById('demo-category');
+        
+        if (titleInput) {
+          titleInput.value = 'Epic clutch play in ranked match';
+          titleInput.dispatchEvent(new Event('input'));
+        }
+        
+        if (descInput) {
+          descInput.value = 'Amazing 1v4 clutch in the final round that secured our victory. Watch how I outplayed the entire enemy team with precision shots and smart positioning!';
+          descInput.dispatchEvent(new Event('input'));
+        }
+        
+        if (gameInput) {
+          gameInput.value = 'Rainbow Six Siege';
+        }
+        
+        if (categorySelect) {
+          categorySelect.value = 'competitive';
+        }
+        
+        // Add sample tags
+        const selectedTags = document.getElementById('demo-selected-tags');
+        const tagCounter = document.getElementById('demo-tag-counter');
+        if (selectedTags && demoForm.formState.metadata.tags.length === 0) {
+          demoForm.addTag('clutch', selectedTags, tagCounter);
+          demoForm.addTag('ranked', selectedTags, tagCounter);
+          demoForm.addTag('epic', selectedTags, tagCounter);
+        }
+        
+        demoForm.showMessage('Sample data filled successfully!', 'success');
+      }
+    });
+    
+    document.getElementById('show-validation').addEventListener('click', () => {
+      const titleError = document.getElementById('demo-title-error');
+      const gameError = document.getElementById('demo-game-error');
+      
+      if (titleError) {
+        titleError.textContent = 'Title is required';
+        titleError.style.display = 'block';
+        
+        const titleInput = document.getElementById('demo-title');
+        if (titleInput) {
+          titleInput.style.borderColor = '#ef4444';
+          titleInput.style.animation = 'shake 0.5s ease-in-out';
+        }
+      }
+      
+      if (gameError) {
+        gameError.textContent = 'Please select a valid game';
+        gameError.style.display = 'block';
+        
+        const gameInput = document.getElementById('demo-game-search');
+        if (gameInput) {
+          gameInput.style.borderColor = '#ef4444';
+        }
+      }
+      
+      if (demoForm) {
+        demoForm.showMessage('Validation errors displayed', 'error');
+      }
+      
+      // Clear errors after 3 seconds
+      setTimeout(() => {
+        if (titleError) titleError.style.display = 'none';
+        if (gameError) gameError.style.display = 'none';
+        
+        const titleInput = document.getElementById('demo-title');
+        const gameInput = document.getElementById('demo-game-search');
+        if (titleInput) {
+          titleInput.style.borderColor = 'transparent';
+          titleInput.style.animation = 'none';
+        }
+        if (gameInput) gameInput.style.borderColor = 'transparent';
+      }, 3000);
+    });
+    
+    document.getElementById('simulate-upload').addEventListener('click', () => {
+      if (demoForm) {
+        // Create mock file
+        const mockFile = new File(['mock content'], 'epic-gameplay.mp4', { type: 'video/mp4' });
+        Object.defineProperty(mockFile, 'size', { value: 25 * 1024 * 1024 }); // 25MB
+        
+        const container = document.getElementById('content-submission-form');
+        demoForm.handleFiles([mockFile], container);
+      }
+    });
+    
+    document.getElementById('reset-form').addEventListener('click', () => {
+      if (demoForm) {
+        demoForm.resetForm();
+        
+        // Reset UI elements
+        const inputs = document.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+          if (input.type !== 'file') {
+            input.value = '';
+          }
+        });
+        
+        // Reset counters
+        const titleCounter = document.getElementById('demo-title-counter');
+        const descCounter = document.getElementById('demo-description-counter');
+        const tagCounter = document.getElementById('demo-tag-counter');
+        
+        if (titleCounter) titleCounter.textContent = '0/100';
+        if (descCounter) descCounter.textContent = '0/500';
+        if (tagCounter) tagCounter.textContent = '0/10';
+        
+        // Clear tags and files
+        const selectedTags = document.getElementById('demo-selected-tags');
+        const uploadedFiles = document.getElementById('demo-uploaded-files');
+        
+        if (selectedTags) selectedTags.innerHTML = '';
+        if (uploadedFiles) uploadedFiles.innerHTML = '';
+        
+        // Reset blade selection
+        const blades = document.querySelectorAll('.blade-item');
+        blades.forEach((blade, index) => {
+          if (index === 0) {
+            blade.classList.add('active');
+            blade.style.background = 'linear-gradient(135deg, #065f46, #064e3b)';
+            blade.style.borderColor = '#10b981';
+            blade.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.4)';
+            blade.style.animation = 'bladeGlow 3s ease-in-out infinite';
+            const label = blade.querySelector('.blade-label');
+            if (label) label.style.color = '#10b981';
+          } else {
+            blade.classList.remove('active');
+            blade.style.background = '#374151';
+            blade.style.borderColor = 'transparent';
+            blade.style.boxShadow = 'none';
+            blade.style.animation = 'none';
+            const label = blade.querySelector('.blade-label');
+            if (label) label.style.color = '#d1d5db';
+          }
+        });
+        
+        // Reset platform selection
+        const platforms = document.querySelectorAll('.platform-option');
+        platforms.forEach((platform, index) => {
+          if (index === 0) {
+            platform.classList.add('selected');
+            platform.style.borderColor = '#10b981';
+            platform.style.background = 'rgba(16, 185, 129, 0.2)';
+          } else {
+            platform.classList.remove('selected');
+            platform.style.borderColor = '#4b5563';
+            platform.style.background = 'transparent';
+          }
+        });
+      }
+    });
+    
+    // Add CSS animation for shake effect
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+      }
+      
+      @keyframes tagAppear {
+        from { opacity: 0; transform: scale(0.8); }
+        to { opacity: 1; transform: scale(1); }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Initialize the demo when DOM is loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeDemo);
+    } else {
+      initializeDemo();
+    }
+    
+  </script>
+</body>
+</html>

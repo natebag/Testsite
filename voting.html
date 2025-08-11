@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vote Vault - MLG Token Burn Voting | MLG.clan</title>
+  
+  <!-- Meta Tags -->
+  <meta name="description" content="Vote Vault - Democratic content voting powered by MLG token burns. Each vote costs tokens, creating real economic incentives.">
+  <meta name="keywords" content="voting, token burn, MLG, gaming, esports, clan, DAO, blockchain, Solana">
+  <meta name="author" content="MLG.clan Development Team">
+  
+  <!-- Security Headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdn.socket.io; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: blob: https:; connect-src 'self' wss: https: ws://localhost:3000; frame-src 'self' https://www.youtube.com https://player.twitch.tv https://www.tiktok.com; font-src 'self' data:;">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗳️</text></svg>">
+  
+  <!-- Standardized Module Loading System -->
+  <script src="src/js/page-loader.js"></script>
+  
+  <style>
+    /* Page-specific styles */
+    
+    /* Vote-specific styles */
+    .vote-card {
+      transition: all 0.3s ease;
+      border: 1px solid rgba(0, 255, 136, 0.1);
+    }
+    
+    .vote-card:hover {
+      border-color: rgba(0, 255, 136, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 255, 136, 0.1);
+    }
+    
+    .burn-animation {
+      animation: burn 0.5s ease-in-out;
+    }
+    
+    @keyframes burn {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); color: #ef4444; }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body class="bg-gaming-bg text-white min-h-screen">
+  
+  <!-- Navigation Header -->
+  <nav class="bg-black bg-opacity-60 backdrop-blur-md border-b border-gaming-accent border-opacity-20 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <a href="index.html" onclick="handleNavigation(event, 'index.html')" class="text-2xl font-bold text-gaming-accent flex items-center space-x-2 hover:text-green-400 transition-colors">
+              <span class="animate-pulse">🎮</span>
+              <span>MLG.clan</span>
+            </a>
+          </div>
+          <div class="hidden md:block ml-10">
+            <div class="flex items-baseline space-x-4">
+              <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'index.html')">Dashboard</a>
+              <a href="voting.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium bg-gaming-accent text-black transition-colors" onclick="handleNavigation(event, 'voting.html')">Vote Vault</a>
+              <a href="clans.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'clans.html')">Clans</a>
+              <a href="content.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'content.html')">Content Hub</a>
+              <a href="dao.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'dao.html')">DAO</a>
+              <a href="analytics.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'analytics.html')">Analytics</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <!-- System Status -->
+          <div id="system-status" class="flex items-center space-x-2">
+            <div class="status-online">
+              <i data-lucide="activity" class="w-4 h-4 text-gaming-accent"></i>
+            </div>
+            <span class="text-sm text-gaming-accent font-medium">All Systems Online</span>
+          </div>
+          
+          <!-- Wallet Connection -->
+          <button id="wallet-connect" class="bg-gaming-purple hover:bg-purple-600 px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2">
+            <i data-lucide="wallet" class="w-4 h-4"></i>
+            <span>Connect Phantom</span>
+          </button>
+          
+          <!-- User Info (Hidden by default) -->
+          <div id="user-info" class="hidden flex items-center space-x-3">
+            <div class="flex items-center space-x-2 bg-gaming-surface px-3 py-1 rounded-lg">
+              <div class="w-6 h-6 bg-gradient-to-r from-gaming-accent to-gaming-blue rounded-full"></div>
+              <span id="user-address" class="text-sm font-mono"></span>
+            </div>
+            <div class="text-right">
+              <div class="text-xs text-gray-400">MLG Balance</div>
+              <div id="mlg-balance" class="text-sm font-bold text-gaming-yellow">0</div>
+            </div>
+            <a href="profile.html" onclick="handleNavigation(event, 'profile.html')" class="text-gray-300 hover:text-gaming-accent transition-colors">
+              <i data-lucide="user" class="w-5 h-5"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Vote Vault Header -->
+  <section class="relative py-16 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-gaming-bg via-gaming-surface to-gaming-bg opacity-50"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-5xl font-bold mb-6 text-gaming-accent animate-float">
+        🗳️ Vote Vault
+      </h1>
+      <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+        Democratic content voting powered by MLG token burns. Each vote costs tokens, creating real economic incentives.
+      </p>
+      
+      <!-- Vote Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <div class="card-glow rounded-lg p-6">
+          <div class="text-3xl font-bold text-gaming-accent" id="daily-votes">856</div>
+          <div class="text-sm text-gray-400">Votes Today</div>
+        </div>
+        <div class="card-glow rounded-lg p-6">
+          <div class="text-3xl font-bold text-gaming-red" id="tokens-burned">289K</div>
+          <div class="text-sm text-gray-400">MLG Burned</div>
+        </div>
+        <div class="card-glow rounded-lg p-6">
+          <div class="text-3xl font-bold text-gaming-blue" id="active-voters">5,621</div>
+          <div class="text-sm text-gray-400">Active Voters</div>
+        </div>
+        <div class="card-glow rounded-lg p-6">
+          <div class="text-3xl font-bold text-gaming-yellow" id="vote-cost">25</div>
+          <div class="text-sm text-gray-400">MLG per Vote</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Voting Power Panel -->
+        <div class="card-glow rounded-xl p-8">
+          <h3 class="text-2xl font-bold text-gaming-accent mb-6 flex items-center">
+            <i data-lucide="zap" class="w-6 h-6 mr-3"></i>
+            Your Voting Power
+          </h3>
+          <div class="space-y-4">
+            <div class="bg-gaming-surface rounded-lg p-4">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-300">Daily Votes Remaining</span>
+                <span class="text-2xl font-bold text-gaming-accent" id="votes-remaining">4/4</span>
+              </div>
+              <div class="w-full bg-gray-600 rounded-full h-2">
+                <div class="bg-gaming-accent h-2 rounded-full" style="width: 100%" id="votes-progress"></div>
+              </div>
+            </div>
+            
+            <div class="space-y-3">
+              <div class="flex justify-between">
+                <span class="text-gray-300">MLG Token Balance</span>
+                <span class="text-gaming-yellow font-bold" id="user-mlg-balance">1,250</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-300">Next Vote Cost</span>
+                <span class="text-gaming-red font-bold">25 MLG</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-300">Your Votes Today</span>
+                <span class="text-gaming-blue font-bold" id="user-votes-today">0</span>
+              </div>
+            </div>
+            
+            <button id="buy-votes" class="w-full bg-gaming-purple hover:bg-purple-600 px-6 py-3 rounded-lg font-bold transition-colors">
+              Buy More Votes
+            </button>
+          </div>
+        </div>
+
+        <!-- Content Voting Section -->
+        <div class="lg:col-span-2 card-glow rounded-xl p-8">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-2xl font-bold text-gaming-accent flex items-center">
+              <i data-lucide="trending-up" class="w-6 h-6 mr-3"></i>
+              Trending Content
+            </h3>
+            <div class="flex space-x-2">
+              <button class="bg-gaming-surface hover:bg-gaming-blue px-4 py-2 rounded-lg text-sm transition-colors">
+                Latest
+              </button>
+              <button class="bg-gaming-blue text-white px-4 py-2 rounded-lg text-sm">
+                Trending
+              </button>
+              <button class="bg-gaming-surface hover:bg-gaming-blue px-4 py-2 rounded-lg text-sm transition-colors">
+                Top Rated
+              </button>
+            </div>
+          </div>
+          
+          <!-- Content Items -->
+          <div class="space-y-4" id="content-list">
+            
+            <!-- Content Item 1 -->
+            <div class="flex items-center justify-between p-4 bg-gaming-surface rounded-lg hover:bg-opacity-80 transition-all">
+              <div class="flex items-center space-x-4">
+                <div class="w-16 h-12 bg-gradient-to-r from-red-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <i data-lucide="play" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-white">Epic Valorant Clutch - 1v5 Ace</h4>
+                  <p class="text-sm text-gray-400">by ProGamer2024 • 2 hours ago</p>
+                  <div class="flex items-center space-x-4 text-xs text-gray-500 mt-1">
+                    <span>YouTube</span>
+                    <span>•</span>
+                    <span>2.4M views</span>
+                    <span>•</span>
+                    <span>98% upvoted</span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right flex items-center space-x-4">
+                <div>
+                  <div class="text-2xl font-bold text-gaming-accent">847</div>
+                  <div class="text-xs text-gray-400">votes</div>
+                </div>
+                <button class="bg-gaming-accent hover:bg-green-400 text-black px-6 py-2 rounded-lg font-bold transition-colors vote-btn" data-content-id="1" data-cost="25">
+                  Vote (25 MLG)
+                </button>
+              </div>
+            </div>
+
+            <!-- Content Item 2 -->
+            <div class="flex items-center justify-between p-4 bg-gaming-surface rounded-lg hover:bg-opacity-80 transition-all">
+              <div class="flex items-center space-x-4">
+                <div class="w-16 h-12 bg-gradient-to-r from-blue-500 to-teal-600 rounded-lg flex items-center justify-center">
+                  <i data-lucide="play" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-white">Insane Rocket League Air Dribble Goal</h4>
+                  <p class="text-sm text-gray-400">by AerialMaster • 4 hours ago</p>
+                  <div class="flex items-center space-x-4 text-xs text-gray-500 mt-1">
+                    <span>TikTok</span>
+                    <span>•</span>
+                    <span>1.8M views</span>
+                    <span>•</span>
+                    <span>94% upvoted</span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right flex items-center space-x-4">
+                <div>
+                  <div class="text-2xl font-bold text-gaming-accent">623</div>
+                  <div class="text-xs text-gray-400">votes</div>
+                </div>
+                <button class="bg-gaming-accent hover:bg-green-400 text-black px-6 py-2 rounded-lg font-bold transition-colors vote-btn" data-content-id="2" data-cost="25">
+                  Vote (25 MLG)
+                </button>
+              </div>
+            </div>
+
+            <!-- Content Item 3 -->
+            <div class="flex items-center justify-between p-4 bg-gaming-surface rounded-lg hover:bg-opacity-80 transition-all">
+              <div class="flex items-center space-x-4">
+                <div class="w-16 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                  <i data-lucide="users" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                  <h4 class="font-bold text-white">MLG Elite vs Phoenix Rising - Epic Showdown</h4>
+                  <p class="text-sm text-gray-400">by TournamentHQ • 6 hours ago</p>
+                  <div class="flex items-center space-x-4 text-xs text-gray-500 mt-1">
+                    <span>Twitch</span>
+                    <span>•</span>
+                    <span>847K views</span>
+                    <span>•</span>
+                    <span>96% upvoted</span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right flex items-center space-x-4">
+                <div>
+                  <div class="text-2xl font-bold text-gaming-accent">512</div>
+                  <div class="text-xs text-gray-400">votes</div>
+                </div>
+                <button class="bg-gaming-accent hover:bg-green-400 text-black px-6 py-2 rounded-lg font-bold transition-colors vote-btn" data-content-id="3" data-cost="25">
+                  Vote (25 MLG)
+                </button>
+              </div>
+            </div>
+
+          </div>
+          
+          <div class="mt-8 text-center">
+            <button class="bg-gaming-surface hover:bg-gaming-blue px-8 py-3 rounded-lg font-bold transition-colors">
+              Load More Content
+            </button>
+          </div>
+        </div>
+        
+      </div>
+      
+      <!-- How It Works -->
+      <div class="mt-16 card-glow rounded-xl p-8">
+        <h3 class="text-2xl font-bold text-gaming-accent mb-6 text-center">How Vote Vault Works</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-gaming-accent rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-lucide="gift" class="w-8 h-8 text-black"></i>
+            </div>
+            <h4 class="font-bold text-white mb-2">Daily Free Votes</h4>
+            <p class="text-sm text-gray-400">Every user gets 4 free votes daily to participate in content curation</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-gaming-red rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-lucide="flame" class="w-8 h-8 text-white"></i>
+            </div>
+            <h4 class="font-bold text-white mb-2">Token Burn Mechanism</h4>
+            <p class="text-sm text-gray-400">Additional votes cost 25 MLG tokens, which are permanently burned</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-gaming-purple rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-lucide="trending-up" class="w-8 h-8 text-white"></i>
+            </div>
+            <h4 class="font-bold text-white mb-2">Economic Incentives</h4>
+            <p class="text-sm text-gray-400">Token burning creates scarcity and gives votes real economic weight</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-gaming-blue rounded-full flex items-center justify-center mx-auto mb-4">
+              <i data-lucide="users" class="w-8 h-8 text-white"></i>
+            </div>
+            <h4 class="font-bold text-white mb-2">Democratic Curation</h4>
+            <p class="text-sm text-gray-400">Community decides what content deserves recognition and rewards</p>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-black bg-opacity-80 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <a href="index.html" onclick="handleNavigation(event, 'index.html')" class="text-2xl font-bold mb-4 text-gaming-accent hover:text-green-400 transition-colors inline-block">🎮 MLG.clan</a>
+        <p class="text-gray-400 mb-6">The future of gaming communities is here.</p>
+        <div class="flex justify-center space-x-8 text-sm text-gray-500">
+          <span>Web3 Native</span>
+          <span>•</span>
+          <span>Enterprise Ready</span>
+          <span>•</span>
+          <span>Community Governed</span>
+          <span>•</span>
+          <span>100% Complete</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize platform
+    class VotingPlatform {
+      constructor() {
+        this.userStats = {
+          votesRemaining: 4,
+          votesToday: 0,
+          mlgBalance: 1250
+        };
+        this.init();
+      }
+      
+      init() {
+        this.initializeUI();
+        this.setupEventListeners();
+        this.loadLiveStats();
+      }
+      
+      initializeUI() {
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        }
+        this.updateUserStats();
+      }
+      
+      setupEventListeners() {
+        // Vote buttons
+        document.querySelectorAll('.vote-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const contentId = e.target.dataset.contentId;
+            const cost = parseInt(e.target.dataset.cost);
+            this.castVote(contentId, cost);
+          });
+        });
+        
+        // Buy votes button
+        document.getElementById('buy-votes').addEventListener('click', () => {
+          this.showNotification('🛒 Vote purchasing interface coming soon!', 'info');
+        });
+      }
+      
+      async castVote(contentId, cost) {
+        if (this.userStats.votesRemaining > 0) {
+          // Use free vote
+          this.userStats.votesRemaining--;
+          this.userStats.votesToday++;
+          this.showNotification('✅ Free vote cast successfully!', 'success');
+        } else if (this.userStats.mlgBalance >= cost) {
+          // Use paid vote
+          this.userStats.mlgBalance -= cost;
+          this.userStats.votesToday++;
+          this.showNotification(`🔥 Voted! ${cost} MLG tokens burned.`, 'success');
+        } else {
+          this.showNotification('❌ Insufficient MLG tokens for vote!', 'error');
+          return;
+        }
+        
+        this.updateUserStats();
+        this.updateVoteCount(contentId);
+      }
+      
+      updateUserStats() {
+        document.getElementById('votes-remaining').textContent = `${this.userStats.votesRemaining}/4`;
+        document.getElementById('user-mlg-balance').textContent = this.userStats.mlgBalance.toLocaleString();
+        document.getElementById('user-votes-today').textContent = this.userStats.votesToday;
+        
+        const progressPercent = (this.userStats.votesRemaining / 4) * 100;
+        document.getElementById('votes-progress').style.width = `${progressPercent}%`;
+      }
+      
+      updateVoteCount(contentId) {
+        // Simulate vote count increase
+        const voteElements = document.querySelectorAll('.vote-btn');
+        voteElements.forEach(btn => {
+          if (btn.dataset.contentId === contentId) {
+            const voteCountElement = btn.parentElement.querySelector('div:first-child');
+            const currentVotes = parseInt(voteCountElement.textContent);
+            voteCountElement.textContent = currentVotes + 1;
+          }
+        });
+      }
+      
+      loadLiveStats() {
+        const stats = {
+          'daily-votes': () => 856 + Math.floor(Math.random() * 50),
+          'tokens-burned': () => (289000 + Math.floor(Math.random() * 1000)),
+          'active-voters': () => 5621 + Math.floor(Math.random() * 100),
+          'vote-cost': () => 25
+        };
+        
+        Object.entries(stats).forEach(([id, valueFn]) => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.textContent = typeof valueFn === 'function' ? valueFn().toLocaleString() : valueFn;
+          }
+        });
+        
+        // Update every 30 seconds
+        setInterval(() => this.loadLiveStats(), 30000);
+      }
+      
+      showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-medium z-50 transition-all transform translate-x-full ${
+          type === 'success' ? 'bg-gaming-accent text-black' :
+          type === 'error' ? 'bg-gaming-red' :
+          type === 'warning' ? 'bg-gaming-yellow text-black' :
+          'bg-gaming-blue'
+        }`;
+        
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.classList.remove('translate-x-full');
+        }, 100);
+        
+        setTimeout(() => {
+          notification.classList.add('translate-x-full');
+          setTimeout(() => {
+            if (document.body.contains(notification)) {
+              document.body.removeChild(notification);
+            }
+          }, 300);
+        }, 4000);
+      }
+    }
+    
+    // Universal navigation handler for both SPA and multi-page modes
+    function handleNavigation(event, pageUrl) {
+      // Check if SPA router is available and ready
+      if (window.router && window.router.push && typeof window.router.push === 'function') {
+        event.preventDefault();
+        const routePath = '/' + pageUrl.replace('.html', '').replace('index', 'dashboard');
+        window.router.push(routePath);
+      }
+      // If no SPA router, let the default link behavior happen (multi-page navigation)
+    }
+    
+    // Active navigation state management
+    function updateActiveNavigation(currentPage) {
+      // Remove active class from all nav links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('bg-gaming-accent', 'text-black');
+        link.classList.add('text-gray-300');
+      });
+      
+      // Add active class to current page link
+      const activeLink = document.querySelector(`.nav-link[href="${currentPage}"]`);
+      if (activeLink) {
+        activeLink.classList.remove('text-gray-300');
+        activeLink.classList.add('bg-gaming-accent', 'text-black');
+      }
+    }
+    
+    // Make navigation functions globally available
+    window.handleNavigation = handleNavigation;
+    window.updateActiveNavigation = updateActiveNavigation;
+    
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      new VotingPlatform();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan - Burn Vote Confirmation Modal Wireframes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Xbox 360 Design System Variables */
+        :root {
+            --xbox-green: #10b981;
+            --xbox-green-hover: #059669;
+            --xbox-green-light: #34d399;
+            --burn-orange: #f59e0b;
+            --burn-red: #dc2626;
+            --burn-gradient: linear-gradient(45deg, #dc2626, #f59e0b);
+            --warning-gradient: linear-gradient(45deg, #f59e0b, #d97706);
+            --success-gradient: linear-gradient(45deg, #10b981, #059669);
+            --modal-blur: blur(10px);
+            --tile-bg: rgba(31, 41, 55, 0.95);
+            --tile-border: rgba(16, 185, 129, 0.3);
+            --spacing-unit: 8px;
+            --border-radius: 8px;
+            --transition-fast: 0.15s ease-out;
+            --transition-medium: 0.3s ease;
+            --transition-slow: 0.5s ease;
+            --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.4);
+            --shadow-burn: 0 0 20px rgba(245, 158, 11, 0.6);
+            --shadow-danger: 0 0 20px rgba(220, 38, 38, 0.5);
+        }
+
+        /* Base Modal Styles */
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: var(--modal-blur);
+            z-index: 2000;
+        }
+
+        .modal-container {
+            background: var(--tile-bg);
+            border: 2px solid var(--tile-border);
+            border-radius: calc(var(--border-radius) * 2);
+            box-shadow: var(--shadow-glow);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Burn Effects */
+        .burn-effect {
+            background: var(--burn-gradient);
+            animation: burn-glow 2s infinite;
+        }
+
+        .burn-warning {
+            background: var(--warning-gradient);
+            animation: warning-pulse 1.5s infinite;
+        }
+
+        .burn-danger {
+            background: var(--burn-gradient);
+            animation: danger-pulse 1s infinite;
+            box-shadow: var(--shadow-danger);
+        }
+
+        @keyframes burn-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.7); }
+        }
+
+        @keyframes warning-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.9; }
+        }
+
+        @keyframes danger-pulse {
+            0%, 100% { box-shadow: var(--shadow-danger); }
+            50% { box-shadow: 0 0 30px rgba(220, 38, 38, 0.8); }
+        }
+
+        /* Success Animations */
+        .success-effect {
+            background: var(--success-gradient);
+            animation: success-celebration 0.6s ease-out;
+        }
+
+        @keyframes success-celebration {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Token Cost Display */
+        .token-cost {
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            border: 2px solid var(--burn-orange);
+            animation: cost-highlight 2s infinite;
+        }
+
+        @keyframes cost-highlight {
+            0%, 100% { border-color: var(--burn-orange); }
+            50% { border-color: var(--burn-red); }
+        }
+
+        /* Progressive Burn Indicators */
+        .burn-level-1 { --burn-intensity: 0.3; }
+        .burn-level-2 { --burn-intensity: 0.5; }
+        .burn-level-3 { --burn-intensity: 0.7; }
+        .burn-level-4 { --burn-intensity: 1.0; }
+
+        .burn-indicator {
+            opacity: var(--burn-intensity);
+            filter: hue-rotate(calc(var(--burn-intensity) * 30deg));
+        }
+
+        /* Confirmation Checkboxes */
+        .confirmation-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--burn-orange);
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition-fast);
+        }
+
+        .confirmation-checkbox:checked {
+            background: var(--burn-orange);
+            border-color: var(--burn-red);
+        }
+
+        .confirmation-checkbox:checked::after {
+            content: "✓";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: black;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        /* Transaction Simulation */
+        .simulation-preview {
+            background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            animation: simulation-scan 3s infinite;
+        }
+
+        @keyframes simulation-scan {
+            0%, 100% { border-color: rgba(59, 130, 246, 0.3); }
+            50% { border-color: rgba(59, 130, 246, 0.6); }
+        }
+
+        /* Mobile Adaptations */
+        @media (max-width: 768px) {
+            .modal-container {
+                margin: var(--spacing-unit);
+                max-height: 95vh;
+            }
+            
+            .touch-target {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+
+        /* Wire frame visualization */
+        .wireframe {
+            border: 2px dashed #6b7280;
+            background: rgba(107, 114, 128, 0.1);
+        }
+
+        .component-annotation {
+            background: #fbbf24;
+            color: #000;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            position: absolute;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-mono">
+    <!-- Header -->
+    <header class="bg-gray-800 border-b border-green-500 p-4">
+        <h1 class="text-2xl font-bold text-green-400">MLG.clan Burn Vote Confirmation - Wireframes & Specifications</h1>
+        <p class="text-gray-400 mt-2">Xbox 360-inspired modal design system for SPL token burn confirmations</p>
+    </header>
+
+    <!-- Design System Overview -->
+    <section class="p-8 border-b border-gray-700">
+        <h2 class="text-xl font-bold text-green-400 mb-6">Design System Foundation</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Color Palette -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-600">
+                <h3 class="font-bold mb-4 text-green-300">Color Palette</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 bg-green-500 rounded border"></div>
+                        <span class="text-sm">Xbox Green: #10b981 (Primary Actions)</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 rounded border" style="background: linear-gradient(45deg, #dc2626, #f59e0b);"></div>
+                        <span class="text-sm">Burn Gradient: Red→Orange (Danger)</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 bg-yellow-500 rounded border"></div>
+                        <span class="text-sm">Warning: #f59e0b (Caution)</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-6 bg-blue-500 rounded border"></div>
+                        <span class="text-sm">Info: #3b82f6 (Simulation)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spacing System -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-600">
+                <h3 class="font-bold mb-4 text-green-300">8px Grid System</h3>
+                <div class="space-y-2 text-sm">
+                    <div>XS: 4px - Icon padding</div>
+                    <div>SM: 8px - Element spacing</div>
+                    <div>MD: 16px - Section padding</div>
+                    <div>LG: 24px - Modal padding</div>
+                    <div>XL: 32px - Modal margins</div>
+                </div>
+            </div>
+
+            <!-- Animation Timing -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-600">
+                <h3 class="font-bold mb-4 text-green-300">Animation System</h3>
+                <div class="space-y-2 text-sm">
+                    <div>Fast: 0.15s - Button hover</div>
+                    <div>Medium: 0.3s - Modal transitions</div>
+                    <div>Slow: 0.5s - Success celebrations</div>
+                    <div>Infinite: Burn glow effects</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Wireframe: Burn Vote Confirmation Modal -->
+    <section class="p-8 border-b border-gray-700">
+        <h2 class="text-xl font-bold text-green-400 mb-6">1. Main Burn Vote Confirmation Modal</h2>
+        
+        <div class="relative">
+            <!-- Modal Overlay Visualization -->
+            <div class="modal-overlay fixed inset-0 flex items-center justify-center p-4" style="position: relative; height: 600px;">
+                <div class="modal-container w-full max-w-md p-6 relative">
+                    <!-- Annotation -->
+                    <div class="component-annotation -top-6 left-0">Modal Container: 480px max-width</div>
+                    
+                    <!-- Header -->
+                    <div class="border-b border-gray-600 pb-4 mb-6">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold flex items-center gap-2">
+                                <span class="text-2xl">🔥</span>
+                                Confirm MLG Burn Vote
+                            </h3>
+                            <button class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                        </div>
+                        <p class="text-sm text-gray-400 mt-2">Voting will permanently burn MLG tokens</p>
+                    </div>
+
+                    <!-- Content Info -->
+                    <div class="bg-gray-800 p-4 rounded-lg mb-6">
+                        <div class="flex items-start gap-3">
+                            <div class="w-12 h-12 bg-purple-600 rounded flex items-center justify-center text-2xl">🎮</div>
+                            <div>
+                                <h4 class="font-semibold">Epic VALORANT Ace Clutch</h4>
+                                <p class="text-sm text-gray-400">by ProGamer123</p>
+                                <div class="flex items-center gap-4 mt-2 text-xs">
+                                    <span class="text-green-400">👍 142 votes</span>
+                                    <span class="text-yellow-500">🔥 28 MLG votes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transaction Preview -->
+                    <div class="simulation-preview p-4 rounded-lg mb-6">
+                        <h4 class="font-semibold mb-3 flex items-center gap-2">
+                            <span class="text-blue-400">⚡</span>
+                            Transaction Simulation
+                        </h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span>MLG Tokens to Burn:</span>
+                                <span class="font-bold text-yellow-500">1 MLG</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Vote Weight:</span>
+                                <span class="text-green-400">2x Standard Vote</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Network Fee:</span>
+                                <span class="text-blue-400">~0.001 SOL</span>
+                            </div>
+                            <div class="border-t border-gray-600 pt-2 mt-2">
+                                <div class="flex justify-between font-bold">
+                                    <span>Total Cost:</span>
+                                    <span class="text-yellow-500">1 MLG + 0.001 SOL</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning Box -->
+                    <div class="burn-warning p-4 rounded-lg mb-6 text-black">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl">⚠️</span>
+                            <div>
+                                <h4 class="font-bold">Permanent Token Burn</h4>
+                                <p class="text-sm mt-1">MLG tokens will be permanently destroyed and cannot be recovered. This action is irreversible.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-3">
+                        <button class="flex-1 bg-gray-600 hover:bg-gray-500 px-4 py-3 rounded-lg font-semibold transition-colors">
+                            Cancel
+                        </button>
+                        <button class="flex-1 burn-effect px-4 py-3 rounded-lg font-semibold text-black">
+                            Burn & Vote
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Multi-Stage Confirmation Flow -->
+    <section class="p-8 border-b border-gray-700">
+        <h2 class="text-xl font-bold text-green-400 mb-6">2. Multi-Stage Confirmation Flow (4+ MLG Tokens)</h2>
+        
+        <div class="space-y-8">
+            <!-- Stage 1: Initial Warning -->
+            <div class="relative">
+                <div class="modal-overlay fixed inset-0 flex items-center justify-center p-4" style="position: relative; height: 500px;">
+                    <div class="modal-container w-full max-w-md p-6 relative">
+                        <div class="component-annotation -top-6 left-0">Stage 1: High-Value Burn Warning</div>
+                        
+                        <!-- Header with Danger Indicator -->
+                        <div class="border-b border-red-500 pb-4 mb-6">
+                            <h3 class="text-lg font-bold flex items-center gap-2 text-red-400">
+                                <span class="text-2xl animate-pulse">🚨</span>
+                                High-Value Burn Detected
+                            </h3>
+                            <p class="text-sm text-red-300 mt-2">This will burn 4+ MLG tokens - Multiple confirmations required</p>
+                        </div>
+
+                        <!-- Cost Breakdown -->
+                        <div class="token-cost p-4 rounded-lg mb-6">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-yellow-500 mb-2">4 MLG</div>
+                                <div class="text-sm text-gray-400">Tokens to be permanently destroyed</div>
+                                <div class="text-lg text-green-400 mt-2">= 8x Vote Weight</div>
+                            </div>
+                        </div>
+
+                        <!-- First Confirmation -->
+                        <div class="bg-red-900/30 border border-red-500 p-4 rounded-lg mb-6">
+                            <label class="flex items-start gap-3 cursor-pointer">
+                                <input type="checkbox" class="confirmation-checkbox mt-1">
+                                <div class="text-sm">
+                                    <div class="font-semibold">I understand this is a high-value burn</div>
+                                    <div class="text-red-300">4 MLG tokens will be permanently destroyed</div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button class="flex-1 bg-gray-600 hover:bg-gray-500 px-4 py-3 rounded-lg font-semibold">
+                                Cancel
+                            </button>
+                            <button class="flex-1 bg-red-600 hover:bg-red-500 px-4 py-3 rounded-lg font-semibold" disabled>
+                                Continue to Stage 2
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage 2: Final Confirmation -->
+            <div class="relative">
+                <div class="modal-overlay fixed inset-0 flex items-center justify-center p-4" style="position: relative; height: 550px;">
+                    <div class="modal-container w-full max-w-md p-6 relative">
+                        <div class="component-annotation -top-6 left-0">Stage 2: Final Confirmation</div>
+                        
+                        <!-- Header -->
+                        <div class="border-b border-red-500 pb-4 mb-6">
+                            <h3 class="text-lg font-bold flex items-center gap-2 text-red-400">
+                                <span class="text-2xl">⚡</span>
+                                Final Confirmation Required
+                            </h3>
+                            <p class="text-sm text-red-300 mt-2">Last chance to cancel this burn operation</p>
+                        </div>
+
+                        <!-- Multiple Checkboxes -->
+                        <div class="space-y-4 mb-6">
+                            <div class="bg-red-900/30 border border-red-500 p-3 rounded">
+                                <label class="flex items-start gap-3 cursor-pointer">
+                                    <input type="checkbox" class="confirmation-checkbox mt-1">
+                                    <span class="text-sm">I confirm I want to burn 4 MLG tokens</span>
+                                </label>
+                            </div>
+                            <div class="bg-red-900/30 border border-red-500 p-3 rounded">
+                                <label class="flex items-start gap-3 cursor-pointer">
+                                    <input type="checkbox" class="confirmation-checkbox mt-1">
+                                    <span class="text-sm">I understand this action is irreversible</span>
+                                </label>
+                            </div>
+                            <div class="bg-red-900/30 border border-red-500 p-3 rounded">
+                                <label class="flex items-start gap-3 cursor-pointer">
+                                    <input type="checkbox" class="confirmation-checkbox mt-1">
+                                    <span class="text-sm">I accept the network fees will be charged</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Type Confirmation -->
+                        <div class="bg-gray-800 p-4 rounded-lg mb-6">
+                            <label class="block text-sm mb-2">Type "BURN 4 MLG" to confirm:</label>
+                            <input type="text" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:border-red-500 focus:outline-none" placeholder="Type confirmation here...">
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button class="flex-1 bg-gray-600 hover:bg-gray-500 px-4 py-3 rounded-lg font-semibold">
+                                Cancel
+                            </button>
+                            <button class="flex-1 burn-danger px-4 py-3 rounded-lg font-semibold text-white" disabled>
+                                Execute Burn
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Error States -->
+    <section class="p-8 border-b border-gray-700">
+        <h2 class="text-xl font-bold text-green-400 mb-6">3. Error State Dialogs</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Insufficient Balance -->
+            <div class="relative">
+                <div class="modal-overlay flex items-center justify-center p-4" style="position: relative; height: 400px;">
+                    <div class="modal-container w-full max-w-sm p-6 relative">
+                        <div class="component-annotation -top-6 left-0">Insufficient MLG Balance</div>
+                        
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">💸</div>
+                            <h3 class="text-lg font-bold text-red-400 mb-2">Insufficient MLG Tokens</h3>
+                            <p class="text-sm text-gray-400 mb-6">You need 4 MLG tokens but only have 2</p>
+                            
+                            <div class="bg-red-900/30 border border-red-500 p-4 rounded-lg mb-6">
+                                <div class="flex justify-between text-sm">
+                                    <span>Required:</span>
+                                    <span class="text-red-400">4 MLG</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span>Available:</span>
+                                    <span class="text-yellow-500">2 MLG</span>
+                                </div>
+                                <div class="border-t border-red-400 pt-2 mt-2 flex justify-between font-bold">
+                                    <span>Shortage:</span>
+                                    <span class="text-red-400">2 MLG</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3">
+                                <button class="flex-1 bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded font-semibold text-sm">
+                                    Cancel
+                                </button>
+                                <button class="flex-1 bg-green-600 hover:bg-green-500 px-4 py-2 rounded font-semibold text-sm">
+                                    Get MLG Tokens
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaction Failed -->
+            <div class="relative">
+                <div class="modal-overlay flex items-center justify-center p-4" style="position: relative; height: 400px;">
+                    <div class="modal-container w-full max-w-sm p-6 relative">
+                        <div class="component-annotation -top-6 left-0">Transaction Failed</div>
+                        
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">❌</div>
+                            <h3 class="text-lg font-bold text-red-400 mb-2">Transaction Failed</h3>
+                            <p class="text-sm text-gray-400 mb-6">Your burn vote could not be processed</p>
+                            
+                            <div class="bg-red-900/30 border border-red-500 p-4 rounded-lg mb-6 text-left">
+                                <div class="text-sm">
+                                    <div class="font-semibold text-red-400 mb-2">Error Details:</div>
+                                    <div class="text-gray-300">Network congestion detected. Transaction timed out after 30 seconds.</div>
+                                </div>
+                                <div class="mt-3 text-xs text-gray-400">
+                                    Tx: 3k2j4...9k2j (Failed)
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-3">
+                                <button class="flex-1 bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded font-semibold text-sm">
+                                    Cancel
+                                </button>
+                                <button class="flex-1 bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded font-semibold text-sm">
+                                    Retry
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success States -->
+    <section class="p-8 border-b border-gray-700">
+        <h2 class="text-xl font-bold text-green-400 mb-6">4. Success State Animations</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Burn Success -->
+            <div class="relative">
+                <div class="modal-overlay flex items-center justify-center p-4" style="position: relative; height: 450px;">
+                    <div class="modal-container w-full max-w-sm p-6 relative">
+                        <div class="component-annotation -top-6 left-0">Burn Vote Success</div>
+                        
+                        <div class="text-center">
+                            <div class="success-effect w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-4">
+                                🔥
+                            </div>
+                            <h3 class="text-lg font-bold text-green-400 mb-2">Burn Vote Successful!</h3>
+                            <p class="text-sm text-gray-400 mb-6">Your MLG tokens have been burned and your vote has been cast</p>
+                            
+                            <div class="bg-green-900/30 border border-green-500 p-4 rounded-lg mb-6">
+                                <div class="text-sm space-y-2">
+                                    <div class="flex justify-between">
+                                        <span>MLG Burned:</span>
+                                        <span class="text-yellow-500 font-bold">1 MLG</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Vote Weight:</span>
+                                        <span class="text-green-400 font-bold">2x</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>New Total Votes:</span>
+                                        <span class="text-blue-400 font-bold">144</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Achievement Unlock -->
+                            <div class="bg-purple-900/30 border border-purple-500 p-3 rounded-lg mb-6">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-2xl">🏆</span>
+                                    <div class="text-left">
+                                        <div class="font-bold text-purple-400">Achievement Unlocked!</div>
+                                        <div class="text-sm text-gray-400">Token Holder - Cast your first MLG vote</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="w-full success-effect px-4 py-3 rounded-lg font-semibold text-black">
+                                Awesome!
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- High-Value Burn Success -->
+            <div class="relative">
+                <div class="modal-overlay flex items-center justify-center p-4" style="position: relative; height: 450px;">
+                    <div class="modal-container w-full max-w-sm p-6 relative">
+                        <div class="component-annotation -top-6 left-0">High-Value Burn Success</div>
+                        
+                        <div class="text-center">
+                            <div class="success-effect w-20 h-20 mx-auto rounded-full flex items-center justify-center text-4xl mb-4 relative">
+                                🔥
+                                <div class="absolute -top-2 -right-2 bg-purple-600 text-white text-xs px-2 py-1 rounded-full font-bold">
+                                    4x
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-bold text-green-400 mb-2">Epic Burn Complete!</h3>
+                            <p class="text-sm text-gray-400 mb-6">You've made a legendary 4 MLG token burn vote</p>
+                            
+                            <div class="bg-green-900/30 border border-green-500 p-4 rounded-lg mb-6">
+                                <div class="text-sm space-y-2">
+                                    <div class="flex justify-between">
+                                        <span>MLG Burned:</span>
+                                        <span class="text-yellow-500 font-bold">4 MLG</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Vote Weight:</span>
+                                        <span class="text-green-400 font-bold">8x</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Legendary Status:</span>
+                                        <span class="text-purple-400 font-bold">Unlocked!</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Special Effects -->
+                            <div class="bg-purple-900/30 border border-purple-500 p-3 rounded-lg mb-6">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-2xl">⚡</span>
+                                    <div class="text-left">
+                                        <div class="font-bold text-purple-400">Legendary Burn!</div>
+                                        <div class="text-sm text-gray-400">Your vote carries maximum weight</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="w-full bg-purple-600 hover:bg-purple-500 px-4 py-3 rounded-lg font-semibold">
+                                Return to Vote Vault
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mobile Adaptations -->
+    <section class="p-8 border-b border-gray-700">
+        <h2 class="text-xl font-bold text-green-400 mb-6">5. Mobile Responsive Adaptations</h2>
+        
+        <div class="relative">
+            <div class="mx-auto" style="width: 375px; height: 667px; border: 2px solid #6b7280; border-radius: 20px; padding: 8px; background: #111827;">
+                <div class="component-annotation -top-6 left-0">iPhone 8 Viewport: 375x667</div>
+                
+                <!-- Mobile Modal -->
+                <div class="bg-gray-800 h-full rounded-2xl p-4 overflow-y-auto border border-green-500/30">
+                    <!-- Mobile Header -->
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-600">
+                        <h3 class="font-bold flex items-center gap-2">
+                            <span class="text-xl">🔥</span>
+                            Burn Vote
+                        </h3>
+                        <button class="touch-target text-gray-400 hover:text-white text-xl flex items-center justify-center">&times;</button>
+                    </div>
+
+                    <!-- Mobile Content Preview -->
+                    <div class="bg-gray-700 p-3 rounded-lg mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-purple-600 rounded flex items-center justify-center text-lg">🎮</div>
+                            <div>
+                                <h4 class="font-semibold text-sm">Epic VALORANT Ace</h4>
+                                <p class="text-xs text-gray-400">by ProGamer123</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Transaction Preview -->
+                    <div class="simulation-preview p-3 rounded-lg mb-4">
+                        <h4 class="font-semibold text-sm mb-2 flex items-center gap-2">
+                            <span class="text-blue-400">⚡</span>
+                            Transaction Cost
+                        </h4>
+                        <div class="text-xs space-y-1">
+                            <div class="flex justify-between">
+                                <span>MLG to Burn:</span>
+                                <span class="font-bold text-yellow-500">1 MLG</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Network Fee:</span>
+                                <span class="text-blue-400">~0.001 SOL</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Warning -->
+                    <div class="burn-warning p-3 rounded-lg mb-4 text-black">
+                        <div class="flex items-start gap-2">
+                            <span class="text-lg">⚠️</span>
+                            <div>
+                                <h4 class="font-bold text-sm">Permanent Burn</h4>
+                                <p class="text-xs mt-1">Tokens will be destroyed forever</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Action Buttons - Stacked -->
+                    <div class="space-y-3">
+                        <button class="touch-target w-full bg-gray-600 hover:bg-gray-500 py-3 rounded-lg font-semibold">
+                            Cancel
+                        </button>
+                        <button class="touch-target w-full burn-effect py-3 rounded-lg font-semibold text-black">
+                            Burn & Vote
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Specifications -->
+    <section class="p-8">
+        <h2 class="text-xl font-bold text-green-400 mb-6">6. Technical Implementation Specifications</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- CSS Variables -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-600">
+                <h3 class="font-bold mb-4 text-green-300">CSS Custom Properties</h3>
+                <pre class="text-sm text-gray-300 bg-gray-900 p-4 rounded overflow-x-auto"><code>:root {
+  --xbox-green: #10b981;
+  --burn-gradient: linear-gradient(45deg, #dc2626, #f59e0b);
+  --modal-blur: blur(10px);
+  --tile-bg: rgba(31, 41, 55, 0.95);
+  --spacing-unit: 8px;
+  --transition-fast: 0.15s ease-out;
+  --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.4);
+}</code></pre>
+            </div>
+
+            <!-- JavaScript API -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-600">
+                <h3 class="font-bold mb-4 text-green-300">Modal API Interface</h3>
+                <pre class="text-sm text-gray-300 bg-gray-900 p-4 rounded overflow-x-auto"><code>// Show burn confirmation modal
+showBurnVoteConfirmation({
+  contentId: 'clip-123',
+  mlgCost: 1,
+  voteWeight: 2,
+  onConfirm: (burnTx) => {},
+  onCancel: () => {},
+  onError: (error) => {}
+});
+
+// Multi-stage for high-value burns
+if (mlgCost >= 4) {
+  showMultiStageConfirmation(options);
+}</code></pre>
+            </div>
+
+            <!-- Animation Keyframes -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-600">
+                <h3 class="font-bold mb-4 text-green-300">Key Animations</h3>
+                <pre class="text-sm text-gray-300 bg-gray-900 p-4 rounded overflow-x-auto"><code>@keyframes burn-glow {
+  0%, 100% { 
+    box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); 
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.7); 
+  }
+}
+
+@keyframes success-celebration {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}</code></pre>
+            </div>
+
+            <!-- Accessibility -->
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-600">
+                <h3 class="font-bold mb-4 text-green-300">Accessibility Requirements</h3>
+                <ul class="text-sm text-gray-300 space-y-2">
+                    <li>• ARIA labels for all interactive elements</li>
+                    <li>• Focus management with proper tab order</li>
+                    <li>• Screen reader announcements for state changes</li>
+                    <li>• High contrast mode support</li>
+                    <li>• Keyboard navigation (ESC to close)</li>
+                    <li>• Reduced motion preferences respected</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 border-t border-green-500 p-4 text-center">
+        <p class="text-gray-400">MLG.clan Burn Vote Confirmation System - Ready for ui-production-builder implementation</p>
+        <div class="flex justify-center gap-6 mt-2 text-sm">
+            <span>✓ Xbox 360 Aesthetic</span>
+            <span>✓ Mobile Responsive</span>
+            <span>✓ Accessibility Compliant</span>
+            <span>✓ Animation System</span>
+        </div>
+    </footer>
+</body>
+</html>

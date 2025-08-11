@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLG.clan Vote Display System - Standalone Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #065f46, #064e3b, #000);
+      color: white;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    
+    /* Inline critical CSS for vote display components */
+    :root {
+      --vote-primary: #10b981;
+      --vote-secondary: #3b82f6;
+      --vote-burn: #f59e0b;
+      --vote-disabled: #6b7280;
+      --vote-transition: 0.3s ease;
+      --vote-update-animation: 0.2s ease-out;
+      --vote-spacing-xs: 4px;
+      --vote-spacing-sm: 8px;
+      --vote-spacing-md: 16px;
+      --vote-spacing-lg: 24px;
+    }
+
+    .vote-display-compact {
+      display: flex;
+      flex-direction: column;
+      gap: var(--vote-spacing-sm);
+      padding: var(--vote-spacing-md);
+      background: rgba(16, 185, 129, 0.05);
+      border: 1px solid var(--vote-primary);
+      border-radius: 8px;
+      transition: var(--vote-transition);
+    }
+
+    .vote-counts-display {
+      display: flex;
+      gap: var(--vote-spacing-sm);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .vote-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: var(--vote-spacing-xs) var(--vote-spacing-sm);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid var(--vote-primary);
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      color: white;
+      transition: var(--vote-transition);
+    }
+
+    .vote-badge.mlg-votes {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: var(--vote-burn);
+      color: var(--vote-burn);
+    }
+
+    .vote-badge.likes {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    .vote-actions {
+      display: flex;
+      gap: var(--vote-spacing-sm);
+      flex-wrap: wrap;
+    }
+
+    .vote-btn {
+      background: linear-gradient(45deg, var(--vote-secondary), #2563eb);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 10px 16px;
+      transition: var(--vote-transition);
+      position: relative;
+      overflow: hidden;
+      font-size: 14px;
+    }
+
+    .vote-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+    }
+
+    .vote-btn.mlg-vote {
+      background: linear-gradient(45deg, var(--vote-burn), #d97706);
+      animation: burn-glow 2s infinite;
+    }
+
+    @keyframes burn-glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
+      50% { box-shadow: 0 0 20px rgba(217, 119, 6, 0.8); }
+    }
+
+    .vote-count-update {
+      animation: voteCountUp 0.3s ease-out;
+      color: var(--vote-primary);
+      text-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+    }
+
+    @keyframes voteCountUp {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .vote-success {
+      background: #059669 !important;
+      animation: vote-success 0.5s ease;
+    }
+
+    @keyframes vote-success {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .network-status-compact {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: #9ca3af;
+      margin-top: var(--vote-spacing-xs);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--vote-disabled);
+      transition: var(--vote-transition);
+    }
+
+    .status-dot[data-status="connected"] {
+      background: var(--vote-primary);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Demo specific styles */
+    .demo-section {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid #10b981;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+    }
+
+    .demo-title {
+      color: #10b981;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .content-tile {
+      background: linear-gradient(135deg, #065f46, #064e3b);
+      border: 1px solid #10b981;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .clip-preview {
+      width: 100%;
+      height: 150px;
+      background: linear-gradient(45deg, #374151, #4b5563);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      color: #9ca3af;
+      font-size: 14px;
+    }
+
+    .demo-btn {
+      background: linear-gradient(45deg, #3b82f6, #2563eb);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 8px 16px;
+      transition: all 0.3s ease;
+      margin: 4px;
+    }
+
+    .demo-btn:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="container mx-auto px-4 py-8 max-w-4xl">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-green-400 mb-4">
+        MLG.clan Vote Display System
+      </h1>
+      <p class="text-gray-300 text-lg">
+        Standalone demonstration of real-time vote components
+      </p>
+    </div>
+
+    <!-- Demo Controls -->
+    <div class="demo-section">
+      <div class="demo-title">Demo Controls</div>
+      <div class="text-center">
+        <button class="demo-btn" onclick="simulateVoteUpdate()">Simulate Vote Update</button>
+        <button class="demo-btn" onclick="simulateUserVote()">Cast Simulated Vote</button>
+        <button class="demo-btn" onclick="resetVoteCounts()">Reset Vote Counts</button>
+        <button class="demo-btn" onclick="toggleNetworkStatus()">Toggle Network Status</button>
+      </div>
+    </div>
+
+    <!-- Compact Vote Display Examples -->
+    <div class="demo-section">
+      <div class="demo-title">Compact Vote Displays</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Clip Tile 1 -->
+        <div class="content-tile">
+          <div class="clip-preview">
+            <span>🎮 "Epic MLG Clutch"</span>
+          </div>
+          <h4 class="font-bold mb-2 text-green-400">Halo 3 Highlight</h4>
+          <p class="text-gray-300 text-sm mb-3">Amazing 1v4 clutch play</p>
+          <div class="vote-display-compact" data-content-id="clip-1" role="group" aria-label="Vote on this content">
+            <div class="vote-counts-display" aria-live="polite">
+              <span class="vote-badge standard-votes" aria-label="Standard votes">
+                👍 <span class="vote-count" data-type="standard">142</span>
+              </span>
+              <span class="vote-badge mlg-votes" aria-label="MLG token votes">
+                🔥 <span class="vote-count" data-type="mlg">28</span>
+              </span>
+              <span class="vote-badge likes" aria-label="Likes">
+                ❤️ <span class="vote-count" data-type="likes">67</span>
+              </span>
+            </div>
+            <div class="vote-actions">
+              <button class="vote-btn free-vote" data-content-id="clip-1" data-type="free" onclick="handleVote('clip-1', 'free', this)">
+                <span class="vote-btn-text">Free Vote</span>
+                <span class="vote-btn-status">(1 left)</span>
+              </button>
+              <button class="vote-btn mlg-vote" data-content-id="clip-1" data-type="mlg" onclick="handleVote('clip-1', 'mlg', this)">
+                <span class="vote-btn-text">MLG Vote</span>
+                <span class="vote-btn-cost">(1 token)</span>
+              </button>
+            </div>
+            <div class="network-status-compact" aria-live="polite">
+              <span class="status-dot" data-status="connected"></span>
+              <span class="status-text">Network: Connected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clip Tile 2 -->
+        <div class="content-tile">
+          <div class="clip-preview">
+            <span>🎯 "No-Scope Montage"</span>
+          </div>
+          <h4 class="font-bold mb-2 text-green-400">Sniper Highlights</h4>
+          <p class="text-gray-300 text-sm mb-3">Incredible sniper compilation</p>
+          <div class="vote-display-compact" data-content-id="clip-2" role="group" aria-label="Vote on this content">
+            <div class="vote-counts-display" aria-live="polite">
+              <span class="vote-badge standard-votes" aria-label="Standard votes">
+                👍 <span class="vote-count" data-type="standard">89</span>
+              </span>
+              <span class="vote-badge mlg-votes" aria-label="MLG token votes">
+                🔥 <span class="vote-count" data-type="mlg">15</span>
+              </span>
+              <span class="vote-badge likes" aria-label="Likes">
+                ❤️ <span class="vote-count" data-type="likes">34</span>
+              </span>
+            </div>
+            <div class="vote-actions">
+              <button class="vote-btn free-vote" data-content-id="clip-2" data-type="free" onclick="handleVote('clip-2', 'free', this)">
+                <span class="vote-btn-text">Free Vote</span>
+                <span class="vote-btn-status">(1 left)</span>
+              </button>
+              <button class="vote-btn mlg-vote" data-content-id="clip-2" data-type="mlg" onclick="handleVote('clip-2', 'mlg', this)">
+                <span class="vote-btn-text">MLG Vote</span>
+                <span class="vote-btn-cost">(1 token)</span>
+              </button>
+            </div>
+            <div class="network-status-compact" aria-live="polite">
+              <span class="status-dot" data-status="connected"></span>
+              <span class="status-text">Network: Connected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clip Tile 3 -->
+        <div class="content-tile">
+          <div class="clip-preview">
+            <span>🏆 "Tournament Finals"</span>
+          </div>
+          <h4 class="font-bold mb-2 text-green-400">Championship Win</h4>
+          <p class="text-gray-300 text-sm mb-3">Game-winning final moment</p>
+          <div class="vote-display-compact" data-content-id="clip-3" role="group" aria-label="Vote on this content">
+            <div class="vote-counts-display" aria-live="polite">
+              <span class="vote-badge standard-votes" aria-label="Standard votes">
+                👍 <span class="vote-count" data-type="standard">203</span>
+              </span>
+              <span class="vote-badge mlg-votes" aria-label="MLG token votes">
+                🔥 <span class="vote-count" data-type="mlg">45</span>
+              </span>
+              <span class="vote-badge likes" aria-label="Likes">
+                ❤️ <span class="vote-count" data-type="likes">98</span>
+              </span>
+            </div>
+            <div class="vote-actions">
+              <button class="vote-btn free-vote" data-content-id="clip-3" data-type="free" onclick="handleVote('clip-3', 'free', this)">
+                <span class="vote-btn-text">Free Vote</span>
+                <span class="vote-btn-status">(1 left)</span>
+              </button>
+              <button class="vote-btn mlg-vote" data-content-id="clip-3" data-type="mlg" onclick="handleVote('clip-3', 'mlg', this)">
+                <span class="vote-btn-text">MLG Vote</span>
+                <span class="vote-btn-cost">(1 token)</span>
+              </button>
+            </div>
+            <div class="network-status-compact" aria-live="polite">
+              <span class="status-dot" data-status="connected"></span>
+              <span class="status-text">Network: Connected</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Updates Demo -->
+    <div class="demo-section">
+      <div class="demo-title">Real-Time Updates Simulation</div>
+      <div class="text-center">
+        <p class="text-gray-300 mb-4">
+          Watch vote counts update in real-time with smooth animations
+        </p>
+        <div class="bg-black bg-opacity-50 rounded-lg p-4 max-w-md mx-auto">
+          <h4 class="font-bold text-green-400 mb-2">Update Log</h4>
+          <div id="update-log" class="text-sm text-gray-300 h-24 overflow-y-auto">
+            <div class="text-gray-500">Ready for updates...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Overview -->
+    <div class="demo-section">
+      <div class="demo-title">Key Features Demonstrated</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div class="bg-black bg-opacity-30 rounded-lg p-4">
+          <h5 class="font-bold text-green-400 mb-2">✅ Real-Time Updates</h5>
+          <p class="text-gray-300">Vote counts update with smooth animations and visual feedback</p>
+        </div>
+        <div class="bg-black bg-opacity-30 rounded-lg p-4">
+          <h5 class="font-bold text-green-400 mb-2">✅ Xbox 360 Aesthetic</h5>
+          <p class="text-gray-300">Retro green color scheme with glow effects and gradients</p>
+        </div>
+        <div class="bg-black bg-opacity-30 rounded-lg p-4">
+          <h5 class="font-bold text-green-400 mb-2">✅ Accessibility</h5>
+          <p class="text-gray-300">ARIA labels, live regions, and screen reader support</p>
+        </div>
+        <div class="bg-black bg-opacity-30 rounded-lg p-4">
+          <h5 class="font-bold text-green-400 mb-2">✅ Mobile Responsive</h5>
+          <p class="text-gray-300">Touch-friendly buttons and responsive grid layout</p>
+        </div>
+        <div class="bg-black bg-opacity-30 rounded-lg p-4">
+          <h5 class="font-bold text-green-400 mb-2">✅ Vote Types</h5>
+          <p class="text-gray-300">Free votes, MLG token burns, and like interactions</p>
+        </div>
+        <div class="bg-black bg-opacity-30 rounded-lg p-4">
+          <h5 class="font-bold text-green-400 mb-2">✅ Network Status</h5>
+          <p class="text-gray-300">Connection monitoring with visual indicators</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center mt-8 pt-8 border-t border-green-500">
+      <p class="text-gray-400">
+        MLG.clan Vote Display System | Built with Xbox 360 Aesthetic | 
+        <span class="text-green-400">Ready for Solana Integration</span>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Standalone vote display system demo
+    class VoteDisplayDemo {
+      constructor() {
+        this.voteData = new Map();
+        this.networkConnected = true;
+        this.updateLog = [];
+        
+        this.initializeVoteData();
+        this.startRealTimeSimulation();
+      }
+
+      initializeVoteData() {
+        // Initialize vote data for demo clips
+        this.voteData.set('clip-1', { standard: 142, mlg: 28, likes: 67 });
+        this.voteData.set('clip-2', { standard: 89, mlg: 15, likes: 34 });
+        this.voteData.set('clip-3', { standard: 203, mlg: 45, likes: 98 });
+      }
+
+      startRealTimeSimulation() {
+        // Simulate real-time updates every 5-10 seconds
+        setInterval(() => {
+          this.simulateRandomUpdate();
+        }, 5000 + Math.random() * 5000);
+      }
+
+      simulateRandomUpdate() {
+        const contentIds = Array.from(this.voteData.keys());
+        const randomContent = contentIds[Math.floor(Math.random() * contentIds.length)];
+        const voteType = Math.random() < 0.7 ? 'standard' : (Math.random() < 0.8 ? 'mlg' : 'likes');
+        
+        this.incrementVoteCount(randomContent, voteType);
+      }
+
+      incrementVoteCount(contentId, voteType) {
+        const data = this.voteData.get(contentId);
+        if (data) {
+          data[voteType] += Math.floor(Math.random() * 3) + 1;
+          this.updateVoteDisplay(contentId, voteType, data[voteType]);
+          this.logUpdate(`Auto-update: +${voteType} vote on ${contentId}`);
+        }
+      }
+
+      updateVoteDisplay(contentId, voteType, newCount) {
+        const display = document.querySelector(`[data-content-id="${contentId}"]`);
+        if (display) {
+          const countElement = display.querySelector(`[data-type="${voteType}"]`);
+          if (countElement) {
+            this.animateCountUpdate(countElement, newCount);
+          }
+        }
+      }
+
+      animateCountUpdate(element, newCount) {
+        // Add update animation
+        element.classList.add('vote-count-update');
+        element.textContent = newCount;
+        
+        // Remove animation class after animation
+        setTimeout(() => {
+          element.classList.remove('vote-count-update');
+        }, 300);
+      }
+
+      handleVote(contentId, voteType, buttonElement) {
+        const data = this.voteData.get(contentId);
+        if (data) {
+          // Simulate vote processing
+          buttonElement.disabled = true;
+          buttonElement.style.opacity = '0.6';
+          
+          setTimeout(() => {
+            // Update vote count
+            const targetType = voteType === 'free' ? 'standard' : 'mlg';
+            data[targetType] += 1;
+            this.updateVoteDisplay(contentId, targetType, data[targetType]);
+            
+            // Show success animation
+            buttonElement.classList.add('vote-success');
+            buttonElement.disabled = false;
+            buttonElement.style.opacity = '1';
+            
+            // Remove success animation
+            setTimeout(() => {
+              buttonElement.classList.remove('vote-success');
+            }, 500);
+            
+            this.logUpdate(`User cast ${voteType} vote on ${contentId}`);
+          }, 1000);
+        }
+      }
+
+      logUpdate(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        this.updateLog.unshift(`[${timestamp}] ${message}`);
+        
+        // Keep only last 10 updates
+        if (this.updateLog.length > 10) {
+          this.updateLog = this.updateLog.slice(0, 10);
+        }
+
+        this.updateLogDisplay();
+      }
+
+      updateLogDisplay() {
+        const logElement = document.getElementById('update-log');
+        if (logElement) {
+          logElement.innerHTML = this.updateLog
+            .map(log => `<div class="mb-1">${log}</div>`)
+            .join('');
+        }
+      }
+
+      toggleNetworkStatus() {
+        this.networkConnected = !this.networkConnected;
+        const status = this.networkConnected ? 'connected' : 'error';
+        
+        // Update all status indicators
+        document.querySelectorAll('.status-dot').forEach(dot => {
+          dot.dataset.status = status;
+        });
+        
+        document.querySelectorAll('.status-text').forEach(text => {
+          text.textContent = `Network: ${this.networkConnected ? 'Connected' : 'Connection Lost'}`;
+        });
+
+        this.logUpdate(`Network status: ${this.networkConnected ? 'Connected' : 'Disconnected'}`);
+      }
+
+      resetVoteCounts() {
+        this.initializeVoteData();
+        
+        for (const [contentId, data] of this.voteData) {
+          this.updateVoteDisplay(contentId, 'standard', data.standard);
+          this.updateVoteDisplay(contentId, 'mlg', data.mlg);
+          this.updateVoteDisplay(contentId, 'likes', data.likes);
+        }
+
+        this.logUpdate('All vote counts reset to initial values');
+      }
+    }
+
+    // Global functions for demo buttons
+    let demoSystem;
+
+    window.simulateVoteUpdate = function() {
+      if (demoSystem) {
+        demoSystem.simulateRandomUpdate();
+      }
+    };
+
+    window.simulateUserVote = function() {
+      if (demoSystem) {
+        const contentIds = ['clip-1', 'clip-2', 'clip-3'];
+        const randomContent = contentIds[Math.floor(Math.random() * contentIds.length)];
+        const voteType = Math.random() < 0.5 ? 'free' : 'mlg';
+        
+        // Find the button and simulate click
+        const display = document.querySelector(`[data-content-id="${randomContent}"]`);
+        const button = display?.querySelector(`[data-type="${voteType}"]`);
+        if (button) {
+          demoSystem.handleVote(randomContent, voteType, button);
+        }
+      }
+    };
+
+    window.resetVoteCounts = function() {
+      if (demoSystem) {
+        demoSystem.resetVoteCounts();
+      }
+    };
+
+    window.toggleNetworkStatus = function() {
+      if (demoSystem) {
+        demoSystem.toggleNetworkStatus();
+      }
+    };
+
+    window.handleVote = function(contentId, voteType, buttonElement) {
+      if (demoSystem) {
+        demoSystem.handleVote(contentId, voteType, buttonElement);
+      }
+    };
+
+    // Initialize demo when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      demoSystem = new VoteDisplayDemo();
+      demoSystem.logUpdate('Vote Display Demo initialized successfully');
+    });
+  </script>
+</body>
+</html>

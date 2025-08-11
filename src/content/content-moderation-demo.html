@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan Content Moderation System Demo</title>
+    <link rel="stylesheet" href="content-moderation.css">
+    <style>
+        /* Demo-specific styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(26, 26, 26, 0.8);
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+
+        .demo-header h1 {
+            margin: 0 0 1rem 0;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #00ff41, #107c10);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .demo-header p {
+            margin: 0;
+            color: #cccccc;
+            font-size: 1.1rem;
+        }
+
+        .demo-section {
+            margin-bottom: 3rem;
+            background: rgba(26, 26, 26, 0.6);
+            border-radius: 12px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .demo-section-header {
+            background: linear-gradient(135deg, #0099ff, #0078d4);
+            padding: 1rem 2rem;
+        }
+
+        .demo-section-header h2 {
+            margin: 0;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .demo-section-content {
+            padding: 2rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .feature-card h3 {
+            margin: 0 0 1rem 0;
+            color: #00ff41;
+            font-size: 1.2rem;
+        }
+
+        .feature-card p {
+            margin: 0;
+            color: #cccccc;
+            line-height: 1.6;
+        }
+
+        .demo-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .content-item {
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .content-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .content-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .content-stats {
+            display: flex;
+            gap: 1rem;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .integration-example {
+            background: rgba(16, 124, 16, 0.1);
+            border: 1px solid #107c10;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .code-block {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #00ff41;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .stat-card {
+            background: rgba(42, 42, 42, 0.8);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #00ff41;
+            display: block;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Header -->
+        <div class="demo-header">
+            <h1>🛡️ MLG.clan Content Moderation System</h1>
+            <p>Community-driven blockchain moderation with MLG token voting</p>
+        </div>
+
+        <!-- Overview Section -->
+        <div class="demo-section">
+            <div class="demo-section-header">
+                <h2>🏗️ System Overview</h2>
+            </div>
+            <div class="demo-section-content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>🚨 Community Reporting</h3>
+                        <p>Users can report inappropriate content with detailed categorization including spam, harassment, copyright violations, and more.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🗳️ Token-Based Voting</h3>
+                        <p>Community members burn MLG tokens to vote on reported content. Progressive pricing prevents spam while ensuring fair representation.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>⭐ Reputation System</h3>
+                        <p>Vote weight is determined by user reputation, accuracy history, and community standing. Trusted members have more influence.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>⚖️ Appeal Process</h3>
+                        <p>Content creators can appeal moderation decisions with stake-backed appeals reviewed by the community.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔗 Blockchain Integration</h3>
+                        <p>All votes and stakes are recorded on Solana blockchain for complete transparency and immutability.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📊 Transparency Reports</h3>
+                        <p>Public statistics show moderation activity, community participation, and system health metrics.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Demo Section -->
+        <div class="demo-section">
+            <div class="demo-section-header">
+                <h2>🎮 Interactive Demo</h2>
+            </div>
+            <div class="demo-section-content">
+                <p>Experience the moderation system with sample content and interactions:</p>
+
+                <!-- Sample Content Item -->
+                <div class="content-item" data-content-id="demo-content-1">
+                    <div class="content-meta">
+                        <h3 class="content-title">🎯 Epic Fortnite Victory Royale - Solo Clutch</h3>
+                        <div class="content-stats">
+                            <span>👀 1,234 views</span>
+                            <span>👍 89 likes</span>
+                            <span>🔥 92.3 trending</span>
+                        </div>
+                    </div>
+                    <p style="color: #ccc;">Incredible last-minute clutch in Fortnite Battle Royale. Watch as I take down the final squad with only 10 HP!</p>
+                    
+                    <div class="moderation-status">
+                        <span class="status-indicator active">Active</span>
+                    </div>
+
+                    <div class="demo-buttons">
+                        <button class="btn btn-secondary" onclick="showReportDemo()">
+                            🚨 Report Content
+                        </button>
+                        <button class="btn btn-secondary" onclick="showReputationDemo()">
+                            ⭐ View Reputation
+                        </button>
+                        <button class="btn btn-primary" onclick="showStatsDemo()">
+                            📊 Moderation Stats
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content Under Review -->
+                <div class="content-item" data-content-id="demo-content-2">
+                    <div class="content-meta">
+                        <h3 class="content-title">⚠️ Controversial Gaming Content</h3>
+                        <div class="content-stats">
+                            <span>👀 2,567 views</span>
+                            <span>👎 45 reports</span>
+                            <span>🗳️ Voting active</span>
+                        </div>
+                    </div>
+                    <p style="color: #ccc;">This content has been reported by community members and is currently under review.</p>
+                    
+                    <div class="moderation-status">
+                        <span class="status-indicator voting">Under Community Review</span>
+                    </div>
+
+                    <div id="voting-demo-container">
+                        <!-- Voting interface will be inserted here -->
+                    </div>
+
+                    <div class="demo-buttons">
+                        <button class="btn btn-primary" onclick="showVotingDemo()">
+                            🗳️ Show Voting Interface
+                        </button>
+                        <button class="btn btn-secondary" onclick="showAppealDemo()">
+                            ⚖️ Appeal Process
+                        </button>
+                    </div>
+                </div>
+
+                <!-- System Statistics -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-value" id="total-reports">127</span>
+                        <span class="stat-label">Total Reports</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="active-votes">43</span>
+                        <span class="stat-label">Active Votes</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="tokens-burned">1,234</span>
+                        <span class="stat-label">MLG Burned</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value" id="consensus-rate">87%</span>
+                        <span class="stat-label">Consensus Rate</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Examples -->
+        <div class="demo-section">
+            <div class="demo-section-header">
+                <h2>🔧 Integration Examples</h2>
+            </div>
+            <div class="demo-section-content">
+                <div class="integration-example">
+                    <h3>📝 Report Content Integration</h3>
+                    <p>Easy integration with existing content components:</p>
+                    <div class="code-block">
+// Add report button to any content
+const reportButton = contentModerationUI.createReportModal(contentId);
+contentElement.appendChild(reportButton);
+
+// Handle report submission
+await moderationSystem.reportContent(contentId, {
+    category: 'SPAM',
+    reason: 'Promotional content',
+    description: 'This appears to be advertisement spam'
+});
+                    </div>
+                </div>
+
+                <div class="integration-example">
+                    <h3>🗳️ Voting Integration</h3>
+                    <p>Community voting with blockchain verification:</p>
+                    <div class="code-block">
+// Create voting interface
+const votingUI = contentModerationUI.createModerationVotingInterface(contentId);
+
+// Submit vote with MLG token burn
+const result = await moderationSystem.voteOnModeration(
+    contentId,
+    'REMOVE',
+    {
+        voterWallet: wallet.publicKey.toString(),
+        transactionSignature: burnTxSignature
+    }
+);
+                    </div>
+                </div>
+
+                <div class="integration-example">
+                    <h3>📈 Content Ranking Integration</h3>
+                    <p>Integrate moderation scores with content ranking:</p>
+                    <div class="code-block">
+// Calculate moderation-weighted content score
+const moderationScore = await moderationRanking.calculateModerationScore(contentId);
+const reputationScore = await moderationRanking.calculateCreatorReputationScore(walletAddress);
+
+// Apply to content ranking
+const adjustedScore = baseScore * moderationScore * reputationScore;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Technical Architecture -->
+        <div class="demo-section">
+            <div class="demo-section-header">
+                <h2>🏛️ Technical Architecture</h2>
+            </div>
+            <div class="demo-section-content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>🔗 Solana Integration</h3>
+                        <p><strong>MLG Token:</strong> 7XJiwLDrjzxDYdZipnJXzpr1iDTmK55XixSFAa7JgNEL<br>
+                        <strong>Burn Verification:</strong> Transaction signature validation<br>
+                        <strong>Wallet Integration:</strong> Phantom wallet support</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>⚡ Real-time Updates</h3>
+                        <p><strong>Polling System:</strong> 5-second update intervals<br>
+                        <strong>Event Callbacks:</strong> Status change notifications<br>
+                        <strong>Live Statistics:</strong> Dynamic metric updates</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🛡️ Security Features</h3>
+                        <p><strong>Rate Limiting:</strong> 10 reports/day, 20 votes/hour<br>
+                        <strong>Sybil Resistance:</strong> Wallet age + reputation requirements<br>
+                        <strong>Signature Verification:</strong> Cryptographic message signing</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📊 Analytics & Reporting</h3>
+                        <p><strong>Transparency Reports:</strong> Public moderation statistics<br>
+                        <strong>User Profiles:</strong> Reputation and activity tracking<br>
+                        <strong>System Health:</strong> Performance and accuracy metrics</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo JavaScript -->
+    <script>
+        // Simulate moderation system data
+        const demoData = {
+            reports: 127,
+            activeVotes: 43,
+            tokensBurned: 1234,
+            consensusRate: 87,
+            userReputation: {
+                score: 450,
+                tier: 'Trusted',
+                accuracy: 0.87,
+                totalVotes: 23
+            }
+        };
+
+        // Update stats periodically
+        function updateStats() {
+            demoData.reports += Math.floor(Math.random() * 3);
+            demoData.activeVotes += Math.floor(Math.random() * 5) - 2;
+            demoData.tokensBurned += Math.floor(Math.random() * 10);
+            
+            document.getElementById('total-reports').textContent = demoData.reports;
+            document.getElementById('active-votes').textContent = Math.max(0, demoData.activeVotes);
+            document.getElementById('tokens-burned').textContent = demoData.tokensBurned;
+            document.getElementById('consensus-rate').textContent = demoData.consensusRate + '%';
+        }
+
+        // Demo functions
+        function showReportDemo() {
+            const modal = createDemoModal('Report Content', `
+                <form class="report-form">
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select>
+                            <option value="">Select category</option>
+                            <option value="SPAM">Spam</option>
+                            <option value="INAPPROPRIATE">Inappropriate Content</option>
+                            <option value="COPYRIGHT">Copyright Violation</option>
+                            <option value="HARASSMENT">Harassment</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea rows="4" placeholder="Describe the issue..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeDemoModal()">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="submitDemoReport()">Submit Report</button>
+                    </div>
+                </form>
+            `);
+            document.body.appendChild(modal);
+        }
+
+        function showVotingDemo() {
+            const container = document.getElementById('voting-demo-container');
+            container.innerHTML = `
+                <div class="moderation-voting-interface">
+                    <div class="moderation-voting-card">
+                        <div class="voting-header">
+                            <h4>Community Moderation Vote</h4>
+                            <div class="vote-status">
+                                <span class="status-indicator">Voting Active</span>
+                            </div>
+                        </div>
+                        <div class="voting-options">
+                            <div class="vote-option">
+                                <button class="vote-btn keep-btn" onclick="castDemoVote('keep')">
+                                    <span class="vote-icon">👍</span>
+                                    <span class="vote-label">Keep Content</span>
+                                    <span class="vote-cost">1 MLG</span>
+                                </button>
+                            </div>
+                            <div class="vote-option">
+                                <button class="vote-btn remove-btn" onclick="castDemoVote('remove')">
+                                    <span class="vote-icon">👎</span>
+                                    <span class="vote-label">Remove Content</span>
+                                    <span class="vote-cost">2 MLG</span>
+                                </button>
+                            </div>
+                            <div class="vote-option">
+                                <button class="vote-btn escalate-btn" onclick="castDemoVote('escalate')">
+                                    <span class="vote-icon">⚠️</span>
+                                    <span class="vote-label">Escalate Review</span>
+                                    <span class="vote-cost">3 MLG</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="voting-stats">
+                            <div class="vote-breakdown">
+                                <div class="vote-stat">
+                                    <span class="stat-label">Keep:</span>
+                                    <span class="stat-value">12 votes (60%)</span>
+                                </div>
+                                <div class="vote-stat">
+                                    <span class="stat-label">Remove:</span>
+                                    <span class="stat-value">8 votes (40%)</span>
+                                </div>
+                                <div class="vote-stat">
+                                    <span class="stat-label">MLG Burned:</span>
+                                    <span class="stat-value">28.5 MLG</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showReputationDemo() {
+            const modal = createDemoModal('User Reputation', `
+                <div class="user-reputation-display">
+                    <div class="reputation-card">
+                        <div class="reputation-header">
+                            <h4>Community Standing</h4>
+                            <span class="reputation-tier trusted">Trusted</span>
+                        </div>
+                        <div class="reputation-details">
+                            <div class="reputation-score">
+                                <span class="score-label">Reputation:</span>
+                                <span class="score-value">450</span>
+                            </div>
+                            <div class="reputation-role">
+                                <span class="role-label">Role:</span>
+                                <span class="role-value">Trusted Member</span>
+                            </div>
+                            <div class="reputation-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Votes:</span>
+                                    <span class="stat-value">23</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Accuracy:</span>
+                                    <span class="stat-value">87.0%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="role-permissions">
+                            <h5>Permissions:</h5>
+                            <ul class="permissions-list">
+                                <li class="permission-item">report</li>
+                                <li class="permission-item">vote</li>
+                                <li class="permission-item">escalate</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `);
+            document.body.appendChild(modal);
+        }
+
+        function showStatsDemo() {
+            const modal = createDemoModal('Moderation Statistics', `
+                <div class="stats-display">
+                    <h4>Weekly Statistics</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-value">127</span>
+                            <span class="stat-label">Reports Submitted</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value">89</span>
+                            <span class="stat-label">Reports Resolved</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value">324</span>
+                            <span class="stat-label">Community Votes</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value">1,234</span>
+                            <span class="stat-label">MLG Tokens Burned</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value">87%</span>
+                            <span class="stat-label">Consensus Rate</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value">156</span>
+                            <span class="stat-label">Active Moderators</span>
+                        </div>
+                    </div>
+                </div>
+            `);
+            document.body.appendChild(modal);
+        }
+
+        function showAppealDemo() {
+            const modal = createDemoModal('Appeal Content Removal', `
+                <div class="appeal-interface">
+                    <div class="appeal-card">
+                        <div class="appeal-header">
+                            <h4>Appeal Content Removal</h4>
+                            <div class="stake-requirement">
+                                <span class="stake-label">Required Stake:</span>
+                                <span class="stake-amount">5 MLG tokens</span>
+                            </div>
+                        </div>
+                        <form class="appeal-form">
+                            <div class="form-group">
+                                <label>Appeal Type</label>
+                                <select>
+                                    <option value="">Select appeal type</option>
+                                    <option value="FALSE_POSITIVE">Content was incorrectly removed</option>
+                                    <option value="INSUFFICIENT_EVIDENCE">Report lacked sufficient evidence</option>
+                                    <option value="POLICY_MISAPPLICATION">Moderation policy was misapplied</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Appeal Description</label>
+                                <textarea rows="4" placeholder="Explain why this content should be restored..."></textarea>
+                            </div>
+                            <div class="appeal-warning">
+                                <p>⚠️ <strong>Important:</strong></p>
+                                <ul>
+                                    <li>Appeals require a 5 MLG token stake</li>
+                                    <li>Stakes are refunded if appeal is successful</li>
+                                    <li>You have 7 days from removal to submit an appeal</li>
+                                </ul>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="closeDemoModal()">Cancel</button>
+                                <button type="button" class="btn btn-primary" onclick="submitDemoAppeal()">Submit Appeal</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `);
+            document.body.appendChild(modal);
+        }
+
+        function createDemoModal(title, content) {
+            const modal = document.createElement('div');
+            modal.className = 'moderation-report-modal';
+            modal.innerHTML = `
+                <div class="modal-overlay">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>${title}</h3>
+                            <button class="close-btn" onclick="closeDemoModal()">×</button>
+                        </div>
+                        <div style="padding: 1.5rem;">
+                            ${content}
+                        </div>
+                    </div>
+                </div>
+            `;
+            return modal;
+        }
+
+        function closeDemoModal() {
+            const modal = document.querySelector('.moderation-report-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function castDemoVote(voteType) {
+            showNotification(`Vote cast: ${voteType.toUpperCase()}. Transaction simulated.`, 'success');
+            
+            // Update demo stats
+            demoData.activeVotes++;
+            demoData.tokensBurned += voteType === 'keep' ? 1 : voteType === 'remove' ? 2 : 3;
+            updateStats();
+        }
+
+        function submitDemoReport() {
+            showNotification('Report submitted successfully! Community review initiated.', 'success');
+            closeDemoModal();
+            demoData.reports++;
+            updateStats();
+        }
+
+        function submitDemoAppeal() {
+            showNotification('Appeal submitted successfully! 5 MLG tokens staked.', 'success');
+            closeDemoModal();
+        }
+
+        function showNotification(message, type = 'info') {
+            let container = document.getElementById('notification-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'notification-container';
+                container.className = 'notification-container';
+                document.body.appendChild(container);
+            }
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+            `;
+
+            container.appendChild(notification);
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Initialize demo
+        updateStats();
+        setInterval(updateStats, 10000); // Update every 10 seconds
+
+        // Show welcome notification
+        setTimeout(() => {
+            showNotification('Welcome to the MLG.clan Content Moderation System Demo!', 'info');
+        }, 1000);
+    </script>
+</body>
+</html>

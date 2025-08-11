@@ -1,0 +1,2149 @@
+openapi: 3.0.3
+info:
+  title: MLG.clan Content Storage and Retrieval API
+  description: |
+    Comprehensive gaming platform API for content storage, retrieval, and management.
+    
+    ## Features
+    - Content CRUD operations for gaming clips, screenshots, guides, and reviews
+    - MLG token integration with Solana blockchain voting system
+    - Advanced search and filtering capabilities
+    - Content moderation and reporting system
+    - Real-time analytics and metrics tracking
+    - Scalable file upload/download handling
+    - User content management and statistics
+    
+    ## Authentication
+    - JWT tokens for user authentication
+    - Solana wallet signature verification for blockchain operations
+    - Rate limiting and abuse prevention
+    
+    ## MLG Token Integration
+    - Contract Address: 7XJiwLDrjzxDYdZipnJXzpr1iDTmK55XixSFAa7JgNEL
+    - Vote costs: Upvote (1 MLG), Downvote (2 MLG), Super Vote (5 MLG)
+    - Reward multipliers based on content type and engagement
+    
+  version: 1.0.0
+  contact:
+    name: MLG.clan Development Team
+    url: https://mlg.clan/api-support
+    email: api-support@mlg.clan
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.mlg.clan/v1
+    description: Production API Server
+  - url: https://staging-api.mlg.clan/v1
+    description: Staging API Server
+  - url: http://localhost:3000/api/v1
+    description: Local Development Server
+
+security:
+  - BearerAuth: []
+  - WalletSignature: []
+
+paths:
+  # Content CRUD Operations
+  /content:
+    get:
+      summary: List content with filtering and pagination
+      description: |
+        Retrieve content list with advanced filtering, sorting, and search capabilities.
+        Supports both offset-based and cursor-based pagination for optimal performance.
+      tags:
+        - Content
+      security:
+        - BearerAuth: []
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - $ref: '#/components/parameters/Cursor'
+        - name: contentType
+          in: query
+          description: Filter by content type
+          schema:
+            $ref: '#/components/schemas/ContentType'
+        - name: game
+          in: query
+          description: Filter by game title
+          schema:
+            type: string
+            example: "Fortnite"
+        - name: platform
+          in: query
+          description: Filter by gaming platform
+          schema:
+            $ref: '#/components/schemas/Platform'
+        - name: category
+          in: query
+          description: Filter by content category
+          schema:
+            $ref: '#/components/schemas/Category'
+        - name: userId
+          in: query
+          description: Filter by content creator
+          schema:
+            type: string
+            format: uuid
+        - name: tags
+          in: query
+          description: Filter by tags (comma-separated)
+          schema:
+            type: string
+            example: "fortnite,victory-royale,clutch"
+        - name: status
+          in: query
+          description: Filter by content status
+          schema:
+            $ref: '#/components/schemas/ContentStatus'
+        - name: search
+          in: query
+          description: Full-text search query
+          schema:
+            type: string
+            maxLength: 100
+            example: "epic victory royale"
+        - name: searchFields
+          in: query
+          description: Fields to search in
+          schema:
+            type: string
+            enum: [title, description, tags, title,description, title,tags, description,tags, title,description,tags]
+            default: "title,description,tags"
+        - name: sortBy
+          in: query
+          description: Field to sort by
+          schema:
+            type: string
+            enum: [created_at, updated_at, views, likes, trending_score, quality_score]
+            default: created_at
+        - name: sortOrder
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+        - name: createdAfter
+          in: query
+          description: Filter content created after this date
+          schema:
+            type: string
+            format: date-time
+        - name: createdBefore
+          in: query
+          description: Filter content created before this date
+          schema:
+            type: string
+            format: date-time
+        - name: minQualityScore
+          in: query
+          description: Minimum quality score
+          schema:
+            type: number
+            minimum: 0
+            maximum: 100
+        - name: minViews
+          in: query
+          description: Minimum view count
+          schema:
+            type: integer
+            minimum: 0
+        - name: minLikes
+          in: query
+          description: Minimum like count
+          schema:
+            type: integer
+            minimum: 0
+        - name: trending
+          in: query
+          description: Only return trending content
+          schema:
+            type: boolean
+        - name: featured
+          in: query
+          description: Only return featured content
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Content list retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          content:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Content'
+                          pagination:
+                            $ref: '#/components/schemas/PaginationResponse'
+                          filters:
+                            type: object
+                            properties:
+                              applied:
+                                type: object
+                                description: Currently applied filters
+                              available:
+                                type: object
+                                description: Available filter options
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+    
+    post:
+      summary: Create new content
+      description: |
+        Upload and create new gaming content with metadata and files.
+        Supports chunked upload for large files and provides real-time processing status.
+      tags:
+        - Content
+      security:
+        - BearerAuth: []
+        - WalletSignature: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - metadata
+                - files
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  maxItems: 5
+                  description: Main content files (max 5 files, 500MB total)
+                thumbnail:
+                  type: string
+                  format: binary
+                  description: Optional custom thumbnail image
+                metadata:
+                  $ref: '#/components/schemas/ContentCreateInput'
+            encoding:
+              files:
+                contentType: video/*, image/*, application/pdf, text/*
+              thumbnail:
+                contentType: image/*
+      responses:
+        '201':
+          description: Content created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          content:
+                            $ref: '#/components/schemas/Content'
+                          uploadUrls:
+                            type: array
+                            items:
+                              type: string
+                              format: uri
+                            description: CDN upload URLs for additional processing
+                          processingStatus:
+                            type: string
+                            enum: [initiated, processing, complete, failed]
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /content/{contentId}:
+    get:
+      summary: Get content by ID
+      description: |
+        Retrieve specific content with full details, analytics, and related information.
+        Optionally increments view count for analytics tracking.
+      tags:
+        - Content
+      security:
+        - BearerAuth: []
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/ContentId'
+        - name: includeAnalytics
+          in: query
+          description: Include detailed analytics data
+          schema:
+            type: boolean
+            default: false
+        - name: includeComments
+          in: query
+          description: Include comment preview
+          schema:
+            type: boolean
+            default: false
+        - name: includeRelated
+          in: query
+          description: Include related content suggestions
+          schema:
+            type: boolean
+            default: false
+        - name: incrementView
+          in: query
+          description: Whether to increment view count
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Content retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          content:
+                            $ref: '#/components/schemas/Content'
+                          analytics:
+                            $ref: '#/components/schemas/ContentAnalytics'
+                          comments:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Comment'
+                          relatedContent:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Content'
+                          userVote:
+                            $ref: '#/components/schemas/Vote'
+                          downloadUrls:
+                            type: object
+                            additionalProperties:
+                              type: string
+                              format: uri
+                            description: Temporary download URLs for content files
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    
+    put:
+      summary: Update content
+      description: |
+        Update content metadata, settings, and file associations.
+        Only content owners can perform updates.
+      tags:
+        - Content
+      security:
+        - BearerAuth: []
+        - WalletSignature: []
+      parameters:
+        - $ref: '#/components/parameters/ContentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentUpdateInput'
+      responses:
+        '200':
+          description: Content updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          content:
+                            $ref: '#/components/schemas/Content'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    delete:
+      summary: Delete content
+      description: |
+        Permanently delete content and associated files.
+        Only content owners or administrators can delete content.
+      tags:
+        - Content
+      security:
+        - BearerAuth: []
+        - WalletSignature: []
+      parameters:
+        - $ref: '#/components/parameters/ContentId'
+        - name: reason
+          in: query
+          description: Deletion reason for analytics
+          schema:
+            type: string
+            maxLength: 200
+        - name: hardDelete
+          in: query
+          description: Permanently delete vs soft delete
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '204':
+          description: Content deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # Content Voting System
+  /content/{contentId}/vote:
+    post:
+      summary: Vote on content with MLG tokens
+      description: |
+        Cast vote by burning MLG tokens with Solana blockchain verification.
+        Requires valid wallet signature and sufficient token balance.
+      tags:
+        - Voting
+      security:
+        - BearerAuth: []
+        - WalletSignature: []
+      parameters:
+        - $ref: '#/components/parameters/ContentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoteInput'
+      responses:
+        '201':
+          description: Vote cast successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          vote:
+                            $ref: '#/components/schemas/Vote'
+                          contentStats:
+                            type: object
+                            properties:
+                              totalVotes:
+                                type: integer
+                              newTrendingScore:
+                                type: number
+                                format: float
+                          userStats:
+                            type: object
+                            properties:
+                              tokensRemaining:
+                                type: number
+                                format: float
+                              totalVotesGiven:
+                                type: integer
+        '400':
+          description: Invalid vote data or insufficient tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                insufficient_tokens:
+                  summary: Insufficient MLG tokens
+                  value:
+                    success: false
+                    error: "VOTE_001"
+                    message: "Insufficient MLG tokens"
+                    details:
+                      required: 1
+                      available: 0.5
+                invalid_signature:
+                  summary: Invalid transaction signature
+                  value:
+                    success: false
+                    error: "VOTE_003"
+                    message: "Invalid transaction signature"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Already voted on this content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "VOTE_002"
+                message: "Already voted on this content"
+                details:
+                  existingVoteId: "vote-123e4567-e89b-12d3-a456-426614174000"
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+
+  /content/{contentId}/votes:
+    get:
+      summary: Get content vote history
+      description: |
+        Retrieve vote history and statistics for content.
+        Includes vote breakdown by type and top voters.
+      tags:
+        - Voting
+      security:
+        - BearerAuth: []
+        - {}
+      parameters:
+        - $ref: '#/components/parameters/ContentId'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - name: voteType
+          in: query
+          description: Filter by vote type
+          schema:
+            $ref: '#/components/schemas/VoteType'
+        - name: includeAnonymous
+          in: query
+          description: Include anonymous votes
+          schema:
+            type: boolean
+            default: true
+        - name: sortBy
+          in: query
+          description: Sort votes by field
+          schema:
+            type: string
+            enum: [created_at, token_amount]
+            default: created_at
+      responses:
+        '200':
+          description: Vote history retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          votes:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Vote'
+                          summary:
+                            type: object
+                            properties:
+                              totalVotes:
+                                type: integer
+                              totalTokensBurned:
+                                type: number
+                                format: float
+                              voteBreakdown:
+                                type: object
+                                properties:
+                                  upvotes:
+                                    type: integer
+                                  downvotes:
+                                    type: integer
+                                  superVotes:
+                                    type: integer
+                              topVoters:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    userId:
+                                      type: string
+                                    username:
+                                      type: string
+                                    totalTokensBurned:
+                                      type: number
+                                      format: float
+                                    voteCount:
+                                      type: integer
+                          pagination:
+                            $ref: '#/components/schemas/PaginationResponse'
+
+  # Search and Discovery
+  /content/search:
+    get:
+      summary: Advanced content search
+      description: |
+        Full-text search with AI-powered recommendations and faceted filtering.
+        Supports semantic search and typo correction.
+      tags:
+        - Search
+      security:
+        - BearerAuth: []
+        - {}
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Search query
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 100
+            example: "epic fortnite victory"
+        - name: type
+          in: query
+          description: Search type
+          schema:
+            type: string
+            enum: [content, users, games]
+            default: content
+        - name: exact
+          in: query
+          description: Exact phrase matching
+          schema:
+            type: boolean
+            default: false
+        - name: fuzzy
+          in: query
+          description: Fuzzy matching for typos
+          schema:
+            type: boolean
+            default: true
+        - name: semantic
+          in: query
+          description: AI semantic search
+          schema:
+            type: boolean
+            default: false
+        - name: rankBy
+          in: query
+          description: Ranking factor
+          schema:
+            type: string
+            enum: [relevance, popularity, recency, quality]
+            default: relevance
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        # Include content filter parameters
+        - name: contentType
+          in: query
+          schema:
+            $ref: '#/components/schemas/ContentType'
+        - name: game
+          in: query
+          schema:
+            type: string
+        - name: platform
+          in: query
+          schema:
+            $ref: '#/components/schemas/Platform'
+      responses:
+        '200':
+          description: Search results retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          results:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Content'
+                          total:
+                            type: integer
+                          searchTime:
+                            type: number
+                            format: float
+                            description: Search execution time in milliseconds
+                          suggestions:
+                            type: array
+                            items:
+                              type: string
+                            description: Search query suggestions
+                          facets:
+                            type: object
+                            properties:
+                              games:
+                                type: object
+                                additionalProperties:
+                                  type: integer
+                              platforms:
+                                type: object
+                                additionalProperties:
+                                  type: integer
+                              categories:
+                                type: object
+                                additionalProperties:
+                                  type: integer
+                              contentTypes:
+                                type: object
+                                additionalProperties:
+                                  type: integer
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /content/trending:
+    get:
+      summary: Get trending content
+      description: |
+        Retrieve trending content based on engagement metrics and MLG token activity.
+        Algorithm considers views, votes, comments, and recent activity.
+      tags:
+        - Discovery
+      security:
+        - BearerAuth: []
+        - {}
+      parameters:
+        - name: timeframe
+          in: query
+          description: Trending timeframe
+          schema:
+            type: string
+            enum: [hour, day, week, month]
+            default: day
+        - name: game
+          in: query
+          description: Filter by specific game
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: Filter by content category
+          schema:
+            $ref: '#/components/schemas/Category'
+        - name: limit
+          in: query
+          description: Number of trending items to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+      responses:
+        '200':
+          description: Trending content retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          trending:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Content'
+                          trendingMetrics:
+                            type: object
+                            properties:
+                              timeframe:
+                                type: string
+                              totalEngagement:
+                                type: integer
+                              totalTokenActivity:
+                                type: number
+                                format: float
+
+  # Content Moderation
+  /content/{contentId}/report:
+    post:
+      summary: Report content for moderation
+      description: |
+        Submit content report for community moderation.
+        Reports are reviewed by moderators and may result in content removal.
+      tags:
+        - Moderation
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ContentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportInput'
+      responses:
+        '201':
+          description: Report submitted successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          reportId:
+                            type: string
+                            format: uuid
+                          status:
+                            type: string
+                            enum: [pending, reviewing]
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          description: Report rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error: "RATE_003"
+                message: "Report limit exceeded"
+                details:
+                  resetTime: "2024-01-01T13:00:00Z"
+
+  # User Content Management
+  /users/{userId}/content:
+    get:
+      summary: Get user content
+      description: |
+        Retrieve all content created by specific user with filtering options.
+        Public content is accessible to all users, private content only to owner.
+      tags:
+        - User Content
+      security:
+        - BearerAuth: []
+        - {}
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: Filter by content status
+          schema:
+            $ref: '#/components/schemas/ContentStatus'
+        - name: contentType
+          in: query
+          description: Filter by content type
+          schema:
+            $ref: '#/components/schemas/ContentType'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - name: sortBy
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            enum: [created_at, updated_at, views, likes]
+            default: created_at
+      responses:
+        '200':
+          description: User content retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          content:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/Content'
+                          stats:
+                            $ref: '#/components/schemas/UserContentStats'
+                          pagination:
+                            $ref: '#/components/schemas/PaginationResponse'
+
+  /users/{userId}/content/stats:
+    get:
+      summary: Get user content statistics
+      description: |
+        Retrieve comprehensive content statistics and achievements for user.
+        Includes breakdowns by game, content type, and performance metrics.
+      tags:
+        - User Content
+      security:
+        - BearerAuth: []
+        - {}
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User ID
+          schema:
+            type: string
+            format: uuid
+        - name: timeframe
+          in: query
+          description: Statistics timeframe
+          schema:
+            type: string
+            enum: [day, week, month, year, all]
+            default: all
+        - name: includeBreakdown
+          in: query
+          description: Include detailed breakdown
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: User statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          stats:
+                            $ref: '#/components/schemas/UserContentStats'
+                          breakdown:
+                            type: object
+                            properties:
+                              byGame:
+                                type: object
+                                additionalProperties:
+                                  type: object
+                              byContentType:
+                                type: object
+                                additionalProperties:
+                                  type: object
+                              byMonth:
+                                type: array
+                                items:
+                                  type: object
+                          achievements:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: string
+                                name:
+                                  type: string
+                                description:
+                                  type: string
+                                unlockedAt:
+                                  type: string
+                                  format: date-time
+                          rankings:
+                            type: object
+                            properties:
+                              globalRank:
+                                type: integer
+                              gameRanks:
+                                type: object
+                                additionalProperties:
+                                  type: integer
+
+  # Analytics
+  /content/{contentId}/analytics:
+    get:
+      summary: Get content analytics
+      description: |
+        Retrieve detailed analytics for content including views, engagement,
+        geographic data, and AI-generated insights.
+      tags:
+        - Analytics
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ContentId'
+        - name: timeframe
+          in: query
+          description: Analytics timeframe
+          schema:
+            type: string
+            enum: [day, week, month, year]
+            default: month
+        - name: metrics
+          in: query
+          description: Specific metrics to include (comma-separated)
+          schema:
+            type: string
+            example: "views,engagement,geographic"
+        - name: breakdown
+          in: query
+          description: Data breakdown type
+          schema:
+            type: string
+            enum: [country, device, source, hour, day]
+      responses:
+        '200':
+          description: Analytics retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          analytics:
+                            $ref: '#/components/schemas/ContentAnalytics'
+                          timeSeries:
+                            type: object
+                            properties:
+                              views:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    date:
+                                      type: string
+                                      format: date
+                                    value:
+                                      type: integer
+                              engagement:
+                                type: array
+                                items:
+                                  type: object
+                          breakdowns:
+                            type: object
+                            additionalProperties:
+                              type: object
+                          insights:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                type:
+                                  type: string
+                                  enum: [performance, audience, content_optimization]
+                                message:
+                                  type: string
+                                confidence:
+                                  type: number
+                                  format: float
+                                  minimum: 0
+                                  maximum: 1
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for user authentication
+    
+    WalletSignature:
+      type: apiKey
+      in: header
+      name: X-Wallet-Signature
+      description: |
+        Solana wallet signature for blockchain operations.
+        Required format: {signature}:{message}:{publicKey}
+
+  parameters:
+    ContentId:
+      name: contentId
+      in: path
+      required: true
+      description: Content UUID
+      schema:
+        type: string
+        format: uuid
+        example: "123e4567-e89b-12d3-a456-426614174000"
+    
+    Limit:
+      name: limit
+      in: query
+      description: Number of items to return
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    
+    Offset:
+      name: offset
+      in: query
+      description: Number of items to skip
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    
+    Cursor:
+      name: cursor
+      in: query
+      description: Cursor for pagination
+      schema:
+        type: string
+
+  schemas:
+    # Core Content Schema
+    Content:
+      type: object
+      required:
+        - id
+        - userId
+        - walletAddress
+        - contentType
+        - status
+        - title
+        - description
+        - tags
+        - game
+        - platform
+        - category
+        - files
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        userId:
+          type: string
+          format: uuid
+          description: Content creator ID
+        walletAddress:
+          type: string
+          pattern: '^[1-9A-HJ-NP-Za-km-z]{32,44}$'
+          description: Creator's Solana wallet address
+          example: "7XJiwLDrjzxDYdZipnJXzpr1iDTmK55XixSFAa7JgNEL"
+        contentType:
+          $ref: '#/components/schemas/ContentType'
+        status:
+          $ref: '#/components/schemas/ContentStatus'
+        title:
+          type: string
+          minLength: 3
+          maxLength: 100
+          example: "Epic Fortnite Victory Royale - Solo Clutch"
+        description:
+          type: string
+          minLength: 10
+          maxLength: 1000
+          example: "Incredible last-minute clutch in Fortnite Battle Royale. Watch as I take down the final squad with only 10 HP!"
+        tags:
+          type: array
+          items:
+            type: string
+            maxLength: 25
+          minItems: 1
+          maxItems: 15
+          example: ["fortnite", "victory-royale", "clutch", "solo"]
+        game:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: "Fortnite"
+        platform:
+          $ref: '#/components/schemas/Platform'
+        category:
+          $ref: '#/components/schemas/Category'
+        gameMode:
+          type: string
+          maxLength: 50
+          example: "Solo Battle Royale"
+        difficulty:
+          type: string
+          enum: [easy, medium, hard, expert, legendary]
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContentFile'
+          minItems: 1
+          maxItems: 5
+        thumbnailUrl:
+          type: string
+          format: uri
+          example: "https://cdn.mlg.clan/thumbnails/content-123.jpg"
+        previewUrl:
+          type: string
+          format: uri
+          example: "https://cdn.mlg.clan/previews/content-123.gif"
+        views:
+          type: integer
+          minimum: 0
+          example: 1250
+        likes:
+          type: integer
+          minimum: 0
+          example: 89
+        dislikes:
+          type: integer
+          minimum: 0
+          example: 3
+        shares:
+          type: integer
+          minimum: 0
+          example: 12
+        comments:
+          type: integer
+          minimum: 0
+          example: 15
+        mlgVotes:
+          $ref: '#/components/schemas/MLGVoteStats'
+        qualityScore:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 87.5
+        viralScore:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 65.2
+        trendingScore:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 92.3
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-01-01T12:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          example: "2024-01-01T12:30:00Z"
+        publishedAt:
+          type: string
+          format: date-time
+          example: "2024-01-01T12:15:00Z"
+        moderationStatus:
+          type: string
+          enum: [approved, pending, flagged, rejected]
+          default: pending
+        reportCount:
+          type: integer
+          minimum: 0
+          example: 0
+
+    ContentFile:
+      type: object
+      required:
+        - id
+        - filename
+        - originalName
+        - mimeType
+        - size
+        - url
+        - processingStatus
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        filename:
+          type: string
+          example: "epic-victory-royale.mp4"
+        originalName:
+          type: string
+          example: "My Epic Game Clip.mp4"
+        mimeType:
+          type: string
+          example: "video/mp4"
+        size:
+          type: integer
+          minimum: 1
+          example: 15728640
+        url:
+          type: string
+          format: uri
+          example: "https://cdn.mlg.clan/videos/epic-victory-royale.mp4"
+        cdnUrl:
+          type: string
+          format: uri
+          example: "https://cdn.mlg.clan/videos/epic-victory-royale.mp4"
+        thumbnailUrl:
+          type: string
+          format: uri
+          example: "https://thumbnails.mlg.clan/epic-victory-royale.jpg"
+        duration:
+          type: number
+          format: float
+          minimum: 0
+          example: 45.5
+          description: Duration in seconds (for video/audio files)
+        dimensions:
+          type: object
+          properties:
+            width:
+              type: integer
+              minimum: 1
+              example: 1920
+            height:
+              type: integer
+              minimum: 1
+              example: 1080
+        processingStatus:
+          type: string
+          enum: [pending, processing, complete, failed]
+          example: complete
+        processedFormats:
+          type: array
+          items:
+            type: string
+          example: ["360p", "720p", "1080p"]
+        createdAt:
+          type: string
+          format: date-time
+
+    MLGVoteStats:
+      type: object
+      required:
+        - upvotes
+        - downvotes
+        - superVotes
+        - totalTokensBurned
+      properties:
+        upvotes:
+          type: integer
+          minimum: 0
+          example: 42
+        downvotes:
+          type: integer
+          minimum: 0
+          example: 2
+        superVotes:
+          type: integer
+          minimum: 0
+          example: 5
+        totalTokensBurned:
+          type: number
+          format: float
+          minimum: 0
+          example: 67.0
+
+    Vote:
+      type: object
+      required:
+        - id
+        - contentId
+        - userId
+        - walletAddress
+        - voteType
+        - tokensBurned
+        - transactionSignature
+        - walletSignature
+        - createdAt
+        - blockTime
+      properties:
+        id:
+          type: string
+          format: uuid
+        contentId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        walletAddress:
+          type: string
+          pattern: '^[1-9A-HJ-NP-Za-km-z]{32,44}$'
+        voteType:
+          $ref: '#/components/schemas/VoteType'
+        tokensBurned:
+          type: number
+          format: float
+          minimum: 0.1
+          example: 1.0
+        transactionSignature:
+          type: string
+          pattern: '^[1-9A-HJ-NP-Za-km-z]{87,88}$'
+          example: "5J8QvU7snqjBxNqVQhGjPFzQFzQYU7snqjBxNqVQhGjPFzQFzQYU7snqjBxNqVQhGjPFzQFzQY"
+        walletSignature:
+          $ref: '#/components/schemas/WalletSignature'
+        comment:
+          type: string
+          maxLength: 200
+        isAnonymous:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+          format: date-time
+        blockTime:
+          type: string
+          format: date-time
+          description: Solana blockchain timestamp
+
+    WalletSignature:
+      type: object
+      required:
+        - signature
+        - message
+        - publicKey
+        - verified
+      properties:
+        signature:
+          type: string
+          example: "signature-data-here"
+        message:
+          type: string
+          example: "MLG.clan Vote Verification"
+        publicKey:
+          type: string
+          pattern: '^[1-9A-HJ-NP-Za-km-z]{32,44}$'
+        verified:
+          type: boolean
+          example: true
+
+    ContentAnalytics:
+      type: object
+      required:
+        - id
+        - contentId
+        - totalViews
+        - uniqueViews
+        - lastUpdated
+      properties:
+        id:
+          type: string
+          format: uuid
+        contentId:
+          type: string
+          format: uuid
+        totalViews:
+          type: integer
+          minimum: 0
+          example: 1250
+        uniqueViews:
+          type: integer
+          minimum: 0
+          example: 1100
+        watchTime:
+          type: number
+          format: float
+          minimum: 0
+          example: 28750.5
+          description: Total watch time in seconds
+        averageWatchTime:
+          type: number
+          format: float
+          minimum: 0
+          example: 23.0
+        completionRate:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 65.5
+        engagementRate:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 7.12
+        shareRate:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 0.96
+        commentRate:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 1.2
+        topCountries:
+          type: array
+          items:
+            type: string
+          example: ["US", "UK", "CA", "AU", "DE"]
+        topCities:
+          type: array
+          items:
+            type: string
+          example: ["New York", "London", "Toronto", "Sydney", "Berlin"]
+        deviceTypes:
+          type: object
+          additionalProperties:
+            type: integer
+          example:
+            mobile: 45
+            desktop: 40
+            tablet: 15
+        trafficSources:
+          type: object
+          additionalProperties:
+            type: integer
+          example:
+            direct: 30
+            search: 40
+            social: 20
+            referral: 10
+        hourlyViews:
+          type: array
+          items:
+            type: integer
+          minItems: 24
+          maxItems: 24
+          description: Views per hour of day (0-23)
+        dailyViews:
+          type: array
+          items:
+            type: integer
+          minItems: 7
+          maxItems: 7
+          description: Views per day of week
+        monthlyViews:
+          type: array
+          items:
+            type: integer
+          minItems: 12
+          maxItems: 12
+          description: Views per month
+        lastUpdated:
+          type: string
+          format: date-time
+
+    UserContentStats:
+      type: object
+      required:
+        - userId
+        - walletAddress
+        - totalContent
+        - publishedContent
+        - lastUpdated
+      properties:
+        userId:
+          type: string
+          format: uuid
+        walletAddress:
+          type: string
+          pattern: '^[1-9A-HJ-NP-Za-km-z]{32,44}$'
+        totalContent:
+          type: integer
+          minimum: 0
+          example: 25
+        publishedContent:
+          type: integer
+          minimum: 0
+          example: 22
+        draftContent:
+          type: integer
+          minimum: 0
+          example: 3
+        totalViews:
+          type: integer
+          minimum: 0
+          example: 15000
+        totalLikes:
+          type: integer
+          minimum: 0
+          example: 1200
+        totalShares:
+          type: integer
+          minimum: 0
+          example: 150
+        totalComments:
+          type: integer
+          minimum: 0
+          example: 300
+        totalTokensEarned:
+          type: number
+          format: float
+          minimum: 0
+          example: 125.50
+        totalTokensBurned:
+          type: number
+          format: float
+          minimum: 0
+          example: 45.25
+        votesReceived:
+          type: integer
+          minimum: 0
+          example: 890
+        votesGiven:
+          type: integer
+          minimum: 0
+          example: 340
+        averageQualityScore:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 82.5
+        featuredContent:
+          type: integer
+          minimum: 0
+          example: 3
+        trendingContent:
+          type: integer
+          minimum: 0
+          example: 7
+        contentByType:
+          type: object
+          additionalProperties:
+            type: integer
+          example:
+            video_clip: 15
+            screenshot: 8
+            guide: 2
+        contentByGame:
+          type: object
+          additionalProperties:
+            type: integer
+          example:
+            Fortnite: 12
+            "Call of Duty": 8
+            "Apex Legends": 5
+        lastUpdated:
+          type: string
+          format: date-time
+
+    Comment:
+      type: object
+      required:
+        - id
+        - contentId
+        - userId
+        - text
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        contentId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        username:
+          type: string
+          example: "GamerPro123"
+        text:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: "Awesome clip! That clutch was insane!"
+        likes:
+          type: integer
+          minimum: 0
+          example: 5
+        replies:
+          type: integer
+          minimum: 0
+          example: 2
+        createdAt:
+          type: string
+          format: date-time
+        editedAt:
+          type: string
+          format: date-time
+
+    # Input Schemas
+    ContentCreateInput:
+      type: object
+      required:
+        - title
+        - description
+        - contentType
+        - game
+        - platform
+        - category
+        - tags
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 100
+        description:
+          type: string
+          minLength: 10
+          maxLength: 1000
+        contentType:
+          $ref: '#/components/schemas/ContentType'
+        game:
+          type: string
+          minLength: 2
+          maxLength: 100
+        platform:
+          $ref: '#/components/schemas/Platform'
+        category:
+          $ref: '#/components/schemas/Category'
+        tags:
+          type: array
+          items:
+            type: string
+            maxLength: 25
+          minItems: 1
+          maxItems: 15
+        gameMode:
+          type: string
+          maxLength: 50
+        difficulty:
+          type: string
+          enum: [easy, medium, hard, expert, legendary]
+        isPublic:
+          type: boolean
+          default: true
+        allowComments:
+          type: boolean
+          default: true
+        allowVoting:
+          type: boolean
+          default: true
+
+    ContentUpdateInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 100
+        description:
+          type: string
+          minLength: 10
+          maxLength: 1000
+        tags:
+          type: array
+          items:
+            type: string
+            maxLength: 25
+          minItems: 1
+          maxItems: 15
+        category:
+          $ref: '#/components/schemas/Category'
+        gameMode:
+          type: string
+          maxLength: 50
+        difficulty:
+          type: string
+          enum: [easy, medium, hard, expert, legendary]
+        isPublic:
+          type: boolean
+        allowComments:
+          type: boolean
+        allowVoting:
+          type: boolean
+        addFiles:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: File IDs to add to content
+        removeFiles:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: File IDs to remove from content
+        thumbnailFileId:
+          type: string
+          format: uuid
+          description: Set new thumbnail file
+
+    VoteInput:
+      type: object
+      required:
+        - voteType
+        - tokenAmount
+        - transactionSignature
+        - walletSignature
+      properties:
+        voteType:
+          $ref: '#/components/schemas/VoteType'
+        tokenAmount:
+          type: number
+          format: float
+          minimum: 0.1
+          maximum: 1000
+          example: 1.0
+        transactionSignature:
+          type: string
+          pattern: '^[1-9A-HJ-NP-Za-km-z]{87,88}$'
+          description: Solana transaction signature for token burn
+        walletSignature:
+          type: object
+          required:
+            - signature
+            - message
+            - publicKey
+          properties:
+            signature:
+              type: string
+            message:
+              type: string
+              enum: ["MLG.clan Vote Verification"]
+            publicKey:
+              type: string
+              pattern: '^[1-9A-HJ-NP-Za-km-z]{32,44}$'
+        comment:
+          type: string
+          maxLength: 200
+        isAnonymous:
+          type: boolean
+          default: false
+
+    ReportInput:
+      type: object
+      required:
+        - reason
+        - description
+        - category
+        - severity
+      properties:
+        reason:
+          type: string
+          enum: [spam, inappropriate, copyright, cheating, harassment, fake, other]
+        description:
+          type: string
+          minLength: 10
+          maxLength: 500
+        category:
+          type: string
+          enum: [content, user, technical, legal]
+        severity:
+          type: string
+          enum: [low, medium, high, critical]
+        evidence:
+          type: array
+          items:
+            type: string
+            format: uri
+          maxItems: 5
+          description: URLs to evidence files
+
+    # Enum Schemas
+    ContentType:
+      type: string
+      enum:
+        - video_clip
+        - screenshot
+        - guide
+        - review
+        - stream
+        - tournament_content
+      example: video_clip
+
+    ContentStatus:
+      type: string
+      enum:
+        - draft
+        - pending
+        - published
+        - flagged
+        - removed
+      example: published
+
+    VoteType:
+      type: string
+      enum:
+        - upvote
+        - downvote
+        - super_vote
+      example: upvote
+
+    Platform:
+      type: string
+      enum:
+        - pc
+        - xbox
+        - playstation
+        - mobile
+        - nintendo
+        - steam-deck
+        - other
+      example: pc
+
+    Category:
+      type: string
+      enum:
+        - highlights
+        - gameplay
+        - tutorials
+        - funny
+        - competitive
+        - speedrun
+        - review
+        - guide
+      example: highlights
+
+    # Response Schemas
+    SuccessResponse:
+      type: object
+      required:
+        - success
+        - data
+        - meta
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          description: Response data
+        meta:
+          type: object
+          properties:
+            timestamp:
+              type: string
+              format: date-time
+            requestId:
+              type: string
+              format: uuid
+            version:
+              type: string
+              example: "1.0.0"
+
+    ErrorResponse:
+      type: object
+      required:
+        - success
+        - error
+        - message
+        - meta
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: "CONTENT_001"
+        message:
+          type: string
+          example: "Content not found"
+        details:
+          type: object
+          description: Additional error details
+        meta:
+          type: object
+          properties:
+            timestamp:
+              type: string
+              format: date-time
+            requestId:
+              type: string
+              format: uuid
+            version:
+              type: string
+              example: "1.0.0"
+
+    ValidationError:
+      type: object
+      required:
+        - field
+        - message
+        - code
+      properties:
+        field:
+          type: string
+          example: "title"
+        message:
+          type: string
+          example: "Title is required"
+        code:
+          type: string
+          example: "VALIDATION_001"
+        details:
+          type: object
+
+    PaginationResponse:
+      type: object
+      required:
+        - total
+        - limit
+        - offset
+        - hasNext
+        - hasPrev
+      properties:
+        total:
+          type: integer
+          minimum: 0
+          example: 150
+        limit:
+          type: integer
+          minimum: 1
+          example: 20
+        offset:
+          type: integer
+          minimum: 0
+          example: 40
+        hasNext:
+          type: boolean
+          example: true
+        hasPrev:
+          type: boolean
+          example: true
+        nextCursor:
+          type: string
+          example: "eyJpZCI6IjEyMyIsInRzIjoxNjQwOTk1MjAwfQ"
+        prevCursor:
+          type: string
+          example: "eyJpZCI6IjEwMCIsInRzIjoxNjQwOTk1MTAwfQ"
+
+  responses:
+    BadRequest:
+      description: Bad request - invalid parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "VALIDATION_002"
+            message: "Invalid field format"
+
+    Unauthorized:
+      description: Unauthorized - invalid or missing authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "AUTH_001"
+            message: "Invalid or expired JWT token"
+
+    Forbidden:
+      description: Forbidden - insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "AUTH_003"
+            message: "Insufficient permissions"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "CONTENT_001"
+            message: "Content not found"
+
+    PayloadTooLarge:
+      description: Payload too large
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "FILE_001"
+            message: "File too large"
+
+    RateLimitExceeded:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error: "RATE_001"
+            message: "Too many requests"
+            details:
+              limit: 100
+              remaining: 0
+              resetTime: "2024-01-01T13:00:00Z"
+
+    ValidationError:
+      description: Validation failed
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ErrorResponse'
+              - type: object
+                properties:
+                  details:
+                    type: object
+                    properties:
+                      errors:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ValidationError'
+                      warnings:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ValidationError'
+          example:
+            success: false
+            error: "validation_failed"
+            message: "Content validation failed"
+            details:
+              errors:
+                - field: "title"
+                  message: "Title is required"
+                  code: "VALIDATION_001"
+                - field: "files"
+                  message: "At least one file is required"
+                  code: "VALIDATION_001"
+
+tags:
+  - name: Content
+    description: Content CRUD operations
+  - name: Voting
+    description: MLG token voting system
+  - name: Search
+    description: Content search and filtering
+  - name: Discovery
+    description: Content discovery and trending
+  - name: Moderation
+    description: Content moderation and reporting
+  - name: User Content
+    description: User content management
+  - name: Analytics
+    description: Content analytics and metrics
+
+externalDocs:
+  description: MLG.clan Developer Documentation
+  url: https://docs.mlg.clan/api

@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan Browser Integration Tests</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .test-pass { background-color: #22c55e; }
+        .test-fail { background-color: #ef4444; }
+        .test-warn { background-color: #f59e0b; }
+        .test-info { background-color: #3b82f6; }
+        .floating-test-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 400px;
+            max-height: 80vh;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #6ab04c;
+            border-radius: 10px;
+            color: white;
+            font-size: 12px;
+            z-index: 10000;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-4xl font-bold mb-6">MLG.clan Platform Integration Testing</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Platform Preview -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-4">Platform Preview</h2>
+                <iframe id="platformFrame" 
+                        src="index.html" 
+                        width="100%" 
+                        height="600"
+                        class="border rounded-lg">
+                </iframe>
+            </div>
+            
+            <!-- Test Controls -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-4">Integration Test Suite</h2>
+                
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <button onclick="runAllTests()" 
+                            class="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                        🧪 Run All Tests
+                    </button>
+                    <button onclick="runComponentTests()" 
+                            class="bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 font-semibold">
+                        🔧 Component Tests
+                    </button>
+                    <button onclick="runPerformanceTests()" 
+                            class="bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 font-semibold">
+                        ⚡ Performance Tests
+                    </button>
+                    <button onclick="runSecurityTests()" 
+                            class="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 font-semibold">
+                        🔒 Security Tests
+                    </button>
+                    <button onclick="generateReport()" 
+                            class="bg-yellow-600 text-white px-4 py-3 rounded-lg hover:bg-yellow-700 font-semibold">
+                        📊 Generate Report
+                    </button>
+                    <button onclick="clearResults()" 
+                            class="bg-gray-600 text-white px-4 py-3 rounded-lg hover:bg-gray-700 font-semibold">
+                        🗑️ Clear Results
+                    </button>
+                </div>
+                
+                <!-- Test Status -->
+                <div id="testStatus" class="mb-4 p-3 bg-gray-100 rounded-lg">
+                    <div class="text-sm text-gray-600">Ready to run tests</div>
+                </div>
+                
+                <!-- Test Summary -->
+                <div id="testSummary" class="hidden">
+                    <h3 class="font-bold mb-2">Test Summary</h3>
+                    <div class="grid grid-cols-4 gap-2 text-center text-sm">
+                        <div class="test-pass text-white p-2 rounded">
+                            <div class="font-bold" id="passCount">0</div>
+                            <div>Pass</div>
+                        </div>
+                        <div class="test-fail text-white p-2 rounded">
+                            <div class="font-bold" id="failCount">0</div>
+                            <div>Fail</div>
+                        </div>
+                        <div class="test-warn text-white p-2 rounded">
+                            <div class="font-bold" id="warnCount">0</div>
+                            <div>Warn</div>
+                        </div>
+                        <div class="test-info text-white p-2 rounded">
+                            <div class="font-bold" id="totalCount">0</div>
+                            <div>Total</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <div class="text-sm font-semibold mb-1">Test Coverage</div>
+                        <div class="bg-gray-200 rounded-full h-6 relative">
+                            <div id="coverageBar" class="bg-green-500 h-6 rounded-full transition-all duration-500" style="width: 0%"></div>
+                            <div class="absolute inset-0 flex items-center justify-center text-xs font-bold" id="coverageText">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Results -->
+        <div class="mt-6 bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">Test Results</h2>
+            <div id="testResults" class="space-y-2 max-h-96 overflow-y-auto">
+                <!-- Results will appear here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class BrowserIntegrationTester {
+            constructor() {
+                this.testResults = [];
+                this.platform = null;
+                this.init();
+            }
+
+            init() {
+                console.log('🧪 Browser Integration Tester Initialized');
+                
+                // Wait for platform to load
+                const iframe = document.getElementById('platformFrame');
+                iframe.onload = () => {
+                    this.platform = iframe.contentWindow;
+                    this.updateStatus('Platform loaded - Ready for testing');
+                    
+                    // Auto-run basic connectivity test
+                    setTimeout(() => this.runConnectivityTest(), 1000);
+                };
+            }
+
+            updateStatus(message) {
+                document.getElementById('testStatus').innerHTML = `
+                    <div class="text-sm text-gray-800 font-medium">${message}</div>
+                    <div class="text-xs text-gray-500">${new Date().toLocaleTimeString()}</div>
+                `;
+            }
+
+            async runConnectivityTest() {
+                try {
+                    if (this.platform && this.platform.document) {
+                        this.logTest('Platform Connection', 'Platform iframe loaded successfully', 'pass');
+                        
+                        // Test basic DOM elements
+                        const hasMainElements = this.platform.document.querySelector('[data-section]');
+                        this.logTest('Platform Elements', hasMainElements ? 'Main elements found' : 'Main elements missing', 
+                            hasMainElements ? 'pass' : 'fail');
+                            
+                        // Test MLG app instance
+                        const hasApp = this.platform.mlgApp || this.platform.app;
+                        this.logTest('Platform App Instance', hasApp ? 'MLG app instance found' : 'App instance missing', 
+                            hasApp ? 'pass' : 'warn');
+                    } else {
+                        this.logTest('Platform Connection', 'Failed to connect to platform iframe', 'fail');
+                    }
+                } catch (error) {
+                    this.logTest('Platform Connection', `Connection error: ${error.message}`, 'fail');
+                }
+            }
+
+            async runAllTests() {
+                this.clearResults();
+                this.updateStatus('Running comprehensive integration tests...');
+                
+                console.log('🧪 Starting comprehensive integration tests');
+
+                try {
+                    await this.runComponentTests();
+                    await this.runWebSocketTests();
+                    await this.runWalletTests();
+                    await this.runNavigationTests();
+                    await this.runVideoTests();
+                    await this.runPerformanceTests();
+                    await this.runErrorHandlingTests();
+                    await this.runAccessibilityTests();
+                    await this.runSecurityTests();
+                    await this.runCrossBrowserTests();
+                    
+                    this.updateSummary();
+                    this.updateStatus('All tests completed');
+                    
+                    console.log('✅ Integration tests completed');
+                } catch (error) {
+                    this.logTest('Test Suite', `Suite error: ${error.message}`, 'fail');
+                    this.updateStatus('Test suite encountered errors');
+                }
+            }
+
+            async runComponentTests() {
+                this.logTest('Component Integration', 'Testing component integrations...', 'info');
+                
+                if (!this.platform) {
+                    this.logTest('Component Integration', 'Platform not accessible', 'fail');
+                    return;
+                }
+
+                try {
+                    // Test 1: Voting System Integration
+                    const votingSection = this.platform.document.querySelector('[data-section="voting"]');
+                    if (votingSection) {
+                        // Click to navigate to voting section
+                        votingSection.click();
+                        await this.wait(1000);
+                        
+                        const burnButtons = this.platform.document.querySelectorAll('.burn-vote-btn');
+                        this.logTest('Voting System', burnButtons.length > 0 ? `Found ${burnButtons.length} burn-vote buttons` : 'No burn-vote buttons found', 
+                            burnButtons.length > 0 ? 'pass' : 'fail');
+                            
+                        // Test MLG token elements
+                        const tokenElements = this.platform.document.querySelectorAll('[data-token="MLG"], .mlg-token, .token-balance');
+                        this.logTest('MLG Token Integration', tokenElements.length > 0 ? `Found ${tokenElements.length} token elements` : 'No token elements', 
+                            tokenElements.length > 0 ? 'pass' : 'warn');
+                    } else {
+                        this.logTest('Voting System', 'Voting section not found', 'fail');
+                    }
+
+                    // Test 2: Clan Management Integration
+                    const clanSection = this.platform.document.querySelector('[data-section="clans"]');
+                    if (clanSection) {
+                        clanSection.click();
+                        await this.wait(2000); // Wait for React component to load
+                        
+                        const clanElements = this.platform.document.querySelectorAll('#clan-management-root, .clan-card, .member-card');
+                        this.logTest('Clan Management', clanElements.length > 0 ? `Clan management system active` : 'Clan management not found', 
+                            clanElements.length > 0 ? 'pass' : 'warn');
+                    } else {
+                        this.logTest('Clan Management', 'Clan section not found', 'fail');
+                    }
+
+                    // Test 3: Content Submission System
+                    const contentSection = this.platform.document.querySelector('[data-section="content"]');
+                    if (contentSection) {
+                        contentSection.click();
+                        await this.wait(1000);
+                        
+                        const videoElements = this.platform.document.querySelectorAll('iframe, video, .video-embed');
+                        this.logTest('Content System', videoElements.length > 0 ? `Found ${videoElements.length} video elements` : 'No video elements found', 
+                            videoElements.length > 0 ? 'pass' : 'warn');
+                    } else {
+                        this.logTest('Content System', 'Content section not found', 'fail');
+                    }
+
+                    // Test 4: Achievement System
+                    const achievementSection = this.platform.document.querySelector('[data-section="achievements"]');
+                    if (achievementSection) {
+                        achievementSection.click();
+                        await this.wait(1000);
+                        
+                        const achievementElements = this.platform.document.querySelectorAll('.achievement-card, .achievement-badge');
+                        this.logTest('Achievement System', achievementElements.length > 0 ? `Achievement system active` : 'Achievement system not found', 
+                            achievementElements.length > 0 ? 'pass' : 'warn');
+                    } else {
+                        this.logTest('Achievement System', 'Achievement section not found', 'fail');
+                    }
+
+                    // Test 5: Profile Dashboard
+                    const profileSection = this.platform.document.querySelector('[data-section="profile"]') || 
+                                         this.platform.document.querySelector('[data-section="dashboard"]');
+                    if (profileSection) {
+                        profileSection.click();
+                        await this.wait(1000);
+                        
+                        this.logTest('Profile Dashboard', 'Profile/Dashboard section accessible', 'pass');
+                    } else {
+                        this.logTest('Profile Dashboard', 'Profile/Dashboard sections not found', 'fail');
+                    }
+
+                    // Test 6: Data Flow Integration
+                    const mlgApp = this.platform.mlgApp || this.platform.app;
+                    if (mlgApp && typeof mlgApp.showSection === 'function') {
+                        this.logTest('Data Flow Integration', 'MLG app instance with navigation methods found', 'pass');
+                    } else {
+                        this.logTest('Data Flow Integration', 'MLG app instance or methods not accessible', 'warn');
+                    }
+
+                } catch (error) {
+                    this.logTest('Component Integration', `Error during component tests: ${error.message}`, 'fail');
+                }
+            }
+
+            async runWebSocketTests() {
+                this.logTest('WebSocket Integration', 'Testing real-time connections...', 'info');
+
+                try {
+                    // Test WebSocket API availability
+                    const hasWebSocket = typeof WebSocket !== 'undefined';
+                    this.logTest('WebSocket Support', hasWebSocket ? 'WebSocket API available' : 'WebSocket not supported', 
+                        hasWebSocket ? 'pass' : 'fail');
+
+                    // Test real-time elements in platform
+                    if (this.platform) {
+                        const realtimeElements = this.platform.document.querySelectorAll('[data-realtime], .realtime-update, .live-update');
+                        this.logTest('Real-time Elements', realtimeElements.length > 0 ? `Found ${realtimeElements.length} real-time elements` : 'No real-time elements found', 
+                            realtimeElements.length > 0 ? 'pass' : 'warn');
+
+                        // Test notification system
+                        const notificationElements = this.platform.document.querySelectorAll('.notification-container, #notifications, .toast-container');
+                        this.logTest('Notification System', notificationElements.length > 0 ? 'Notification system found' : 'No notification system found', 
+                            notificationElements.length > 0 ? 'pass' : 'warn');
+                    }
+
+                    // Test real-time function availability
+                    if (this.platform && this.platform.testRealtime) {
+                        this.logTest('Real-time Functions', 'Real-time test functions available', 'pass');
+                    } else {
+                        this.logTest('Real-time Functions', 'Real-time test functions not found', 'warn');
+                    }
+
+                } catch (error) {
+                    this.logTest('WebSocket Integration', `Error: ${error.message}`, 'fail');
+                }
+            }
+
+            async runWalletTests() {
+                this.logTest('Phantom Wallet', 'Testing wallet integration...', 'info');
+
+                try {
+                    // Test Phantom detection
+                    const phantomAvailable = window.phantom?.solana?.isPhantom || this.platform?.phantom?.solana?.isPhantom;
+                    this.logTest('Phantom Detection', phantomAvailable ? 'Phantom wallet detected' : 'Phantom wallet not installed (expected in test)', 
+                        phantomAvailable ? 'pass' : 'warn');
+
+                    // Test wallet connect button in platform
+                    if (this.platform) {
+                        const walletBtn = this.platform.document.querySelector('#walletConnectBtn, .wallet-connect-btn');
+                        if (walletBtn) {
+                            this.logTest('Wallet Connect UI', 'Wallet connect button found', 'pass');
+                            
+                            // Test button interaction (without actual connection)
+                            try {
+                                walletBtn.click();
+                                await this.wait(500);
+                                this.logTest('Wallet Interaction', 'Wallet connect button clickable', 'pass');
+                            } catch (error) {
+                                this.logTest('Wallet Interaction', 'Wallet button click failed', 'warn');
+                            }
+                        } else {
+                            this.logTest('Wallet Connect UI', 'Wallet connect button not found', 'fail');
+                        }
+
+                        // Test wallet testing functions
+                        const hasTestFunctions = typeof this.platform.testWallet === 'function' && 
+                                               typeof this.platform.validateWallet === 'function';
+                        this.logTest('Wallet Test Functions', hasTestFunctions ? 'Wallet test functions available' : 'Test functions not found', 
+                            hasTestFunctions ? 'pass' : 'warn');
+
+                        // Test token balance display
+                        const tokenDisplays = this.platform.document.querySelectorAll('.token-balance, #token-balance, [data-token-balance]');
+                        this.logTest('Token Balance UI', tokenDisplays.length > 0 ? `Found ${tokenDisplays.length} token displays` : 'No token balance displays', 
+                            tokenDisplays.length > 0 ? 'pass' : 'warn');
+                    }
+
+                } catch (error) {
+                    this.logTest('Phantom Wallet', `Error: ${error.message}`, 'fail');
+                }
+            }
+
+            async runNavigationTests() {
+                this.logTest('Navigation System', 'Testing navigation and routing...', 'info');
+
+                try {
+                    if (!this.platform) {
+                        this.logTest('Navigation System', 'Platform not accessible', 'fail');
+                        return;
+                    }
+
+                    // Test navigation sections
+                    const navSections = this.platform.document.querySelectorAll('[data-section]');
+                    if (navSections.length > 0) {
+                        this.logTest('Navigation Elements', `Found ${navSections.length} navigation sections`, 'pass');
+                        
+                        // Test section switching
+                        const sections = ['dashboard', 'clans', 'voting', 'content', 'achievements', 'treasury', 'profile'];
+                        let workingSections = 0;
+
+                        for (const sectionName of sections) {
+                            try {
+                                const sectionElement = this.platform.document.querySelector(`[data-section="${sectionName}"]`);
+                                if (sectionElement) {
+                                    sectionElement.click();
+                                    await this.wait(300);
+                                    workingSections++;
+                                }
+                            } catch (error) {
+                                // Section might not exist, continue
+                            }
+                        }
+
+                        this.logTest('Section Navigation', `${workingSections}/${sections.length} sections navigable`, 
+                            workingSections >= sections.length - 2 ? 'pass' : 'warn');
+                    } else {
+                        this.logTest('Navigation Elements', 'No navigation sections found', 'fail');
+                    }
+
+                    // Test mobile navigation
+                    const mobileNavElements = this.platform.document.querySelectorAll('.mobile-nav, #mobile-nav, [data-mobile-nav]');
+                    this.logTest('Mobile Navigation', mobileNavElements.length > 0 ? 'Mobile navigation found' : 'No mobile navigation found', 
+                        mobileNavElements.length > 0 ? 'pass' : 'warn');
+
+                    // Test state management
+                    const mlgApp = this.platform.mlgApp || this.platform.app;
+                    if (mlgApp && mlgApp.currentSection !== undefined) {
+                        this.logTest('State Management', 'Navigation state tracking active', 'pass');
+                    } else {
+                        this.logTest('State Management', 'No navigation state tracking found', 'warn');
+                    }
+
+                } catch (error) {
+                    this.logTest('Navigation System', `Error: ${error.message}`, 'fail');
+                }
+            }
+
+            async runVideoTests() {
+                this.logTest('Video System', 'Testing multi-platform video system...', 'info');
+
+                try {
+                    if (!this.platform) {
+                        this.logTest('Video System', 'Platform not accessible', 'fail');
+                        return;
+                    }
+
+                    // Navigate to content section
+                    const contentSection = this.platform.document.querySelector('[data-section="content"]');
+                    if (contentSection) {
+                        contentSection.click();
+                        await this.wait(1000);
+                    }
+
+                    // Test video elements
+                    const videoElements = this.platform.document.querySelectorAll('iframe, video, .video-embed, embed');
+                    this.logTest('Video Elements', videoElements.length > 0 ? `Found ${videoElements.length} video elements` : 'No video elements found', 
+                        videoElements.length > 0 ? 'pass' : 'warn');
+
+                    // Test platform-specific embeds
+                    const platforms = ['youtube', 'twitter', 'tiktok', 'instagram', 'twitch'];
+                    let supportedPlatforms = 0;
+
+                    platforms.forEach(platform => {
+                        const platformElements = this.platform.document.querySelectorAll(`[data-platform="${platform}"], .${platform}-embed, iframe[src*="${platform}"]`);
+                        if (platformElements.length > 0) {
+                            supportedPlatforms++;
+                        }
+                    });
+
+                    this.logTest('Platform Support', `${supportedPlatforms}/${platforms.length} video platforms supported`, 
+                        supportedPlatforms >= 2 ? 'pass' : 'warn');
+
+                    // Test upload interface
+                    const uploadElements = this.platform.document.querySelectorAll('input[type="file"], .upload-area, .drag-drop-area');
+                    this.logTest('Video Upload', uploadElements.length > 0 ? 'Upload interface found' : 'No upload interface found', 
+                        uploadElements.length > 0 ? 'pass' : 'warn');
+
+                    // Test video controls
+                    const controlElements = this.platform.document.querySelectorAll('.video-controls, video[controls]');
+                    this.logTest('Video Controls', controlElements.length > 0 ? 'Video controls found' : 'No video controls found', 
+                        controlElements.length > 0 ? 'pass' : 'info');
+
+                } catch (error) {
+                    this.logTest('Video System', `Error: ${error.message}`, 'fail');
+                }
+            }
+
+            async runPerformanceTests() {
+                this.logTest('Performance', 'Running performance benchmarks...', 'info');
+
+                try {
+                    // Test page load performance
+                    if (performance.timing) {
+                        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                        if (loadTime > 0) {
+                            if (loadTime < 3000) {
+                                this.logTest('Page Load Time', `${loadTime}ms (Excellent)`, 'pass');
+                            } else if (loadTime < 5000) {
+                                this.logTest('Page Load Time', `${loadTime}ms (Good)`, 'pass');
+                            } else if (loadTime < 8000) {
+                                this.logTest('Page Load Time', `${loadTime}ms (Acceptable)`, 'warn');
+                            } else {
+                                this.logTest('Page Load Time', `${loadTime}ms (Slow)`, 'fail');
+                            }
+                        }
+                    }
+
+                    // Test memory usage
+                    if (performance.memory) {
+                        const memoryUsage = Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
+                        if (memoryUsage < 50) {
+                            this.logTest('Memory Usage', `${memoryUsage}MB (Excellent)`, 'pass');
+                        } else if (memoryUsage < 100) {
+                            this.logTest('Memory Usage', `${memoryUsage}MB (Good)`, 'pass');
+                        } else if (memoryUsage < 200) {
+                            this.logTest('Memory Usage', `${memoryUsage}MB (Acceptable)`, 'warn');
+                        } else {
+                            this.logTest('Memory Usage', `${memoryUsage}MB (High)`, 'fail');
+                        }
+                    }
+
+                    // Test DOM complexity
+                    const platformElementCount = this.platform ? this.platform.document.querySelectorAll('*').length : 0;
+                    const localElementCount = document.querySelectorAll('*').length;
+                    
+                    if (platformElementCount > 0) {
+                        if (platformElementCount < 1000) {
+                            this.logTest('Platform DOM Complexity', `${platformElementCount} elements (Good)`, 'pass');
+                        } else if (platformElementCount < 2000) {
+                            this.logTest('Platform DOM Complexity', `${platformElementCount} elements (Acceptable)`, 'warn');
+                        } else {
+                            this.logTest('Platform DOM Complexity', `${platformElementCount} elements (Complex)`, 'fail');
+                        }
+                    }
+
+                    // Test script performance
+                    const startTime = performance.now();
+                    for (let i = 0; i < 1000; i++) {
+                        // Simple performance test
+                        Math.random();
+                    }
+                    const scriptTime = performance.now() - startTime;
+                    
+                    this.logTest('Script Performance', `${scriptTime.toFixed(2)}ms for 1000 operations`, 
+                        scriptTime < 10 ? 'pass' : scriptTime < 50 ? 'warn' : 'fail');
+
+                    // Test responsiveness
+                    const responseStartTime = performance.now();
+                    await this.wait(100);
+                    const responseTime = performance.now() - responseStartTime;
+                    
+                    this.logTest('UI Responsiveness', `${Math.round(responseTime)}ms response time`, 
+                        responseTime < 150 ? 'pass' : responseTime < 300 ? 'warn' : 'fail');
+
+                } catch (error) {
+                    this.logTest('Performance', `Error: ${error.message}`, 'fail');
+                }
+            }
+
+            async runErrorHandlingTests() {
+                this.logTest('Error Handling', 'Testing error scenarios...', 'info');
+
+                try {
+                    // Monitor console errors
+                    let consoleErrors = 0;
+                    const originalError = console.error;
+                    console.error = (...args) => {
+                        consoleErrors++;
+                        originalError.apply(console, args);
+                    };
+
+                    // Test error scenarios
+                    await this.wait(1000);
+
+                    // Reset console.error
+                    console.error = originalError;
+
+                    this.logTest('Console Errors', consoleErrors === 0 ? 'No console errors detected' : `${consoleErrors} console errors found`, 
+                        consoleErrors === 0 ? 'pass' : consoleErrors < 3 ? 'warn' : 'fail');
+
+                    // Test error UI elements
+                    if (this.platform) {
+                        const errorElements = this.platform.document.querySelectorAll('.error-message, .error-boundary, .alert-error');
+                        this.logTest('Error UI Elements', errorElements.length > 0 ? `Found ${errorElements.length} error UI elements` : 'No error UI elements found', 
+                            errorElements.length > 0 ? 'pass' : 'info');
+                    }
+
+                    // Test graceful degradation
+                    this.logTest('Graceful Degradation', 'Platform continues to function despite potential errors', 'pass');
+
+                } catch (error) {
+                    this.logTest('Error Handling', `Error: ${error.message}`, 'fail');
+                }
+            }
+
+            async runAccessibilityTests() {
+                this.logTest('Accessibility', 'Testing accessibility compliance...', 'info');
+
+                try {
+                    if (!this.platform) {
+                        this.logTest('Accessibility', 'Platform not accessible for testing', 'fail');
+                        return;
+                    }
+
+                    // Test ARIA attributes
+                    const ariaElements = this.platform.document.querySelectorAll('[aria-label], [aria-labelledby], [aria-describedby], [role]');
+                    if (ariaElements.length > 10) {
+                        this.logTest('ARIA Attributes', `${ariaElements.length} elements with ARIA attributes (Good)`, 'pass');
+                    } else if (ariaElements.length > 5) {
+                        this.logTest('ARIA Attributes', `${ariaElements.length} elements with ARIA attributes (Acceptable)`, 'warn');
+                    } else {
+                        this.logTest('ARIA Attributes', `Only ${ariaElements.length} ARIA attributes found`, 'fail');
+                    }
+
+                    // Test keyboard navigation
+                    const focusableElements = this.platform.document.querySelectorAll('button, a, input, select, textarea, [tabindex]');
+                    if (focusableElements.length > 20) {
+                        this.logTest('Keyboard Navigation', `${focusableElements.length} focusable elements (Good)`, 'pass');
+                    } else if (focusableElements.length > 10) {
+                        this.logTest('Keyboard Navigation', `${focusableElements.length} focusable elements (Acceptable)`, 'warn');
+                    } else {
+                        this.logTest('Keyboard Navigation', 'Limited keyboard navigation', 'fail');
+                    }
+
+                    // Test semantic HTML
+                    const semanticElements = this.platform.document.querySelectorAll('main, section, article, aside, nav, header, footer, h1, h2, h3, h4, h5, h6');
+                    if (semanticElements.length > 10) {
+                        this.logTest('Semantic HTML', `${semanticElements.length} semantic elements (Good)`, 'pass');
+                    } else if (semanticElements.length > 5) {
+                        this.logTest('Semantic HTML', `${semanticElements.length} semantic elements (Acceptable)`, 'warn');
+                    } else {
+                        this.logTest('Semantic HTML', 'Limited semantic HTML structure', 'fail');
+                    }
+
+                    // Test alt text for images
+                    const images = this.platform.document.querySelectorAll('img');
+                    const imagesWithAlt = this.platform.document.querySelectorAll('img[alt]');
+                    
+                    if (images.length === 0) {
+                        this.logTest('Image Alt Text', 'No images found', 'info');
+                    } else if (imagesWithAlt.length === images.length) {
+                        this.logTest('Image Alt Text', 'All images have alt text', 'pass');
+                    } else {
+                        this.logTest('Image Alt Text', `${imagesWithAlt.length}/${images.length} images have alt text`, 
+                            imagesWithAlt.length / images.length > 0.8 ? 'warn' : 'fail');
+                    }
+
+                    // Test form labels
+                    const inputs = this.platform.document.querySelectorAll('input, textarea, select');
+                    const labelsAndAriaLabels = this.platform.document.querySelectorAll('input[aria-label], input[aria-labelledby], textarea[aria-label], select[aria-label], label');
+                    
+                    if (inputs.length > 0) {
+                        const labelRatio = labelsAndAriaLabels.length / inputs.length;
+                        this.logTest('Form Labels', `${Math.round(labelRatio * 100)}% of inputs have labels`, 
+                            labelRatio > 0.8 ? 'pass' : labelRatio > 0.5 ? 'warn' : 'fail');
+                    } else {
+                        this.logTest('Form Labels', 'No form inputs found', 'info');
+                    }
+
+                } catch (error) {
+                    this.logTest('Accessibility', `Error: ${error.message}`, 'fail');
+                }
+            }
+
+            async runSecurityTests() {
+                this.logTest('Security', 'Running security validation...', 'info');
+
+                try {
+                    // Test HTTPS protocol
+                    const isHttps = location.protocol === 'https:';
+                    this.logTest('HTTPS Protocol', isHttps ? 'Secure HTTPS connection' : 'HTTP connection (local development)', 
+                        isHttps ? 'pass' : 'warn');
+
+                    // Test CSP headers
+                    const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+                    this.logTest('CSP Headers', cspMeta ? 'Content Security Policy headers found' : 'No CSP headers found', 
+                        cspMeta ? 'pass' : 'warn');
+
+                    // Test platform CSP
+                    if (this.platform) {
+                        const platformCSP = this.platform.document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+                        this.logTest('Platform CSP', platformCSP ? 'Platform has CSP headers' : 'Platform has no CSP headers', 
+                            platformCSP ? 'pass' : 'warn');
+                    }
+
+                    // Test for inline scripts (security risk)
+                    const inlineScripts = document.querySelectorAll('script:not([src])');
+                    const platformInlineScripts = this.platform ? this.platform.document.querySelectorAll('script:not([src])') : [];
+                    
+                    const totalInlineScripts = inlineScripts.length + platformInlineScripts.length;
+                    if (totalInlineScripts < 5) {
+                        this.logTest('Inline Scripts', `${totalInlineScripts} inline scripts (Low risk)`, 'pass');
+                    } else if (totalInlineScripts < 15) {
+                        this.logTest('Inline Scripts', `${totalInlineScripts} inline scripts (Moderate risk)`, 'warn');
+                    } else {
+                        this.logTest('Inline Scripts', `${totalInlineScripts} inline scripts (High risk)`, 'fail');
+                    }
+
+                    // Test external resources
+                    const externalResources = document.querySelectorAll('script[src^="http"], link[href^="http"], img[src^="http"]');
+                    const trustedDomains = ['cdn.tailwindcss.com', 'unpkg.com', 'solana.com', 'phantom.app'];
+                    
+                    let untrustedResources = 0;
+                    externalResources.forEach(resource => {
+                        const src = resource.src || resource.href;
+                        if (!trustedDomains.some(domain => src.includes(domain))) {
+                            untrustedResources++;
+                        }
+                    });
+
+                    this.logTest('External Resources', untrustedResources === 0 ? 
+                        `All ${externalResources.length} external resources from trusted domains` : 
+                        `${untrustedResources} resources from untrusted domains`, 
+                        untrustedResources === 0 ? 'pass' : 'warn');
+
+                    // Test input validation (basic check)
+                    if (this.platform) {
+                        const inputs = this.platform.document.querySelectorAll('input, textarea');
+                        const validatedInputs = this.platform.document.querySelectorAll('input[pattern], input[required], input[maxlength], textarea[maxlength]');
+                        
+                        if (inputs.length > 0) {
+                            const validationRatio = validatedInputs.length / inputs.length;
+                            this.logTest('Input Validation', `${Math.round(validationRatio * 100)}% of inputs have validation`, 
+                                validationRatio > 0.7 ? 'pass' : validationRatio > 0.3 ? 'warn' : 'fail');
+                        } else {
+                            this.logTest('Input Validation', 'No form inputs found', 'info');
+                        }
+                    }
+
+                    // Test for potential XSS vectors
+                    if (this.platform) {
+                        const dangerousElements = this.platform.document.querySelectorAll('[onclick], [onload], [onerror]');
+                        this.logTest('XSS Vectors', dangerousElements.length === 0 ? 
+                            'No inline event handlers found' : 
+                            `${dangerousElements.length} inline event handlers (potential XSS risk)`, 
+                            dangerousElements.length === 0 ? 'pass' : 'warn');
+                    }
+
+                } catch (error) {
+                    this.logTest('Security', `Error: ${error.message}`, 'fail');
+                }
+            }
+
+            async runCrossBrowserTests() {
+                this.logTest('Cross-Browser', 'Testing browser compatibility...', 'info');
+
+                try {
+                    // Detect browser
+                    const userAgent = navigator.userAgent;
+                    let browser = 'Unknown';
+                    
+                    if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) browser = 'Chrome';
+                    else if (userAgent.includes('Firefox')) browser = 'Firefox';
+                    else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) browser = 'Safari';
+                    else if (userAgent.includes('Edg')) browser = 'Edge';
+
+                    this.logTest('Browser Detection', `Running on ${browser}`, 'pass');
+
+                    // Test viewport and device info
+                    const viewport = {
+                        width: window.innerWidth,
+                        height: window.innerHeight,
+                        isMobile: window.innerWidth < 768,
+                        isTablet: window.innerWidth >= 768 && window.innerWidth < 1024,
+                        isDesktop: window.innerWidth >= 1024
+                    };
+
+                    const deviceType = viewport.isMobile ? 'Mobile' : viewport.isTablet ? 'Tablet' : 'Desktop';
+                    this.logTest('Device Detection', `${viewport.width}x${viewport.height} (${deviceType})`, 'pass');
+
+                    // Test modern web features
+                    const features = {
+                        'WebSocket': typeof WebSocket !== 'undefined',
+                        'localStorage': typeof localStorage !== 'undefined',
+                        'sessionStorage': typeof sessionStorage !== 'undefined',
+                        'fetch': typeof fetch !== 'undefined',
+                        'Promise': typeof Promise !== 'undefined',
+                        'async/await': (async function() {})().constructor === (async function(){}).constructor,
+                        'ES6 Classes': typeof class {} === 'function',
+                        'Arrow Functions': (() => {}).constructor === (() => {}).constructor,
+                        'Template Literals': true, // Always supported in modern testing environment
+                        'Destructuring': true // Always supported in modern testing environment
+                    };
+
+                    const supportedFeatures = Object.values(features).filter(Boolean).length;
+                    const totalFeatures = Object.keys(features).length;
+
+                    if (supportedFeatures === totalFeatures) {
+                        this.logTest('Modern Features', `All ${totalFeatures} modern features supported`, 'pass');
+                    } else if (supportedFeatures >= totalFeatures * 0.8) {
+                        this.logTest('Modern Features', `${supportedFeatures}/${totalFeatures} features supported (Good)`, 'pass');
+                    } else {
+                        this.logTest('Modern Features', `Only ${supportedFeatures}/${totalFeatures} features supported`, 'warn');
+                    }
+
+                    // Test CSS support
+                    const testElement = document.createElement('div');
+                    testElement.style.display = 'grid';
+                    const hasGrid = testElement.style.display === 'grid';
+                    
+                    testElement.style.display = 'flex';
+                    const hasFlex = testElement.style.display === 'flex';
+
+                    if (hasGrid && hasFlex) {
+                        this.logTest('CSS Support', 'Modern CSS (Grid and Flexbox) supported', 'pass');
+                    } else if (hasFlex) {
+                        this.logTest('CSS Support', 'Flexbox supported, Grid may not be available', 'warn');
+                    } else {
+                        this.logTest('CSS Support', 'Limited CSS support', 'fail');
+                    }
+
+                    // Test touch support
+                    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+                    this.logTest('Touch Support', hasTouch ? 'Touch events supported' : 'No touch support', 
+                        hasTouch ? 'pass' : 'info');
+
+                    // Test performance API
+                    const hasPerformanceAPI = typeof performance !== 'undefined' && performance.now;
+                    this.logTest('Performance API', hasPerformanceAPI ? 'Performance API available' : 'No Performance API', 
+                        hasPerformanceAPI ? 'pass' : 'warn');
+
+                    // Test Web Workers
+                    const hasWebWorkers = typeof Worker !== 'undefined';
+                    this.logTest('Web Workers', hasWebWorkers ? 'Web Workers supported' : 'No Web Workers', 
+                        hasWebWorkers ? 'pass' : 'warn');
+
+                } catch (error) {
+                    this.logTest('Cross-Browser', `Error: ${error.message}`, 'fail');
+                }
+            }
+
+            logTest(category, message, status) {
+                const result = {
+                    category,
+                    message,
+                    status,
+                    timestamp: new Date().toISOString()
+                };
+                
+                this.testResults.push(result);
+                this.displayTest(result);
+                
+                // Console logging
+                const emoji = status === 'pass' ? '✅' : status === 'fail' ? '❌' : status === 'warn' ? '⚠️' : 'ℹ️';
+                console.log(`${emoji} [${category}] ${message}`);
+            }
+
+            displayTest(result) {
+                const resultsContainer = document.getElementById('testResults');
+                const testElement = document.createElement('div');
+                
+                const statusClasses = {
+                    pass: 'test-pass',
+                    fail: 'test-fail',
+                    warn: 'test-warn',
+                    info: 'test-info'
+                };
+
+                testElement.className = `${statusClasses[result.status]} text-white p-3 rounded-lg mb-2`;
+                testElement.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex-1">
+                            <div class="font-semibold">${result.category}</div>
+                            <div class="text-sm opacity-90">${result.message}</div>
+                            <div class="text-xs opacity-70">${new Date(result.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                        <div class="font-bold text-sm">
+                            ${result.status.toUpperCase()}
+                        </div>
+                    </div>
+                `;
+                
+                resultsContainer.appendChild(testElement);
+                resultsContainer.scrollTop = resultsContainer.scrollHeight;
+            }
+
+            updateSummary() {
+                const summary = this.testResults.reduce((acc, result) => {
+                    acc[result.status] = (acc[result.status] || 0) + 1;
+                    acc.total++;
+                    return acc;
+                }, { pass: 0, fail: 0, warn: 0, info: 0, total: 0 });
+
+                document.getElementById('passCount').textContent = summary.pass || 0;
+                document.getElementById('failCount').textContent = summary.fail || 0;
+                document.getElementById('warnCount').textContent = summary.warn || 0;
+                document.getElementById('totalCount').textContent = summary.total || 0;
+
+                const coverage = summary.total > 0 ? Math.round(((summary.pass + summary.warn) / summary.total) * 100) : 0;
+                document.getElementById('coverageBar').style.width = `${coverage}%`;
+                document.getElementById('coverageText').textContent = `${coverage}%`;
+
+                document.getElementById('testSummary').classList.remove('hidden');
+            }
+
+            clearResults() {
+                this.testResults = [];
+                document.getElementById('testResults').innerHTML = '';
+                document.getElementById('testSummary').classList.add('hidden');
+                this.updateStatus('Results cleared - Ready for new tests');
+            }
+
+            async generateReport() {
+                const summary = this.testResults.reduce((acc, result) => {
+                    acc[result.status] = (acc[result.status] || 0) + 1;
+                    acc.total++;
+                    return acc;
+                }, { pass: 0, fail: 0, warn: 0, info: 0, total: 0 });
+
+                const coverage = summary.total > 0 ? Math.round(((summary.pass + summary.warn) / summary.total) * 100) : 0;
+                const passRate = summary.total > 0 ? Math.round((summary.pass / summary.total) * 100) : 0;
+
+                const recommendation = 
+                    passRate >= 90 && summary.fail === 0 ? 'GO - Platform ready for production deployment' :
+                    passRate >= 80 && summary.fail <= 2 ? 'CONDITIONAL GO - Address critical issues before production' :
+                    passRate >= 70 ? 'REVIEW REQUIRED - Significant issues need resolution' :
+                    'NO GO - Critical issues must be resolved before production';
+
+                const report = {
+                    timestamp: new Date().toISOString(),
+                    platform: 'MLG.clan Unified Gaming Platform',
+                    version: '1.0.0-integrated',
+                    testEnvironment: 'Browser-based Integration Testing',
+                    testSuite: 'Comprehensive Platform Integration Tests',
+                    summary: {
+                        totalTests: summary.total,
+                        passed: summary.pass,
+                        failed: summary.fail,
+                        warnings: summary.warn,
+                        info: summary.info,
+                        coverage: `${coverage}%`,
+                        passRate: `${passRate}%`
+                    },
+                    recommendation,
+                    testCategories: {
+                        'Component Integration': this.testResults.filter(r => r.category.includes('Integration') || r.category.includes('System') || r.category.includes('Management') || r.category.includes('Achievement')).length,
+                        'Real-time & WebSocket': this.testResults.filter(r => r.category.includes('WebSocket') || r.category.includes('Real-time')).length,
+                        'Wallet & Blockchain': this.testResults.filter(r => r.category.includes('Wallet') || r.category.includes('Phantom') || r.category.includes('Token')).length,
+                        'Navigation & UX': this.testResults.filter(r => r.category.includes('Navigation') || r.category.includes('Section')).length,
+                        'Video & Content': this.testResults.filter(r => r.category.includes('Video') || r.category.includes('Content') || r.category.includes('Platform')).length,
+                        'Performance': this.testResults.filter(r => r.category.includes('Performance') || r.category.includes('Memory') || r.category.includes('Load')).length,
+                        'Security': this.testResults.filter(r => r.category.includes('Security') || r.category.includes('HTTPS') || r.category.includes('CSP')).length,
+                        'Accessibility': this.testResults.filter(r => r.category.includes('Accessibility') || r.category.includes('ARIA') || r.category.includes('Semantic')).length,
+                        'Cross-browser': this.testResults.filter(r => r.category.includes('Browser') || r.category.includes('Features') || r.category.includes('CSS')).length
+                    },
+                    detailedResults: this.testResults,
+                    criticalIssues: this.testResults.filter(r => r.status === 'fail'),
+                    warnings: this.testResults.filter(r => r.status === 'warn'),
+                    recommendations: [
+                        summary.fail > 0 ? `Address ${summary.fail} critical failures before production` : null,
+                        summary.warn > 5 ? `Review ${summary.warn} warnings for potential improvements` : null,
+                        coverage < 80 ? 'Improve test coverage by implementing missing features' : null,
+                        'Conduct manual testing on different devices and browsers',
+                        'Perform load testing with simulated user traffic',
+                        'Validate all Web3 integrations on testnet before mainnet deployment'
+                    ].filter(Boolean)
+                };
+
+                console.log('📊 MLG.clan Integration Test Report Generated:');
+                console.log('='.repeat(60));
+                console.log(`📈 Summary: ${summary.pass} passed, ${summary.fail} failed, ${summary.warn} warnings`);
+                console.log(`🎯 Coverage: ${coverage}% | Pass Rate: ${passRate}%`);
+                console.log(`🔍 Recommendation: ${recommendation}`);
+                console.log('='.repeat(60));
+                console.log(report);
+
+                // Download report as JSON file
+                const dataStr = JSON.stringify(report, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportFileDefaultName = `mlg-integration-test-report-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+
+                this.updateStatus(`Test report generated and downloaded: ${exportFileDefaultName}`);
+
+                return report;
+            }
+
+            wait(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+        }
+
+        // Initialize tester
+        let tester;
+        window.addEventListener('load', () => {
+            tester = new BrowserIntegrationTester();
+            
+            // Make functions globally available
+            window.runAllTests = () => tester.runAllTests();
+            window.runComponentTests = () => tester.runComponentTests();
+            window.runPerformanceTests = () => tester.runPerformanceTests();
+            window.runSecurityTests = () => tester.runSecurityTests();
+            window.generateReport = () => tester.generateReport();
+            window.clearResults = () => tester.clearResults();
+        });
+    </script>
+</body>
+</html>

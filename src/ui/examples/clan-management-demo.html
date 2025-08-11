@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan Management UI - Interactive Demo</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        /* Xbox 360 Gaming Aesthetic */
+        body {
+            background: linear-gradient(135deg, #0b1426 0%, #1a1a2e 50%, #16213e 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .xbox-glow {
+            box-shadow: 0 0 20px rgba(106, 176, 76, 0.3);
+        }
+
+        .xbox-tile {
+            background: linear-gradient(145deg, #1e272e, #2c2c54);
+            border: 1px solid #3d4465;
+            transition: all 0.3s ease;
+        }
+
+        .xbox-tile:hover {
+            border-color: #6ab04c;
+            box-shadow: 0 0 15px rgba(106, 176, 76, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .xbox-button {
+            background: linear-gradient(145deg, #6ab04c, #2c5530);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .xbox-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(106, 176, 76, 0.4);
+        }
+
+        .xbox-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .xbox-button:hover::before {
+            left: 100%;
+        }
+
+        .status-online {
+            color: #10B981;
+        }
+        
+        .status-idle {
+            color: #F59E0B;
+        }
+        
+        .status-offline {
+            color: #6B7280;
+        }
+
+        .role-owner {
+            color: #FFD700;
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+        
+        .role-admin {
+            color: #FF6B6B;
+            background-color: rgba(255, 107, 107, 0.1);
+        }
+        
+        .role-moderator {
+            color: #4ECDC4;
+            background-color: rgba(78, 205, 196, 0.1);
+        }
+        
+        .role-member {
+            color: #95A5A6;
+            background-color: rgba(149, 165, 166, 0.1);
+        }
+
+        .tier-bronze {
+            color: #CD7F32;
+            background-color: rgba(205, 127, 50, 0.1);
+        }
+        
+        .tier-silver {
+            color: #C0C0C0;
+            background-color: rgba(192, 192, 192, 0.1);
+        }
+        
+        .tier-gold {
+            color: #FFD700;
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+        
+        .tier-diamond {
+            color: #B9F2FF;
+            background-color: rgba(185, 242, 255, 0.1);
+        }
+
+        .health-bar {
+            background: #1a1a2e;
+            border-radius: 4px;
+            overflow: hidden;
+            height: 8px;
+            position: relative;
+        }
+
+        .health-bar-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .health-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .blade-nav {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+        }
+
+        .nav-item {
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            margin: 4px 0;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(106, 176, 76, 0.1);
+            border-left: 4px solid #6ab04c;
+        }
+
+        .nav-item.active {
+            background-color: rgba(106, 176, 76, 0.2);
+            border-left: 4px solid #6ab04c;
+            box-shadow: 0 0 10px rgba(106, 176, 76, 0.2);
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(106, 176, 76, 0.3);
+            border-top: 3px solid #6ab04c;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .blade-nav {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="clan-management-demo"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useCallback } = React;
+
+        // Mock data for demonstration
+        const mockClanData = {
+            id: 'demo-clan-123',
+            name: 'Xbox Elite Gamers',
+            description: 'Premier Xbox gaming clan focused on competitive play and community building.',
+            tier: 'gold',
+            memberCount: 45,
+            maxMembers: 100,
+            owner: 'owner-demo-123',
+            admins: ['admin-demo-1', 'admin-demo-2'],
+            moderators: ['mod-demo-1', 'mod-demo-2'],
+            members: [
+                {
+                    id: 'member-1',
+                    name: 'GameMaster_Pro',
+                    publicKey: 'owner-demo-123',
+                    role: 'owner',
+                    status: 'online',
+                    joinDate: '2025-01-01',
+                    votingPower: 150,
+                    activityScore: 95,
+                    lastSeen: new Date().toISOString()
+                },
+                {
+                    id: 'member-2', 
+                    name: 'EliteSniper_99',
+                    publicKey: 'admin-demo-1',
+                    role: 'admin',
+                    status: 'online',
+                    joinDate: '2025-01-15',
+                    votingPower: 120,
+                    activityScore: 88,
+                    lastSeen: new Date(Date.now() - 300000).toISOString()
+                },
+                {
+                    id: 'member-3',
+                    name: 'TacticMaster',
+                    publicKey: 'mod-demo-1',
+                    role: 'moderator',
+                    status: 'idle',
+                    joinDate: '2025-02-01',
+                    votingPower: 85,
+                    activityScore: 72,
+                    lastSeen: new Date(Date.now() - 1800000).toISOString()
+                },
+                {
+                    id: 'member-4',
+                    name: 'RookieGamer',
+                    publicKey: 'member-demo-1',
+                    role: 'member',
+                    status: 'offline',
+                    joinDate: '2025-02-15',
+                    votingPower: 45,
+                    activityScore: 41,
+                    lastSeen: new Date(Date.now() - 86400000).toISOString()
+                },
+                {
+                    id: 'member-5',
+                    name: 'CompetitivePro',
+                    publicKey: 'member-demo-2',
+                    role: 'member',
+                    status: 'online',
+                    joinDate: '2025-03-01',
+                    votingPower: 65,
+                    activityScore: 78,
+                    lastSeen: new Date().toISOString()
+                }
+            ],
+            stakedTokens: 2500,
+            lockPeriodEnd: '2025-12-31T23:59:59.000Z',
+            network: 'devnet',
+            status: 'active'
+        };
+
+        const mockStatistics = {
+            clanAddress: 'demo-clan-123',
+            clanName: 'Xbox Elite Gamers',
+            overallScore: 78.5,
+            healthScore: 85.2,
+            trendDirection: 'improving',
+            memberActivity: {
+                totalMembers: 45,
+                activeMembers: 38,
+                participationRate: 84.4,
+                engagementScore: 79.2,
+                retentionRate: 92.1
+            },
+            financialPerformance: {
+                totalTokenBurns: 1250,
+                treasuryContributions: 8500,
+                burnEfficiency: 73.5,
+                returnOnInvestment: 145.2
+            },
+            governanceMetrics: {
+                proposalsCreated: 8,
+                proposalsSuccessful: 6,
+                governanceParticipation: 76.8,
+                leadershipEffectiveness: 88.9
+            }
+        };
+
+        const mockInvitations = [
+            {
+                id: 'inv-1',
+                recipientName: 'NewGamer_2025',
+                recipientAddress: 'new-gamer-address-123',
+                role: 'member',
+                status: 'pending',
+                sentAt: new Date(Date.now() - 3600000).toISOString(),
+                expiresAt: new Date(Date.now() + 6 * 24 * 3600000).toISOString(),
+                message: 'Welcome to our elite gaming clan!'
+            },
+            {
+                id: 'inv-2',
+                recipientName: 'ProPlayer_XY',
+                recipientAddress: 'pro-player-address-456',
+                role: 'moderator',
+                status: 'pending',
+                sentAt: new Date(Date.now() - 7200000).toISOString(),
+                expiresAt: new Date(Date.now() + 5 * 24 * 3600000).toISOString()
+            }
+        ];
+
+        // Navigation Configuration
+        const BLADE_NAVIGATION = {
+            DASHBOARD: { id: 'dashboard', name: 'Dashboard', icon: '🏠' },
+            MEMBERS: { id: 'members', name: 'Members', icon: '👥' },
+            ROLES: { id: 'roles', name: 'Roles', icon: '👑' },
+            INVITATIONS: { id: 'invitations', name: 'Invitations', icon: '📨' },
+            SETTINGS: { id: 'settings', name: 'Settings', icon: '⚙️' }
+        };
+
+        // Utility Components
+        const TierBadge = ({ tier }) => {
+            const tierConfig = {
+                bronze: { name: 'Bronze Clan', icon: '🥉', color: '#CD7F32' },
+                silver: { name: 'Silver Clan', icon: '🥈', color: '#C0C0C0' },
+                gold: { name: 'Gold Clan', icon: '🥇', color: '#FFD700' },
+                diamond: { name: 'Diamond Clan', icon: '💎', color: '#B9F2FF' }
+            }[tier] || { name: 'Unknown', icon: '❓', color: '#666' };
+
+            return (
+                <span 
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border tier-${tier}`}
+                    style={{ borderColor: tierConfig.color }}
+                >
+                    <span className="mr-1">{tierConfig.icon}</span>
+                    {tierConfig.name}
+                </span>
+            );
+        };
+
+        const RoleBadge = ({ role }) => {
+            const roleConfig = {
+                owner: 'Clan Owner',
+                admin: 'Admin',
+                moderator: 'Moderator',
+                member: 'Member'
+            }[role] || 'Unknown';
+
+            return (
+                <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border role-${role}`}>
+                    {roleConfig}
+                </span>
+            );
+        };
+
+        const StatusIndicator = ({ status }) => {
+            const statusConfig = {
+                online: { label: 'Online', color: '#10B981', pulse: true },
+                idle: { label: 'Idle', color: '#F59E0B', pulse: false },
+                offline: { label: 'Offline', color: '#6B7280', pulse: false }
+            }[status] || { label: 'Unknown', color: '#666', pulse: false };
+
+            return (
+                <div className="flex items-center">
+                    <div 
+                        className={`w-2 h-2 rounded-full mr-2 ${statusConfig.pulse ? 'animate-pulse' : ''}`}
+                        style={{ backgroundColor: statusConfig.color }}
+                    />
+                    <span className={`text-xs status-${status}`}>{statusConfig.label}</span>
+                </div>
+            );
+        };
+
+        const HealthBar = ({ value, max = 100, label = '', color = '#6ab04c' }) => {
+            const percentage = Math.min((value / max) * 100, 100);
+            
+            return (
+                <div className="w-full">
+                    {label && <div className="text-xs text-gray-400 mb-1">{label}</div>}
+                    <div className="health-bar">
+                        <div
+                            className="health-bar-fill"
+                            style={{
+                                width: `${percentage}%`,
+                                backgroundColor: color
+                            }}
+                        />
+                    </div>
+                    <div className="text-xs text-right mt-1 text-gray-400">
+                        {value.toFixed(1)} / {max}
+                    </div>
+                </div>
+            );
+        };
+
+        // Main Demo Component
+        const ClanManagementDemo = () => {
+            const [activeTab, setActiveTab] = useState(BLADE_NAVIGATION.DASHBOARD.id);
+            const [loading, setLoading] = useState(false);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [sortBy, setSortBy] = useState('name');
+            const [filterBy, setFilterBy] = useState('all');
+            const [showInviteModal, setShowInviteModal] = useState(false);
+            const [selectedMembers, setSelectedMembers] = useState(new Set());
+
+            const [clanData] = useState(mockClanData);
+            const [statistics] = useState(mockStatistics);
+            const [invitations] = useState(mockInvitations);
+
+            // Filter and sort members
+            const filteredAndSortedMembers = useCallback(() => {
+                let filtered = clanData.members;
+
+                // Apply search filter
+                if (searchQuery.trim()) {
+                    const query = searchQuery.toLowerCase();
+                    filtered = filtered.filter(member =>
+                        member.name?.toLowerCase().includes(query) ||
+                        member.publicKey?.toLowerCase().includes(query) ||
+                        member.role?.toLowerCase().includes(query)
+                    );
+                }
+
+                // Apply role filter
+                if (filterBy !== 'all') {
+                    switch (filterBy) {
+                        case 'admins':
+                            filtered = filtered.filter(member => member.role === 'admin' || member.role === 'owner');
+                            break;
+                        case 'moderators':
+                            filtered = filtered.filter(member => member.role === 'moderator');
+                            break;
+                        case 'members':
+                            filtered = filtered.filter(member => member.role === 'member');
+                            break;
+                        case 'online':
+                            filtered = filtered.filter(member => member.status === 'online');
+                            break;
+                        case 'offline':
+                            filtered = filtered.filter(member => member.status !== 'online');
+                            break;
+                    }
+                }
+
+                // Apply sorting
+                filtered.sort((a, b) => {
+                    switch (sortBy) {
+                        case 'name':
+                            return (a.name || '').localeCompare(b.name || '');
+                        case 'role':
+                            const roleOrder = { owner: 4, admin: 3, moderator: 2, member: 1 };
+                            return (roleOrder[b.role] || 0) - (roleOrder[a.role] || 0);
+                        case 'joinDate':
+                            return new Date(b.joinDate || 0) - new Date(a.joinDate || 0);
+                        case 'activity':
+                            return (b.activityScore || 0) - (a.activityScore || 0);
+                        case 'votingPower':
+                            return (b.votingPower || 0) - (a.votingPower || 0);
+                        default:
+                            return 0;
+                    }
+                });
+
+                return filtered;
+            }, [clanData.members, searchQuery, sortBy, filterBy]);
+
+            // Demo action handlers
+            const handleAction = useCallback((action, data = {}) => {
+                setLoading(true);
+                setTimeout(() => {
+                    setLoading(false);
+                    alert(`Demo: ${action} action performed with data: ${JSON.stringify(data)}`);
+                }, 1000);
+            }, []);
+
+            // Render Navigation
+            const renderNavigation = () => (
+                <div className="blade-nav w-64 min-h-screen p-4">
+                    <div className="mb-6">
+                        <h2 className="text-xl font-bold text-white flex items-center">
+                            <span className="text-2xl mr-3">🎮</span>
+                            Clan Management
+                        </h2>
+                        <div className="mt-2">
+                            <div className="text-sm text-gray-400">{clanData.name}</div>
+                            <TierBadge tier={clanData.tier} />
+                        </div>
+                    </div>
+
+                    <nav className="space-y-2">
+                        {Object.values(BLADE_NAVIGATION).map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`w-full p-3 text-left flex items-center nav-item ${
+                                    activeTab === tab.id ? 'active' : ''
+                                }`}
+                                style={{ color: activeTab === tab.id ? '#6ab04c' : '#b0b0b0' }}
+                            >
+                                <span className="text-lg mr-3">{tab.icon}</span>
+                                {tab.name}
+                            </button>
+                        ))}
+                    </nav>
+                </div>
+            );
+
+            // Render Dashboard
+            const renderDashboard = () => (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-2xl font-bold text-white">Clan Dashboard</h3>
+                        <button 
+                            className="xbox-button"
+                            onClick={() => handleAction('refresh')}
+                        >
+                            🔄 Refresh
+                        </button>
+                    </div>
+
+                    {/* Statistics Tiles */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="xbox-tile p-4 rounded-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="text-2xl font-bold text-white">{clanData.memberCount}</div>
+                                    <div className="text-sm text-gray-400">Total Members</div>
+                                </div>
+                                <div className="text-3xl">👥</div>
+                            </div>
+                            <div className="mt-2">
+                                <HealthBar value={clanData.memberCount} max={clanData.maxMembers} label="Capacity" />
+                            </div>
+                        </div>
+
+                        <div className="xbox-tile p-4 rounded-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="text-2xl font-bold text-white">
+                                        {clanData.stakedTokens.toLocaleString()}
+                                    </div>
+                                    <div className="text-sm text-gray-400">MLG Staked</div>
+                                </div>
+                                <div className="text-3xl">💰</div>
+                            </div>
+                            <div className="mt-2">
+                                <TierBadge tier={clanData.tier} />
+                            </div>
+                        </div>
+
+                        <div className="xbox-tile p-4 rounded-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="text-2xl font-bold text-white">
+                                        {statistics.overallScore.toFixed(1)}
+                                    </div>
+                                    <div className="text-sm text-gray-400">Overall Score</div>
+                                </div>
+                                <div className="text-3xl">⚡</div>
+                            </div>
+                            <div className="mt-2">
+                                <HealthBar value={statistics.overallScore} max={100} label="Performance" />
+                            </div>
+                        </div>
+
+                        <div className="xbox-tile p-4 rounded-lg">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="text-2xl font-bold text-white">
+                                        {statistics.memberActivity.participationRate.toFixed(1)}%
+                                    </div>
+                                    <div className="text-sm text-gray-400">Participation</div>
+                                </div>
+                                <div className="text-3xl">📊</div>
+                            </div>
+                            <div className="mt-2">
+                                <HealthBar value={statistics.memberActivity.participationRate} max={100} label="Activity" />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Recent Activity */}
+                    <div className="xbox-tile p-6 rounded-lg">
+                        <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
+                            <span className="text-xl mr-2">📰</span>
+                            Recent Activity
+                        </h4>
+                        <div className="space-y-3">
+                            <div className="text-gray-400 text-center py-8">
+                                No recent activity to display - This is a demo
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Render Member Roster
+            const renderMembers = () => (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-2xl font-bold text-white">Member Roster</h3>
+                        <button 
+                            className="xbox-button"
+                            onClick={() => setShowInviteModal(true)}
+                        >
+                            ➕ Invite Members
+                        </button>
+                    </div>
+
+                    {/* Search and Filter Controls */}
+                    <div className="xbox-tile p-4 rounded-lg">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Search Members</label>
+                                <input
+                                    type="text"
+                                    placeholder="Search by name, address, or role..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Filter by Role</label>
+                                <select
+                                    value={filterBy}
+                                    onChange={(e) => setFilterBy(e.target.value)}
+                                    className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                                >
+                                    <option value="all">All Members</option>
+                                    <option value="admins">Admins & Owners</option>
+                                    <option value="moderators">Moderators</option>
+                                    <option value="members">Regular Members</option>
+                                    <option value="online">Online</option>
+                                    <option value="offline">Offline</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Sort by</label>
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                                >
+                                    <option value="name">Name</option>
+                                    <option value="role">Role</option>
+                                    <option value="joinDate">Join Date</option>
+                                    <option value="activity">Activity</option>
+                                    <option value="votingPower">Voting Power</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Member Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {filteredAndSortedMembers().map((member) => (
+                            <div
+                                key={member.id}
+                                className={`xbox-tile p-4 rounded-lg ${
+                                    selectedMembers.has(member.id) ? 'xbox-glow' : ''
+                                }`}
+                                onClick={() => {
+                                    const newSelected = new Set(selectedMembers);
+                                    if (newSelected.has(member.id)) {
+                                        newSelected.delete(member.id);
+                                    } else {
+                                        newSelected.add(member.id);
+                                    }
+                                    setSelectedMembers(newSelected);
+                                }}
+                            >
+                                <div className="flex items-start justify-between mb-3">
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
+                                            <span className="text-lg">👤</span>
+                                        </div>
+                                        <div>
+                                            <div className="font-medium text-white">{member.name}</div>
+                                            <div className="text-xs text-gray-400 font-mono">
+                                                {member.publicKey.slice(0, 8)}...{member.publicKey.slice(-4)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-end space-y-1">
+                                        <RoleBadge role={member.role} />
+                                        <StatusIndicator status={member.status} />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2 mb-4">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-400">Voting Power:</span>
+                                        <span className="text-white">{member.votingPower}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-400">Activity Score:</span>
+                                        <span className="text-white">{member.activityScore}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-400">Joined:</span>
+                                        <span className="text-white">
+                                            {new Date(member.joinDate).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {member.role !== 'owner' && (
+                                    <div className="flex space-x-2">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAction('promote', { memberId: member.id, role: 'moderator' });
+                                            }}
+                                            className="flex-1 px-2 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                                        >
+                                            Promote
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAction('remove', { memberId: member.id });
+                                            }}
+                                            className="flex-1 px-2 py-1 text-xs bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+
+            // Render Role Management
+            const renderRoles = () => (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-2xl font-bold text-white">Role Management</h3>
+                        <div className="text-sm text-gray-400">
+                            Drag members between roles to reassign (Demo)
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {['owner', 'admin', 'moderator', 'member'].map((roleId) => {
+                            const roleNames = {
+                                owner: 'Clan Owner',
+                                admin: 'Admin',
+                                moderator: 'Moderator',
+                                member: 'Member'
+                            };
+                            
+                            const roleMembers = clanData.members.filter(member => member.role === roleId);
+                            
+                            return (
+                                <div key={roleId} className="xbox-tile p-4 rounded-lg border-2 border-dashed border-gray-600">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h4 className="text-lg font-semibold text-white">{roleNames[roleId]}</h4>
+                                        <div className="text-sm text-gray-400">
+                                            Count: {roleMembers.length}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        {roleMembers.map(member => (
+                                            <div
+                                                key={member.id}
+                                                className="flex items-center justify-between p-2 bg-gray-700 rounded cursor-move hover:bg-gray-600 transition-colors"
+                                                draggable
+                                                onDragStart={(e) => {
+                                                    e.dataTransfer.setData('text/plain', member.id);
+                                                }}
+                                            >
+                                                <div className="flex items-center space-x-2">
+                                                    <span className="text-sm">👤</span>
+                                                    <span className="text-white text-sm">{member.name}</span>
+                                                </div>
+                                                <StatusIndicator status={member.status} />
+                                            </div>
+                                        ))}
+                                        
+                                        {roleMembers.length === 0 && (
+                                            <div className="text-center py-4 text-gray-500 text-sm">
+                                                No members with this role
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            );
+
+            // Render Invitations
+            const renderInvitations = () => (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-2xl font-bold text-white">Invitations & Recruitment</h3>
+                        <button 
+                            className="xbox-button"
+                            onClick={() => setShowInviteModal(true)}
+                        >
+                            📨 Send Invitation
+                        </button>
+                    </div>
+
+                    {/* Invitation Statistics */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        {['pending', 'accepted', 'rejected', 'expired'].map((status) => {
+                            const count = invitations.filter(inv => inv.status === status).length;
+                            const colors = {
+                                pending: '#F59E0B',
+                                accepted: '#10B981',
+                                rejected: '#EF4444',
+                                expired: '#6B7280'
+                            };
+                            
+                            return (
+                                <div key={status} className="xbox-tile p-4 rounded-lg">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <div className="text-2xl font-bold text-white">{count}</div>
+                                            <div className="text-sm capitalize" style={{ color: colors[status] }}>
+                                                {status}
+                                            </div>
+                                        </div>
+                                        <div 
+                                            className="w-4 h-4 rounded-full"
+                                            style={{ backgroundColor: colors[status] }}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Pending Invitations */}
+                    <div className="xbox-tile p-6 rounded-lg">
+                        <h4 className="text-lg font-semibold text-white mb-4">Pending Invitations</h4>
+                        <div className="space-y-3">
+                            {invitations
+                                .filter(inv => inv.status === 'pending')
+                                .map(invitation => (
+                                    <div key={invitation.id} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                                        <div>
+                                            <div className="font-medium text-white">{invitation.recipientName}</div>
+                                            <div className="text-sm text-gray-400">{invitation.recipientAddress}</div>
+                                            <div className="text-xs text-gray-500">
+                                                Sent: {new Date(invitation.sentAt).toLocaleString()}
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RoleBadge role={invitation.role} />
+                                            <button
+                                                onClick={() => handleAction('cancelInvitation', { invitationId: invitation.id })}
+                                                className="px-3 py-1 text-xs bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Render Settings
+            const renderSettings = () => (
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-2xl font-bold text-white">Clan Settings</h3>
+                        <button className="xbox-button">
+                            💾 Edit Settings
+                        </button>
+                    </div>
+
+                    {/* Clan Information */}
+                    <div className="xbox-tile p-6 rounded-lg">
+                        <h4 className="text-lg font-semibold text-white mb-4">Clan Information</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Clan Name</label>
+                                <div className="px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white">
+                                    {clanData.name}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Tier</label>
+                                <div className="px-3 py-2">
+                                    <TierBadge tier={clanData.tier} />
+                                </div>
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Description</label>
+                                <div className="px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white min-h-20">
+                                    {clanData.description}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Financial Information */}
+                    <div className="xbox-tile p-6 rounded-lg">
+                        <h4 className="text-lg font-semibold text-white mb-4">Financial Status</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Staked MLG Tokens</label>
+                                <div className="text-2xl font-bold text-white">
+                                    {clanData.stakedTokens.toLocaleString()}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Lock Period Ends</label>
+                                <div className="text-white">
+                                    {new Date(clanData.lockPeriodEnd).toLocaleDateString()}
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-400 mb-2">Network</label>
+                                <div className="text-white">
+                                    {clanData.network}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Demo Notice */}
+                    <div className="bg-blue-900 border border-blue-700 rounded-lg p-6">
+                        <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
+                            ℹ️ Demo Mode
+                        </h4>
+                        <div className="text-blue-200">
+                            This is a demonstration of the MLG.clan Management UI. 
+                            In a production environment, this would connect to real Solana blockchain 
+                            data and MLG token contracts for full functionality.
+                        </div>
+                    </div>
+                </div>
+            );
+
+            // Render Invite Modal
+            const renderInviteModal = () => {
+                const [inviteData, setInviteData] = useState({
+                    addresses: '',
+                    role: 'member',
+                    message: '',
+                    batchMode: false
+                });
+
+                const handleSubmit = (e) => {
+                    e.preventDefault();
+                    handleAction('sendInvitation', inviteData);
+                    setShowInviteModal(false);
+                    setInviteData({ addresses: '', role: 'member', message: '', batchMode: false });
+                };
+
+                return (
+                    <div className="fixed inset-0 modal-overlay flex items-center justify-center z-50">
+                        <div className="xbox-tile p-6 max-w-md w-full mx-4 rounded-lg">
+                            <div className="flex justify-between items-center mb-4">
+                                <h4 className="text-lg font-semibold text-white">Send Invitation</h4>
+                                <button
+                                    onClick={() => setShowInviteModal(false)}
+                                    className="text-gray-400 hover:text-white text-xl"
+                                >
+                                    ✕
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div>
+                                    <label className="flex items-center space-x-2 mb-2">
+                                        <input
+                                            type="checkbox"
+                                            checked={inviteData.batchMode}
+                                            onChange={(e) => setInviteData(prev => ({ ...prev, batchMode: e.target.checked }))}
+                                            className="rounded border-gray-600"
+                                        />
+                                        <span className="text-sm text-gray-400">Batch invite mode</span>
+                                    </label>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">
+                                        {inviteData.batchMode ? 'Wallet Addresses (one per line)' : 'Wallet Address'}
+                                    </label>
+                                    <textarea
+                                        value={inviteData.addresses}
+                                        onChange={(e) => setInviteData(prev => ({ ...prev, addresses: e.target.value }))}
+                                        placeholder={inviteData.batchMode 
+                                            ? 'Paste wallet addresses, one per line...'
+                                            : 'Enter wallet address...'
+                                        }
+                                        rows={inviteData.batchMode ? 5 : 2}
+                                        className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-green-500 resize-none"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-400 mb-2">Role</label>
+                                    <select
+                                        value={inviteData.role}
+                                        onChange={(e) => setInviteData(prev => ({ ...prev, role: e.target.value }))}
+                                        className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white focus:border-green-500"
+                                    >
+                                        <option value="member">Member</option>
+                                        <option value="moderator">Moderator</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+
+                                {!inviteData.batchMode && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-400 mb-2">
+                                            Personal Message (Optional)
+                                        </label>
+                                        <textarea
+                                            value={inviteData.message}
+                                            onChange={(e) => setInviteData(prev => ({ ...prev, message: e.target.value }))}
+                                            placeholder="Add a personal message..."
+                                            rows={3}
+                                            className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:border-green-500 resize-none"
+                                        />
+                                    </div>
+                                )}
+
+                                <div className="flex space-x-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowInviteModal(false)}
+                                        className="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="xbox-button flex-1"
+                                        disabled={!inviteData.addresses.trim()}
+                                    >
+                                        {inviteData.batchMode ? 'Send Batch Invites' : 'Send Invitation'}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                );
+            };
+
+            // Main render
+            return (
+                <div className="min-h-screen text-white">
+                    <div className="flex">
+                        {renderNavigation()}
+                        
+                        <div className="flex-1 p-6 main-content">
+                            {activeTab === BLADE_NAVIGATION.DASHBOARD.id && renderDashboard()}
+                            {activeTab === BLADE_NAVIGATION.MEMBERS.id && renderMembers()}
+                            {activeTab === BLADE_NAVIGATION.ROLES.id && renderRoles()}
+                            {activeTab === BLADE_NAVIGATION.INVITATIONS.id && renderInvitations()}
+                            {activeTab === BLADE_NAVIGATION.SETTINGS.id && renderSettings()}
+                        </div>
+                    </div>
+
+                    {/* Modals */}
+                    {showInviteModal && renderInviteModal()}
+
+                    {/* Loading overlay */}
+                    {loading && (
+                        <div className="fixed inset-0 modal-overlay flex items-center justify-center z-50">
+                            <div className="xbox-tile p-8 rounded-lg text-center">
+                                <div className="loading-spinner mx-auto mb-4"></div>
+                                <div className="text-white">Processing...</div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<ClanManagementDemo />, document.getElementById('clan-management-demo'));
+    </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+# MLG.clan Mobile App Fastlane Configuration
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and deploy iOS app to TestFlight"
+  lane :beta do
+    # Increment build number
+    increment_build_number(xcodeproj: "ios/MLGClan.xcodeproj")
+    
+    # Build the app
+    gym(
+      scheme: "MLGClan",
+      workspace: "ios/MLGClan.xcworkspace",
+      output_directory: "./build/ios"
+    )
+    
+    # Upload to TestFlight
+    pilot(
+      skip_waiting_for_build_processing: true,
+      skip_submission: true
+    )
+    
+    # Notify team
+    slack(
+      message: "iOS Beta build uploaded to TestFlight! 🚀",
+      channel: "#mobile-releases"
+    )
+  end
+
+  desc "Deploy iOS app to App Store"
+  lane :release do
+    # Increment version number
+    increment_version_number(xcodeproj: "ios/MLGClan.xcodeproj")
+    increment_build_number(xcodeproj: "ios/MLGClan.xcodeproj")
+    
+    # Build the app
+    gym(
+      scheme: "MLGClan",
+      workspace: "ios/MLGClan.xcworkspace",
+      output_directory: "./build/ios"
+    )
+    
+    # Upload to App Store
+    deliver(
+      submit_for_review: true,
+      automatic_release: false,
+      force: true
+    )
+    
+    # Create GitHub release
+    github_release(
+      repository_name: "mlg-clan/mobile-app",
+      api_token: ENV["GITHUB_TOKEN"],
+      name: "iOS Release v#{get_version_number(xcodeproj: 'ios/MLGClan.xcodeproj')}",
+      description: "iOS release build",
+      commitish: "main",
+      upload_assets: ["./build/ios/MLGClan.ipa"]
+    )
+  end
+end
+
+platform :android do
+  desc "Build and deploy Android app to Google Play Internal Testing"
+  lane :beta do
+    # Increment version code
+    increment_version_code(
+      gradle_file_path: "android/app/build.gradle"
+    )
+    
+    # Build the app
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+    
+    # Upload to Google Play
+    upload_to_play_store(
+      track: "internal",
+      aab: "android/app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_apk: true
+    )
+    
+    # Notify team
+    slack(
+      message: "Android Beta build uploaded to Google Play Internal Testing! 🤖",
+      channel: "#mobile-releases"
+    )
+  end
+
+  desc "Deploy Android app to Google Play Store"
+  lane :release do
+    # Increment version
+    increment_version_name(
+      gradle_file_path: "android/app/build.gradle"
+    )
+    increment_version_code(
+      gradle_file_path: "android/app/build.gradle"
+    )
+    
+    # Build the app
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      project_dir: "android/"
+    )
+    
+    # Upload to Google Play
+    upload_to_play_store(
+      track: "production",
+      aab: "android/app/build/outputs/bundle/release/app-release.aab",
+      skip_upload_apk: true
+    )
+    
+    # Create GitHub release
+    github_release(
+      repository_name: "mlg-clan/mobile-app",
+      api_token: ENV["GITHUB_TOKEN"],
+      name: "Android Release v#{get_version_name(gradle_file_path: 'android/app/build.gradle')}",
+      description: "Android release build",
+      commitish: "main",
+      upload_assets: ["android/app/build/outputs/bundle/release/app-release.aab"]
+    )
+  end
+end
+
+# Cross-platform lanes
+desc "Run tests on all platforms"
+lane :test do
+  # Run unit tests
+  sh "cd .. && npm test"
+  
+  # Run E2E tests
+  sh "cd .. && npm run test:e2e"
+  
+  # Generate test report
+  sh "cd .. && npm run test:report"
+end
+
+desc "Setup development environment"
+lane :setup do
+  # Install dependencies
+  sh "cd .. && npm install"
+  
+  # Setup iOS
+  sh "cd ../ios && pod install"
+  
+  # Generate signing certificates (if needed)
+  match(type: "development", readonly: true)
+  match(type: "appstore", readonly: true)
+  
+  # Setup Android keystore (if needed)
+  # This would be handled separately in CI/CD
+end

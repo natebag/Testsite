@@ -43,6 +43,7 @@ export const MLG_TOKEN_CONFIG = {
   SYMBOL: 'MLG',
   NAME: 'MLG Gaming Token',
   DECIMALS: 9, // Standard for Solana SPL tokens
+  EXPECTED_DECIMALS: 9, // Used for burn calculations
   DISCOVERY_ENABLED: true,
   
   // Token operations configuration

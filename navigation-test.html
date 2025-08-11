@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan Navigation Test Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Navigation Manager -->
+    <script src="src/js/navigation-manager.js"></script>
+    
+    <style>
+        :root {
+            --neon-green: #00ff88;
+            --dark-bg: #0a0a0f;
+            --card-bg: #1a1a2e;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .card-glow {
+            background: rgba(26, 26, 46, 0.95);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
+        }
+        
+        .card-glow:hover {
+            border-color: rgba(0, 255, 136, 0.5);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4" style="color: var(--neon-green);">
+                🧭 MLG.clan Navigation Test Suite
+            </h1>
+            <p class="text-gray-300 text-lg">
+                Testing navigation functionality across all platform pages
+            </p>
+        </div>
+
+        <!-- Navigation Status -->
+        <div class="card-glow rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4">Navigation System Status</h2>
+            <div id="nav-status" class="space-y-2">
+                <div>Router Available: <span id="router-status" class="font-mono">Checking...</span></div>
+                <div>Current Page: <span id="current-page" class="font-mono">Checking...</span></div>
+                <div>Navigation Manager: <span id="nav-manager-status" class="font-mono">Checking...</span></div>
+            </div>
+        </div>
+
+        <!-- Navigation Test Links -->
+        <div class="card-glow rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold mb-4">Navigation Tests</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                
+                <button onclick="testNavigation('index.html')" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded transition-colors">
+                    Test Dashboard
+                </button>
+                
+                <button onclick="testNavigation('voting.html')" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded transition-colors">
+                    Test Vote Vault
+                </button>
+                
+                <button onclick="testNavigation('clans.html')" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded transition-colors">
+                    Test Clans
+                </button>
+                
+                <button onclick="testNavigation('content.html')" class="bg-cyan-600 hover:bg-cyan-700 px-4 py-2 rounded transition-colors">
+                    Test Content Hub
+                </button>
+                
+                <button onclick="testNavigation('dao.html')" class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded transition-colors">
+                    Test DAO
+                </button>
+                
+                <button onclick="testNavigation('analytics.html')" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded transition-colors">
+                    Test Analytics
+                </button>
+                
+            </div>
+        </div>
+
+        <!-- Test Results -->
+        <div class="card-glow rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4">Test Results</h2>
+            <div id="test-results" class="space-y-2 text-sm font-mono">
+                <div>Ready to run navigation tests...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = [];
+        
+        function updateStatus() {
+            // Check router availability
+            const routerAvailable = !!(window.router && window.router.push);
+            document.getElementById('router-status').textContent = routerAvailable ? '✅ Available' : '❌ Not Available';
+            document.getElementById('router-status').className = routerAvailable ? 'font-mono text-green-400' : 'font-mono text-red-400';
+            
+            // Check navigation manager
+            const navManagerAvailable = !!(window.navigationManager);
+            document.getElementById('nav-manager-status').textContent = navManagerAvailable ? '✅ Available' : '❌ Not Available';
+            document.getElementById('nav-manager-status').className = navManagerAvailable ? 'font-mono text-green-400' : 'font-mono text-red-400';
+            
+            // Current page
+            const currentPage = window.navigationManager ? window.navigationManager.currentPage : window.location.pathname.split('/').pop() || 'index.html';
+            document.getElementById('current-page').textContent = currentPage;
+            document.getElementById('current-page').className = 'font-mono text-cyan-400';
+        }
+        
+        function testNavigation(pageUrl) {
+            const timestamp = new Date().toLocaleTimeString();
+            let result = `[${timestamp}] Testing navigation to ${pageUrl}: `;
+            
+            try {
+                if (window.navigationManager && typeof window.navigationManager.navigateToPage === 'function') {
+                    // Test with navigation manager
+                    window.navigationManager.navigateToPage(pageUrl);
+                    result += '✅ Navigation manager used successfully';
+                } else if (window.handleNavigation && typeof window.handleNavigation === 'function') {
+                    // Test with global handler
+                    const mockEvent = { preventDefault: () => {} };
+                    window.handleNavigation(mockEvent, pageUrl);
+                    result += '✅ Global handler used successfully';
+                } else {
+                    // Fallback to direct navigation
+                    window.location.href = pageUrl;
+                    result += '⚠️ Direct navigation fallback used';
+                }
+            } catch (error) {
+                result += `❌ Navigation failed: ${error.message}`;
+            }
+            
+            testResults.push(result);
+            updateTestResults();
+            
+            // Update status after navigation test
+            setTimeout(updateStatus, 100);
+        }
+        
+        function updateTestResults() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = testResults.slice(-10).join('<br>'); // Show last 10 results
+        }
+        
+        // Initialize status on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStatus();
+            
+            // Check again after a delay for late initialization
+            setTimeout(updateStatus, 1000);
+            setTimeout(updateStatus, 2000);
+        });
+        
+        // Listen for navigation events
+        window.addEventListener('router:navigate', (event) => {
+            const timestamp = new Date().toLocaleTimeString();
+            testResults.push(`[${timestamp}] Router navigation event: ${JSON.stringify(event.detail)}`);
+            updateTestResults();
+            setTimeout(updateStatus, 100);
+        });
+    </script>
+</body>
+</html>

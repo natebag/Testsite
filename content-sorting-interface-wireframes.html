@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan Content Sorting & Display Interface - Wireframes & Specifications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Xbox 360 Dashboard Aesthetic */
+        .xbox-blade {
+            background: linear-gradient(135deg, #111827, #1f2937, #065f46);
+            border: 1px solid #10b981;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .xbox-blade::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .xbox-blade:hover::before {
+            left: 100%;
+        }
+        
+        .xbox-blade:hover {
+            transform: translateX(8px);
+            box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+            border-color: #34d399;
+        }
+        
+        .sort-tile {
+            background: linear-gradient(135deg, #064e3b, #065f46);
+            border: 1px solid #10b981;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .sort-tile:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #065f46, #047857);
+        }
+        
+        .sort-tile.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
+            transform: scale(1.02);
+        }
+        
+        .filter-dropdown {
+            background: linear-gradient(135deg, #1f2937, #374151);
+            border: 1px solid #4b5563;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-dropdown:hover {
+            border-color: #10b981;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+        
+        .filter-dropdown:focus {
+            border-color: #10b981;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        
+        .content-card {
+            background: linear-gradient(135deg, #111827, #1f2937);
+            border: 1px solid #374151;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #10b981, transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+        
+        .content-card:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .content-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+            border-color: #10b981;
+        }
+        
+        .vote-button {
+            background: linear-gradient(45deg, #374151, #4b5563);
+            border: 1px solid #6b7280;
+            transition: all 0.3s ease;
+        }
+        
+        .vote-button:hover {
+            background: linear-gradient(45deg, #10b981, #059669);
+            border-color: #10b981;
+            transform: scale(1.1);
+        }
+        
+        .vote-button.active {
+            background: linear-gradient(45deg, #10b981, #059669);
+            border-color: #34d399;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+        }
+        
+        .loading-shimmer {
+            background: linear-gradient(
+                90deg,
+                #374151 25%,
+                #4b5563 50%,
+                #374151 75%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .sort-indicator {
+            background: linear-gradient(45deg, #fbbf24, #f59e0b);
+            animation: pulse-gold 2s infinite;
+        }
+        
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 8px rgba(251, 191, 36, 0.4); }
+            50% { box-shadow: 0 0 16px rgba(245, 158, 11, 0.6); }
+        }
+        
+        .trending-badge {
+            background: linear-gradient(45deg, #ef4444, #f59e0b);
+            animation: trending-pulse 1.5s infinite;
+        }
+        
+        @keyframes trending-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .view-mode-button {
+            background: linear-gradient(135deg, #374151, #4b5563);
+            border: 1px solid #6b7280;
+            transition: all 0.3s ease;
+        }
+        
+        .view-mode-button:hover {
+            background: linear-gradient(135deg, #4b5563, #6b7280);
+            transform: translateY(-1px);
+        }
+        
+        .view-mode-button.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-color: #34d399;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+        }
+        
+        .advanced-filter-panel {
+            background: linear-gradient(135deg, #111827, #1f2937);
+            border: 1px solid #374151;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+        
+        .advanced-filter-panel.open {
+            transform: translateY(0);
+            opacity: 1;
+            max-height: 500px;
+        }
+        
+        .search-integration {
+            background: linear-gradient(135deg, #1f2937, #374151);
+            border: 2px solid #4b5563;
+            transition: all 0.3s ease;
+        }
+        
+        .search-integration:focus {
+            border-color: #10b981;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+        
+        .pagination-button {
+            background: linear-gradient(135deg, #374151, #4b5563);
+            border: 1px solid #6b7280;
+            transition: all 0.3s ease;
+        }
+        
+        .pagination-button:hover {
+            background: linear-gradient(135deg, #10b981, #059669);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .pagination-button.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-color: #34d399;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .content-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .detailed-view {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .xbox-blade {
+                transform: none;
+            }
+            .xbox-blade:hover {
+                transform: none;
+            }
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Mobile-specific touch improvements */
+        @media (hover: none) {
+            .sort-tile:active {
+                transform: scale(0.98);
+            }
+            .content-card:active {
+                transform: translateY(-2px);
+            }
+            .vote-button:active {
+                transform: scale(1.05);
+            }
+        }
+        
+        /* Accessibility improvements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        .focus-visible {
+            outline: 2px solid #10b981;
+            outline-offset: 2px;
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .xbox-blade,
+            .sort-tile,
+            .content-card {
+                border-width: 2px;
+            }
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .xbox-blade,
+            .sort-tile,
+            .content-card,
+            .vote-button,
+            .view-mode-button {
+                transition: none;
+            }
+            
+            .loading-shimmer {
+                animation: none;
+            }
+            
+            .sort-indicator,
+            .trending-badge {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <!-- Header with Platform Branding -->
+    <header class="bg-gray-800 border-b border-gray-700 py-4 px-6">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-emerald-400">MLG.clan Content Sorting Interface</h1>
+            <div class="text-sm text-gray-400">Sub-task 4.5 - Wireframes & Specifications</div>
+        </div>
+    </header>
+
+    <!-- Main Content Sorting Interface -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Section 1: Primary Sorting Toolbar (Xbox Blade Style) -->
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-emerald-400 mb-4 flex items-center">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
+                Primary Sorting Controls (Xbox Blade Navigation)
+            </h2>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+                <button class="sort-tile active px-4 py-6 rounded-lg text-center">
+                    <div class="text-emerald-400 text-2xl mb-2">🔥</div>
+                    <div class="font-semibold">Hot</div>
+                    <div class="text-xs text-gray-400 mt-1">Balanced engagement</div>
+                    <div class="sort-indicator absolute top-2 right-2 w-2 h-2 rounded-full"></div>
+                </button>
+                
+                <button class="sort-tile px-4 py-6 rounded-lg text-center">
+                    <div class="text-orange-400 text-2xl mb-2">📈</div>
+                    <div class="font-semibold">Trending</div>
+                    <div class="text-xs text-gray-400 mt-1">Rising fast</div>
+                </button>
+                
+                <button class="sort-tile px-4 py-6 rounded-lg text-center">
+                    <div class="text-yellow-400 text-2xl mb-2">⭐</div>
+                    <div class="font-semibold">Top</div>
+                    <div class="text-xs text-gray-400 mt-1">All-time best</div>
+                </button>
+                
+                <button class="sort-tile px-4 py-6 rounded-lg text-center">
+                    <div class="text-blue-400 text-2xl mb-2">🆕</div>
+                    <div class="font-semibold">New</div>
+                    <div class="text-xs text-gray-400 mt-1">Recently posted</div>
+                </button>
+                
+                <button class="sort-tile px-4 py-6 rounded-lg text-center">
+                    <div class="text-purple-400 text-2xl mb-2">⚡</div>
+                    <div class="font-semibold">Controversial</div>
+                    <div class="text-xs text-gray-400 mt-1">Mixed reactions</div>
+                </button>
+                
+                <button class="sort-tile px-4 py-6 rounded-lg text-center">
+                    <div class="text-red-400 text-2xl mb-2">🏆</div>
+                    <div class="font-semibold">Competitive</div>
+                    <div class="text-xs text-gray-400 mt-1">Esports focus</div>
+                </button>
+            </div>
+            
+            <!-- Sort Direction & Time Range -->
+            <div class="flex items-center space-x-4 text-sm">
+                <button class="flex items-center space-x-1 px-3 py-1 rounded-full bg-gray-700 hover:bg-emerald-600 transition-colors">
+                    <span>↓</span>
+                    <span>Descending</span>
+                </button>
+                <select class="filter-dropdown px-3 py-1 rounded text-sm">
+                    <option>Last 24 hours</option>
+                    <option>Last week</option>
+                    <option>Last month</option>
+                    <option>All time</option>
+                </select>
+                <div class="text-gray-400">|</div>
+                <div class="text-emerald-400 font-medium">2,847 results</div>
+            </div>
+        </section>
+
+        <!-- Section 2: Filter Controls & Search Integration -->
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-emerald-400 mb-4 flex items-center">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
+                Filtering & Search Controls
+            </h2>
+            
+            <!-- Primary Filters Row -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Game</label>
+                    <select class="filter-dropdown w-full px-3 py-2 rounded">
+                        <option>All Games</option>
+                        <option>Fortnite</option>
+                        <option>Call of Duty</option>
+                        <option>Valorant</option>
+                        <option>Apex Legends</option>
+                        <option>League of Legends</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Platform</label>
+                    <select class="filter-dropdown w-full px-3 py-2 rounded">
+                        <option>All Platforms</option>
+                        <option>PC</option>
+                        <option>PlayStation</option>
+                        <option>Xbox</option>
+                        <option>Nintendo Switch</option>
+                        <option>Mobile</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Content Type</label>
+                    <select class="filter-dropdown w-full px-3 py-2 rounded">
+                        <option>All Types</option>
+                        <option>Clips</option>
+                        <option>Screenshots</option>
+                        <option>Guides</option>
+                        <option>Reviews</option>
+                        <option>Tournaments</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">Search</label>
+                    <input type="text" placeholder="Search content..." 
+                           class="search-integration w-full px-3 py-2 rounded text-white placeholder-gray-400">
+                </div>
+            </div>
+            
+            <!-- Advanced Filters Toggle -->
+            <div class="flex items-center justify-between">
+                <button class="flex items-center space-x-2 text-emerald-400 hover:text-emerald-300 text-sm"
+                        onclick="toggleAdvancedFilters()">
+                    <span>Advanced Filters</span>
+                    <span class="transition-transform duration-300" id="advancedToggle">▼</span>
+                </button>
+                
+                <div class="flex items-center space-x-2 text-sm text-gray-400">
+                    <span>Active filters:</span>
+                    <span class="px-2 py-1 bg-emerald-600 text-white rounded text-xs">Hot</span>
+                    <span class="px-2 py-1 bg-blue-600 text-white rounded text-xs">Fortnite</span>
+                    <button class="text-red-400 hover:text-red-300">Clear all</button>
+                </div>
+            </div>
+            
+            <!-- Advanced Filter Panel (Collapsible) -->
+            <div class="advanced-filter-panel mt-4 p-6 rounded-lg" id="advancedPanel">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h3 class="font-semibold text-emerald-400 mb-3">Engagement Metrics</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm text-gray-300 mb-1">Min Votes</label>
+                                <input type="range" min="0" max="1000" value="10" 
+                                       class="w-full accent-emerald-500">
+                                <div class="text-xs text-gray-400">10+ votes</div>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-300 mb-1">Min Views</label>
+                                <input type="range" min="0" max="100000" value="100" 
+                                       class="w-full accent-emerald-500">
+                                <div class="text-xs text-gray-400">100+ views</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-semibold text-emerald-400 mb-3">Gaming Factors</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm text-gray-300 mb-2">Skill Level</label>
+                                <div class="space-y-1">
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" class="mr-2 accent-emerald-500">
+                                        <span>Beginner</span>
+                                    </label>
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" class="mr-2 accent-emerald-500" checked>
+                                        <span>Intermediate</span>
+                                    </label>
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" class="mr-2 accent-emerald-500" checked>
+                                        <span>Advanced</span>
+                                    </label>
+                                    <label class="flex items-center text-sm">
+                                        <input type="checkbox" class="mr-2 accent-emerald-500">
+                                        <span>Professional</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="font-semibold text-emerald-400 mb-3">Creator Reputation</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm text-gray-300 mb-2">Min Gamerscore</label>
+                                <input type="number" value="1000" 
+                                       class="filter-dropdown w-full px-3 py-2 rounded text-sm">
+                            </div>
+                            <div>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" class="mr-2 accent-emerald-500">
+                                    <span>Verified creators only</span>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="flex items-center text-sm">
+                                    <input type="checkbox" class="mr-2 accent-emerald-500">
+                                    <span>Clan leaders only</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-700">
+                    <button class="px-4 py-2 text-gray-400 hover:text-white transition-colors">
+                        Reset
+                    </button>
+                    <button class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 rounded transition-colors">
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: View Mode Controls -->
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-emerald-400 mb-4 flex items-center">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
+                Content Display Modes
+            </h2>
+            
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-2">
+                    <button class="view-mode-button active p-3 rounded transition-all" 
+                            onclick="setViewMode('grid')" title="Grid View">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                        </svg>
+                    </button>
+                    
+                    <button class="view-mode-button p-3 rounded transition-all" 
+                            onclick="setViewMode('list')" title="List View">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 8a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 12a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 16a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"/>
+                        </svg>
+                    </button>
+                    
+                    <button class="view-mode-button p-3 rounded transition-all" 
+                            onclick="setViewMode('detailed')" title="Detailed View">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2v1a1 1 0 001 1h6a1 1 0 001-1V3a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="flex items-center space-x-4 text-sm">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-gray-400">Sort by:</span>
+                        <select class="filter-dropdown px-3 py-1 rounded text-sm">
+                            <option>Relevance</option>
+                            <option>Date</option>
+                            <option>Votes</option>
+                            <option>Views</option>
+                            <option>Comments</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Real-time Sort Indicators -->
+                    <div class="flex items-center space-x-1">
+                        <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <span class="text-emerald-400 text-xs">Live sorting</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Content Display Examples -->
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-emerald-400 mb-4 flex items-center">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
+                Content Display Examples
+            </h2>
+            
+            <!-- Grid View Example -->
+            <div id="gridView" class="content-grid">
+                <!-- Content Card 1 - Hot Trending -->
+                <article class="content-card rounded-lg p-4">
+                    <div class="relative mb-3">
+                        <img src="https://via.placeholder.com/320x180/065f46/ffffff?text=Epic+Fortnite+Victory" 
+                             alt="Epic Victory Royale Clutch" class="w-full h-40 object-cover rounded">
+                        <div class="absolute top-2 left-2">
+                            <span class="trending-badge px-2 py-1 rounded-full text-xs font-semibold text-white">
+                                🔥 TRENDING
+                            </span>
+                        </div>
+                        <div class="absolute top-2 right-2">
+                            <span class="bg-black bg-opacity-75 px-2 py-1 rounded text-xs text-white">
+                                2:34
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h3 class="font-semibold text-white mb-1 line-clamp-2">
+                            Epic Victory Royale Clutch - 1v4 Solo Squad Wipe!
+                        </h3>
+                        <div class="flex items-center space-x-2 text-sm text-gray-400 mb-2">
+                            <span class="text-blue-400">Fortnite</span>
+                            <span>•</span>
+                            <span>PC</span>
+                            <span>•</span>
+                            <span>2 hours ago</span>
+                        </div>
+                        <div class="flex items-center space-x-2 text-xs">
+                            <span class="px-2 py-1 bg-emerald-600 rounded">Advanced</span>
+                            <span class="px-2 py-1 bg-purple-600 rounded">Competitive</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Voting Integration -->
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <button class="vote-button active flex items-center space-x-1 px-3 py-1 rounded">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"/>
+                                </svg>
+                                <span class="font-semibold">847</span>
+                            </button>
+                            
+                            <button class="vote-button flex items-center space-x-1 px-3 py-1 rounded">
+                                <svg class="w-4 h-4 rotate-180" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z"/>
+                                </svg>
+                                <span>23</span>
+                            </button>
+                            
+                            <div class="text-sm text-gray-400">
+                                <span>12.3k views</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-2">
+                            <button class="text-gray-400 hover:text-emerald-400 transition-colors" title="Comment">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                                </svg>
+                                <span class="text-xs">156</span>
+                            </button>
+                            <button class="text-gray-400 hover:text-emerald-400 transition-colors" title="Share">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Creator Info -->
+                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-700">
+                        <div class="flex items-center space-x-2">
+                            <img src="https://via.placeholder.com/24x24/10b981/ffffff?text=U" 
+                                 alt="User" class="w-6 h-6 rounded-full">
+                            <span class="text-sm text-gray-300">ProGamer_2024</span>
+                            <span class="text-xs text-emerald-400">✓ Verified</span>
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            <span class="text-yellow-400">★</span> 15,240 GS
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Content Card 2 - Loading State Example -->
+                <article class="content-card rounded-lg p-4">
+                    <div class="loading-shimmer mb-3 h-40 rounded"></div>
+                    <div class="loading-shimmer mb-2 h-4 rounded w-3/4"></div>
+                    <div class="loading-shimmer mb-2 h-3 rounded w-1/2"></div>
+                    <div class="flex justify-between items-center">
+                        <div class="loading-shimmer h-8 rounded w-20"></div>
+                        <div class="loading-shimmer h-6 rounded w-16"></div>
+                    </div>
+                </article>
+                
+                <!-- Content Card 3 - Competitive Content -->
+                <article class="content-card rounded-lg p-4">
+                    <div class="relative mb-3">
+                        <img src="https://via.placeholder.com/320x180/8b5cf6/ffffff?text=Valorant+Ace" 
+                             alt="Valorant Ace" class="w-full h-40 object-cover rounded">
+                        <div class="absolute top-2 left-2">
+                            <span class="bg-red-600 px-2 py-1 rounded-full text-xs font-semibold text-white">
+                                🏆 COMPETITIVE
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <h3 class="font-semibold text-white mb-1">
+                        Insane Valorant Ace - Ranked Immortal Game
+                    </h3>
+                    <div class="flex items-center space-x-2 text-sm text-gray-400 mb-2">
+                        <span class="text-red-400">Valorant</span>
+                        <span>•</span>
+                        <span>PC</span>
+                        <span>•</span>
+                        <span>5 hours ago</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <button class="vote-button flex items-center space-x-1 px-3 py-1 rounded">
+                                <span>↑</span>
+                                <span>423</span>
+                            </button>
+                            <div class="text-sm text-gray-400">8.7k views</div>
+                        </div>
+                        <div class="text-xs text-emerald-400">Score: 92</div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Section 5: Pagination & Infinite Scroll -->
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-emerald-400 mb-4 flex items-center">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
+                Pagination Controls
+            </h2>
+            
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <button class="pagination-button px-3 py-2 rounded text-sm" disabled>
+                        ← Previous
+                    </button>
+                    <button class="pagination-button active px-3 py-2 rounded text-sm">1</button>
+                    <button class="pagination-button px-3 py-2 rounded text-sm">2</button>
+                    <button class="pagination-button px-3 py-2 rounded text-sm">3</button>
+                    <span class="text-gray-400">...</span>
+                    <button class="pagination-button px-3 py-2 rounded text-sm">47</button>
+                    <button class="pagination-button px-3 py-2 rounded text-sm">
+                        Next →
+                    </button>
+                </div>
+                
+                <div class="flex items-center space-x-4 text-sm">
+                    <div class="text-gray-400">
+                        Showing 1-20 of 2,847 results
+                    </div>
+                    <select class="filter-dropdown px-3 py-1 rounded text-sm">
+                        <option>20 per page</option>
+                        <option>50 per page</option>
+                        <option>100 per page</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Infinite Scroll Trigger -->
+            <div class="mt-8 text-center">
+                <div class="inline-flex items-center space-x-3 text-sm text-gray-400">
+                    <div class="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></div>
+                    <span>Loading more content...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Mobile Responsive Design -->
+        <section class="mb-8 lg:hidden">
+            <h2 class="text-xl font-semibold text-emerald-400 mb-4 flex items-center">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
+                Mobile Interface Adaptations
+            </h2>
+            
+            <!-- Mobile Sort Pills -->
+            <div class="flex overflow-x-auto space-x-2 pb-4 mb-4">
+                <button class="sort-tile active px-4 py-2 rounded-full text-sm whitespace-nowrap">
+                    🔥 Hot
+                </button>
+                <button class="sort-tile px-4 py-2 rounded-full text-sm whitespace-nowrap">
+                    📈 Trending
+                </button>
+                <button class="sort-tile px-4 py-2 rounded-full text-sm whitespace-nowrap">
+                    ⭐ Top
+                </button>
+                <button class="sort-tile px-4 py-2 rounded-full text-sm whitespace-nowrap">
+                    🆕 New
+                </button>
+            </div>
+            
+            <!-- Mobile Search & Filter -->
+            <div class="space-y-3 mb-4">
+                <input type="text" placeholder="Search gaming content..." 
+                       class="search-integration w-full px-4 py-3 rounded-lg text-white placeholder-gray-400">
+                <button class="w-full flex items-center justify-center space-x-2 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"/>
+                    </svg>
+                    <span>Filter & Sort</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 7: Accessibility Features -->
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-emerald-400 mb-4 flex items-center">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
+                Accessibility & WCAG Compliance
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="xbox-blade p-4 rounded-lg">
+                    <h3 class="font-semibold text-emerald-400 mb-3">Keyboard Navigation</h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li class="flex items-center">
+                            <kbd class="px-2 py-1 bg-gray-700 rounded text-xs mr-3">Tab</kbd>
+                            <span>Navigate through sortable elements</span>
+                        </li>
+                        <li class="flex items-center">
+                            <kbd class="px-2 py-1 bg-gray-700 rounded text-xs mr-3">Enter</kbd>
+                            <span>Activate sort/filter controls</span>
+                        </li>
+                        <li class="flex items-center">
+                            <kbd class="px-2 py-1 bg-gray-700 rounded text-xs mr-3">Space</kbd>
+                            <span>Toggle checkboxes and buttons</span>
+                        </li>
+                        <li class="flex items-center">
+                            <kbd class="px-2 py-1 bg-gray-700 rounded text-xs mr-3">↑↓</kbd>
+                            <span>Navigate dropdown options</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="xbox-blade p-4 rounded-lg">
+                    <h3 class="font-semibold text-emerald-400 mb-3">Screen Reader Support</h3>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li>• ARIA labels for all interactive elements</li>
+                        <li>• Live regions for sort result updates</li>
+                        <li>• Descriptive alt text for content images</li>
+                        <li>• Semantic HTML structure with proper headings</li>
+                        <li>• Focus indicators with high contrast borders</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 8: Technical Integration Points -->
+        <section class="mb-8">
+            <h2 class="text-xl font-semibold text-emerald-400 mb-4 flex items-center">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full mr-3"></span>
+                Technical Integration Specifications
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="xbox-blade p-6 rounded-lg">
+                    <h3 class="font-semibold text-emerald-400 mb-4">Content Ranking Algorithm Integration</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="bg-gray-800 p-3 rounded code-block">
+                            <code class="text-emerald-300">
+                                import { ContentRankingAlgorithm, rankingModes } from './content-ranking-algorithm.js';<br/>
+                                const rankedContent = rankingModes.getHot(contentList, { limit: 20 });
+                            </code>
+                        </div>
+                        <ul class="text-gray-300 space-y-1">
+                            <li>• Real-time score updates via WebSocket</li>
+                            <li>• Batch processing for performance</li>
+                            <li>• Cache invalidation on vote changes</li>
+                            <li>• Progressive loading with ranking preservation</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="xbox-blade p-6 rounded-lg">
+                    <h3 class="font-semibold text-emerald-400 mb-4">MLG Token Voting Integration</h3>
+                    <div class="space-y-3 text-sm">
+                        <div class="bg-gray-800 p-3 rounded code-block">
+                            <code class="text-emerald-300">
+                                import { VotingSystem } from './voting-ui.js';<br/>
+                                const voteResult = await votingSystem.submitVote(contentId, voteType, tokenAmount);
+                            </code>
+                        </div>
+                        <ul class="text-gray-300 space-y-1">
+                            <li>• Solana transaction confirmation</li>
+                            <li>• MLG token burn mechanics</li>
+                            <li>• Vote weight calculations</li>
+                            <li>• Daily vote limit tracking</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript for Interactive Elements -->
+    <script>
+        // Advanced Filter Panel Toggle
+        function toggleAdvancedFilters() {
+            const panel = document.getElementById('advancedPanel');
+            const toggle = document.getElementById('advancedToggle');
+            
+            if (panel.classList.contains('open')) {
+                panel.classList.remove('open');
+                toggle.textContent = '▼';
+            } else {
+                panel.classList.add('open');
+                toggle.textContent = '▲';
+            }
+        }
+        
+        // View Mode Switching
+        function setViewMode(mode) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.view-mode-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            event.target.closest('button').classList.add('active');
+            
+            // Update content display (in real implementation, this would change the layout)
+            console.log(`Switched to ${mode} view mode`);
+        }
+        
+        // Sort Tile Selection
+        document.querySelectorAll('.sort-tile').forEach(tile => {
+            tile.addEventListener('click', function() {
+                // Remove active class from all tiles
+                document.querySelectorAll('.sort-tile').forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tile
+                this.classList.add('active');
+                
+                // Update sort indicator
+                const indicator = this.querySelector('.sort-indicator');
+                if (indicator) {
+                    indicator.style.display = 'block';
+                }
+                
+                console.log(`Sorted by: ${this.textContent.trim()}`);
+            });
+        });
+        
+        // Vote Button Interactions
+        document.querySelectorAll('.vote-button').forEach(button => {
+            button.addEventListener('click', function() {
+                this.classList.toggle('active');
+                
+                // Simulate vote count update
+                const countSpan = this.querySelector('span:last-child');
+                if (countSpan && !isNaN(countSpan.textContent)) {
+                    const currentCount = parseInt(countSpan.textContent);
+                    const newCount = this.classList.contains('active') 
+                        ? currentCount + 1 
+                        : currentCount - 1;
+                    countSpan.textContent = newCount;
+                }
+                
+                console.log(`Vote button toggled: ${this.classList.contains('active') ? 'active' : 'inactive'}`);
+            });
+        });
+        
+        // Simulate Real-time Updates
+        setInterval(() => {
+            // Update vote counts randomly for demonstration
+            const voteButtons = document.querySelectorAll('.vote-button:not(.active)');
+            if (voteButtons.length > 0 && Math.random() > 0.7) {
+                const randomButton = voteButtons[Math.floor(Math.random() * voteButtons.length)];
+                const countSpan = randomButton.querySelector('span:last-child');
+                if (countSpan && !isNaN(countSpan.textContent)) {
+                    countSpan.textContent = parseInt(countSpan.textContent) + Math.floor(Math.random() * 3);
+                }
+            }
+        }, 3000);
+        
+        // Keyboard Navigation Enhancement
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                // Close advanced filters panel
+                const panel = document.getElementById('advancedPanel');
+                if (panel.classList.contains('open')) {
+                    toggleAdvancedFilters();
+                }
+            }
+        });
+        
+        // Touch and Hover Enhancements for Mobile
+        if ('ontouchstart' in window) {
+            document.querySelectorAll('.sort-tile, .content-card').forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                });
+                
+                element.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+        }
+        
+        // Accessibility Announcements
+        function announceToScreenReader(message) {
+            const announcement = document.createElement('div');
+            announcement.setAttribute('aria-live', 'polite');
+            announcement.setAttribute('aria-atomic', 'true');
+            announcement.className = 'sr-only';
+            announcement.textContent = message;
+            
+            document.body.appendChild(announcement);
+            
+            setTimeout(() => {
+                document.body.removeChild(announcement);
+            }, 1000);
+        }
+        
+        // Example usage for sort changes
+        document.querySelectorAll('.sort-tile').forEach(tile => {
+            tile.addEventListener('click', function() {
+                const sortType = this.textContent.trim().split('\n')[0];
+                announceToScreenReader(`Content sorted by ${sortType}. Loading new results.`);
+            });
+        });
+    </script>
+</body>
+</html>

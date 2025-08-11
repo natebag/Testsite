@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Dashboard - Platform Insights | MLG.clan</title>
+  
+  <!-- Meta Tags -->
+  <meta name="description" content="Analytics Dashboard - Real-time analytics, performance metrics, and business intelligence for the gaming ecosystem.">
+  <meta name="keywords" content="analytics, dashboard, metrics, insights, gaming, esports, MLG, performance, data">
+  <meta name="author" content="MLG.clan Development Team">
+  
+  <!-- Security Headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdn.socket.io; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: blob: https:; connect-src 'self' wss: https: ws://localhost:3000; frame-src 'self' https://www.youtube.com https://player.twitch.tv https://www.tiktok.com; font-src 'self' data:;">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  
+  <!-- External Dependencies -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  
+  <!-- Socket.IO for Real-time Updates -->
+  <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+  
+  <!-- Solana Web3.js -->
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'gaming-bg': '#0a0a0f',
+            'gaming-surface': '#1a1a2e',
+            'gaming-accent': '#00ff88',
+            'gaming-purple': '#8b5cf6',
+            'gaming-blue': '#3b82f6',
+            'gaming-yellow': '#fbbf24',
+            'gaming-red': '#ef4444'
+          },
+          animation: {
+            'pulse-neon': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow': 'glow 2s ease-in-out infinite alternate',
+            'float': 'float 6s ease-in-out infinite'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Gaming Theme Styles */
+    :root {
+      --neon-green: #00ff88;
+      --neon-blue: #00ffff;
+      --neon-purple: #8b5cf6;
+      --dark-bg: #0a0a0f;
+      --card-bg: #1a1a2e;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    .neon-glow {
+      box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 30px var(--neon-green);
+      border: 1px solid var(--neon-green);
+    }
+    
+    .card-glow {
+      background: rgba(26, 26, 46, 0.95);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      backdrop-filter: blur(15px);
+      transition: all 0.3s ease;
+    }
+    
+    .card-glow:hover {
+      border-color: rgba(0, 255, 136, 0.5);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    @keyframes glow {
+      from { box-shadow: 0 0 10px var(--neon-green); }
+      to { box-shadow: 0 0 20px var(--neon-green), 0 0 30px var(--neon-green); }
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .status-online {
+      position: relative;
+    }
+    
+    .status-online::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 12px;
+      height: 12px;
+      background: var(--neon-green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    .loading-spinner {
+      border: 2px solid rgba(0, 255, 136, 0.1);
+      border-left: 2px solid var(--neon-green);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .chart-container {
+      position: relative;
+      height: 200px;
+      background: rgba(26, 26, 46, 0.5);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .chart-bar {
+      background: linear-gradient(180deg, var(--neon-green), rgba(0, 255, 136, 0.3));
+      transition: all 0.3s ease;
+    }
+
+    .chart-line {
+      stroke: var(--neon-green);
+      stroke-width: 2;
+      fill: none;
+    }
+  </style>
+</head>
+<body class="bg-gaming-bg text-white min-h-screen">
+  
+  <!-- Navigation Header -->
+  <nav class="bg-black bg-opacity-60 backdrop-blur-md border-b border-gaming-accent border-opacity-20 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <a href="index.html" onclick="handleNavigation(event, 'index.html')" class="text-2xl font-bold text-gaming-accent flex items-center space-x-2 hover:text-green-400 transition-colors">
+              <span class="animate-pulse">🎮</span>
+              <span>MLG.clan</span>
+            </a>
+          </div>
+          <div class="hidden md:block ml-10">
+            <div class="flex items-baseline space-x-4">
+              <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'index.html')">Dashboard</a>
+              <a href="voting.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'voting.html')">Vote Vault</a>
+              <a href="clans.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'clans.html')">Clans</a>
+              <a href="content.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'content.html')">Content Hub</a>
+              <a href="dao.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'dao.html')">DAO</a>
+              <a href="analytics.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium bg-gaming-red text-white transition-colors" onclick="handleNavigation(event, 'analytics.html')">Analytics</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <!-- System Status -->
+          <div id="system-status" class="flex items-center space-x-2">
+            <div class="status-online">
+              <i data-lucide="activity" class="w-4 h-4 text-gaming-accent"></i>
+            </div>
+            <span class="text-sm text-gaming-accent font-medium">All Systems Online</span>
+          </div>
+          
+          <!-- Wallet Connection -->
+          <button id="wallet-connect" class="bg-gaming-purple hover:bg-purple-600 px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2">
+            <i data-lucide="wallet" class="w-4 h-4"></i>
+            <span>Connect Phantom</span>
+          </button>
+          
+          <!-- User Info (Hidden by default) -->
+          <div id="user-info" class="hidden flex items-center space-x-3">
+            <div class="flex items-center space-x-2 bg-gaming-surface px-3 py-1 rounded-lg">
+              <div class="w-6 h-6 bg-gradient-to-r from-gaming-accent to-gaming-blue rounded-full"></div>
+              <span id="user-address" class="text-sm font-mono"></span>
+            </div>
+            <div class="text-right">
+              <div class="text-xs text-gray-400">MLG Balance</div>
+              <div id="mlg-balance" class="text-sm font-bold text-gaming-yellow">0</div>
+            </div>
+            <a href="profile.html" onclick="handleNavigation(event, 'profile.html')" class="text-gray-300 hover:text-gaming-accent transition-colors">
+              <i data-lucide="user" class="w-5 h-5"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Analytics Header -->
+  <section class="relative py-16 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-gaming-bg via-gaming-surface to-gaming-bg opacity-50"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-5xl font-bold mb-6 text-gaming-red animate-float">
+        📊 Analytics Dashboard
+      </h1>
+      <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+        Real-time analytics, performance metrics, and business intelligence for the gaming ecosystem.
+      </p>
+      
+      <!-- Key Metrics -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <div class="card-glow rounded-lg p-6">
+          <div class="text-3xl font-bold text-gaming-red" id="revenue">$847K</div>
+          <div class="text-sm text-gray-400">Revenue (30d)</div>
+          <div class="text-xs text-gaming-accent mt-1">↑ 24% MoM</div>
+        </div>
+        <div class="card-glow rounded-lg p-6">
+          <div class="text-3xl font-bold text-gaming-blue" id="active-users">24.8K</div>
+          <div class="text-sm text-gray-400">Daily Users</div>
+          <div class="text-xs text-gaming-blue mt-1">↑ 12% today</div>
+        </div>
+        <div class="card-glow rounded-lg p-6">
+          <div class="text-3xl font-bold text-gaming-purple" id="transactions">156K</div>
+          <div class="text-sm text-gray-400">Transactions</div>
+          <div class="text-xs text-gaming-purple mt-1">↑ 8% today</div>
+        </div>
+        <div class="card-glow rounded-lg p-6">
+          <div class="text-3xl font-bold text-gaming-yellow" id="growth">+24%</div>
+          <div class="text-sm text-gray-400">Growth Rate</div>
+          <div class="text-xs text-gaming-yellow mt-1">vs last month</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Analytics Content -->
+  <section class="py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Real-time Dashboard -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        
+        <!-- Platform Health -->
+        <div class="card-glow rounded-xl p-8">
+          <h3 class="text-2xl font-bold text-gaming-red mb-6 flex items-center">
+            <i data-lucide="heart-pulse" class="w-6 h-6 mr-3"></i>
+            Platform Health
+          </h3>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Server Uptime</span>
+              <div class="flex items-center space-x-2">
+                <div class="w-3 h-3 bg-gaming-accent rounded-full animate-pulse"></div>
+                <span class="text-gaming-accent font-bold" id="uptime">99.98%</span>
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">API Response Time</span>
+              <span class="text-gaming-blue font-bold" id="response-time">147ms</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Cache Hit Rate</span>
+              <span class="text-gaming-purple font-bold" id="cache-rate">87.3%</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Active Connections</span>
+              <span class="text-gaming-yellow font-bold" id="connections">1,247</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Error Rate</span>
+              <span class="text-gaming-accent font-bold" id="error-rate">0.02%</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Database Performance</span>
+              <span class="text-gaming-blue font-bold" id="db-perf">98ms avg</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Engagement -->
+        <div class="card-glow rounded-xl p-8">
+          <h3 class="text-2xl font-bold text-gaming-blue mb-6 flex items-center">
+            <i data-lucide="users" class="w-6 h-6 mr-3"></i>
+            User Engagement
+          </h3>
+          <div class="space-y-6">
+            
+            <!-- Daily Active Users Chart -->
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-300">Daily Active Users</span>
+                <span class="text-gaming-blue font-bold">24,847</span>
+              </div>
+              <div class="chart-container">
+                <div class="flex items-end justify-between h-full p-4">
+                  <div class="chart-bar w-8 bg-gaming-blue opacity-60" style="height: 40%"></div>
+                  <div class="chart-bar w-8 bg-gaming-blue opacity-70" style="height: 60%"></div>
+                  <div class="chart-bar w-8 bg-gaming-blue opacity-80" style="height: 80%"></div>
+                  <div class="chart-bar w-8 bg-gaming-blue opacity-90" style="height: 90%"></div>
+                  <div class="chart-bar w-8 bg-gaming-blue" style="height: 100%"></div>
+                  <div class="chart-bar w-8 bg-gaming-blue opacity-95" style="height: 95%"></div>
+                  <div class="chart-bar w-8 bg-gaming-blue opacity-85" style="height: 85%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Engagement Metrics -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-gaming-surface rounded-lg p-3">
+                <div class="text-sm text-gray-400">Session Duration</div>
+                <div class="text-lg font-bold text-gaming-blue" id="session-duration">28.5 min</div>
+              </div>
+              <div class="bg-gaming-surface rounded-lg p-3">
+                <div class="text-sm text-gray-400">Bounce Rate</div>
+                <div class="text-lg font-bold text-gaming-purple" id="bounce-rate">23.4%</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Financial Analytics -->
+      <div class="card-glow rounded-xl p-8 mb-12">
+        <h3 class="text-2xl font-bold text-gaming-yellow mb-6 flex items-center">
+          <i data-lucide="dollar-sign" class="w-6 h-6 mr-3"></i>
+          Financial Analytics
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="bg-gaming-surface rounded-lg p-6 text-center">
+            <div class="text-3xl font-bold text-gaming-yellow" id="total-revenue">$2.4M</div>
+            <div class="text-sm text-gray-400">Total Revenue</div>
+            <div class="text-xs text-gaming-accent mt-1">All Time</div>
+          </div>
+          <div class="bg-gaming-surface rounded-lg p-6 text-center">
+            <div class="text-3xl font-bold text-gaming-red" id="tokens-burned">456K</div>
+            <div class="text-sm text-gray-400">MLG Burned</div>
+            <div class="text-xs text-gaming-red mt-1">This Month</div>
+          </div>
+          <div class="bg-gaming-surface rounded-lg p-6 text-center">
+            <div class="text-3xl font-bold text-gaming-purple" id="staked-tokens">12.4M</div>
+            <div class="text-sm text-gray-400">MLG Staked</div>
+            <div class="text-xs text-gaming-purple mt-1">In Clans</div>
+          </div>
+          <div class="bg-gaming-surface rounded-lg p-6 text-center">
+            <div class="text-3xl font-bold text-gaming-blue" id="avg-transaction">$47</div>
+            <div class="text-sm text-gray-400">Avg Transaction</div>
+            <div class="text-xs text-gaming-blue mt-1">Per User</div>
+          </div>
+        </div>
+
+        <!-- Revenue Chart -->
+        <div class="bg-gaming-surface rounded-lg p-6">
+          <h4 class="text-lg font-bold mb-4">Revenue Trend (Last 7 Days)</h4>
+          <div class="chart-container">
+            <svg width="100%" height="100%" class="absolute inset-0">
+              <polyline
+                class="chart-line"
+                points="50,150 100,120 150,100 200,80 250,60 300,40 350,20"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content & Gaming Analytics -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        
+        <!-- Content Analytics -->
+        <div class="card-glow rounded-xl p-8">
+          <h3 class="text-2xl font-bold text-gaming-purple mb-6 flex items-center">
+            <i data-lucide="video" class="w-6 h-6 mr-3"></i>
+            Content Analytics
+          </h3>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Total Content Items</span>
+              <span class="text-gaming-purple font-bold" id="content-items">45,234</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Views Today</span>
+              <span class="text-gaming-blue font-bold" id="views-today">2.4M</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Votes Cast</span>
+              <span class="text-gaming-accent font-bold" id="votes-cast">15,847</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Top Platform</span>
+              <span class="text-gaming-red font-bold">YouTube (45%)</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Engagement Rate</span>
+              <span class="text-gaming-yellow font-bold">73.2%</span>
+            </div>
+            
+            <!-- Platform Distribution -->
+            <div class="mt-6">
+              <h4 class="text-sm font-bold text-gray-300 mb-3">Platform Distribution</h4>
+              <div class="space-y-2">
+                <div class="flex items-center">
+                  <div class="w-12 text-xs text-gray-400">YouTube</div>
+                  <div class="flex-1 bg-gray-600 rounded-full h-2 mx-2">
+                    <div class="bg-red-500 h-2 rounded-full" style="width: 45%"></div>
+                  </div>
+                  <div class="text-xs text-gray-300">45%</div>
+                </div>
+                <div class="flex items-center">
+                  <div class="w-12 text-xs text-gray-400">TikTok</div>
+                  <div class="flex-1 bg-gray-600 rounded-full h-2 mx-2">
+                    <div class="bg-black h-2 rounded-full" style="width: 30%"></div>
+                  </div>
+                  <div class="text-xs text-gray-300">30%</div>
+                </div>
+                <div class="flex items-center">
+                  <div class="w-12 text-xs text-gray-400">Twitch</div>
+                  <div class="flex-1 bg-gray-600 rounded-full h-2 mx-2">
+                    <div class="bg-purple-500 h-2 rounded-full" style="width: 25%"></div>
+                  </div>
+                  <div class="text-xs text-gray-300">25%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gaming Analytics -->
+        <div class="card-glow rounded-xl p-8">
+          <h3 class="text-2xl font-bold text-gaming-accent mb-6 flex items-center">
+            <i data-lucide="gamepad-2" class="w-6 h-6 mr-3"></i>
+            Gaming Analytics
+          </h3>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Active Clans</span>
+              <span class="text-gaming-accent font-bold" id="active-clans">2,847</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Tournament Matches</span>
+              <span class="text-gaming-blue font-bold" id="tournament-matches">156</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Prize Pool Distributed</span>
+              <span class="text-gaming-yellow font-bold" id="prize-pool">$847K</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300">Top Game</span>
+              <span class="text-gaming-purple font-bold">Valorant (32%)</span>
+            </div>
+            
+            <!-- Game Distribution -->
+            <div class="mt-6">
+              <h4 class="text-sm font-bold text-gray-300 mb-3">Popular Games</h4>
+              <div class="grid grid-cols-2 gap-2">
+                <div class="bg-gaming-surface rounded p-2 text-center">
+                  <div class="text-sm font-bold text-gaming-purple">Valorant</div>
+                  <div class="text-xs text-gray-400">32%</div>
+                </div>
+                <div class="bg-gaming-surface rounded p-2 text-center">
+                  <div class="text-sm font-bold text-gaming-blue">Rocket League</div>
+                  <div class="text-xs text-gray-400">28%</div>
+                </div>
+                <div class="bg-gaming-surface rounded p-2 text-center">
+                  <div class="text-sm font-bold text-gaming-accent">CS:GO</div>
+                  <div class="text-xs text-gray-400">25%</div>
+                </div>
+                <div class="bg-gaming-surface rounded p-2 text-center">
+                  <div class="text-sm font-bold text-gaming-yellow">Fortnite</div>
+                  <div class="text-xs text-gray-400">15%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Blockchain & Token Analytics -->
+      <div class="card-glow rounded-xl p-8 mb-12">
+        <h3 class="text-2xl font-bold text-gaming-accent mb-6 flex items-center">
+          <i data-lucide="link" class="w-6 h-6 mr-3"></i>
+          Blockchain & Token Analytics
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-gaming-surface rounded-lg p-6 text-center">
+            <div class="text-2xl font-bold text-gaming-accent" id="total-supply">50M</div>
+            <div class="text-sm text-gray-400">MLG Total Supply</div>
+            <div class="text-xs text-gaming-red mt-1">↓ 2.3M burned</div>
+          </div>
+          <div class="bg-gaming-surface rounded-lg p-6 text-center">
+            <div class="text-2xl font-bold text-gaming-blue" id="circulating">47.7M</div>
+            <div class="text-sm text-gray-400">Circulating Supply</div>
+            <div class="text-xs text-gaming-blue mt-1">95.4% of total</div>
+          </div>
+          <div class="bg-gaming-surface rounded-lg p-6 text-center">
+            <div class="text-2xl font-bold text-gaming-purple" id="holders">15,847</div>
+            <div class="text-sm text-gray-400">Token Holders</div>
+            <div class="text-xs text-gaming-purple mt-1">↑ 247 this week</div>
+          </div>
+          <div class="bg-gaming-surface rounded-lg p-6 text-center">
+            <div class="text-2xl font-bold text-gaming-yellow" id="wallet-connections">8,923</div>
+            <div class="text-sm text-gray-400">Wallet Connections</div>
+            <div class="text-xs text-gaming-yellow mt-1">Today</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export & Reports -->
+      <div class="card-glow rounded-xl p-8">
+        <h3 class="text-2xl font-bold text-gaming-blue mb-6 flex items-center">
+          <i data-lucide="download" class="w-6 h-6 mr-3"></i>
+          Reports & Export
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <button class="bg-gaming-surface hover:bg-gaming-accent hover:text-black p-4 rounded-lg transition-colors">
+            <i data-lucide="file-text" class="w-8 h-8 mx-auto mb-2"></i>
+            <div class="font-bold">Daily Report</div>
+            <div class="text-sm text-gray-400">Last 24 hours</div>
+          </button>
+          <button class="bg-gaming-surface hover:bg-gaming-blue hover:text-white p-4 rounded-lg transition-colors">
+            <i data-lucide="calendar" class="w-8 h-8 mx-auto mb-2"></i>
+            <div class="font-bold">Weekly Summary</div>
+            <div class="text-sm text-gray-400">Past 7 days</div>
+          </button>
+          <button class="bg-gaming-surface hover:bg-gaming-purple hover:text-white p-4 rounded-lg transition-colors">
+            <i data-lucide="trending-up" class="w-8 h-8 mx-auto mb-2"></i>
+            <div class="font-bold">Monthly Analytics</div>
+            <div class="text-sm text-gray-400">Full month data</div>
+          </button>
+          <button class="bg-gaming-surface hover:bg-gaming-yellow hover:text-black p-4 rounded-lg transition-colors">
+            <i data-lucide="database" class="w-8 h-8 mx-auto mb-2"></i>
+            <div class="font-bold">Raw Data Export</div>
+            <div class="text-sm text-gray-400">CSV/JSON format</div>
+          </button>
+          <button class="bg-gaming-surface hover:bg-gaming-red hover:text-white p-4 rounded-lg transition-colors">
+            <i data-lucide="bar-chart-3" class="w-8 h-8 mx-auto mb-2"></i>
+            <div class="font-bold">Custom Dashboard</div>
+            <div class="text-sm text-gray-400">Build your own</div>
+          </button>
+          <button class="bg-gaming-surface hover:bg-gaming-accent hover:text-black p-4 rounded-lg transition-colors">
+            <i data-lucide="share" class="w-8 h-8 mx-auto mb-2"></i>
+            <div class="font-bold">Share Report</div>
+            <div class="text-sm text-gray-400">Generate link</div>
+          </button>
+        </div>
+      </div>
+      
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-black bg-opacity-80 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <a href="index.html" onclick="handleNavigation(event, 'index.html')" class="text-2xl font-bold mb-4 text-gaming-accent hover:text-green-400 transition-colors inline-block">🎮 MLG.clan</a>
+        <p class="text-gray-400 mb-6">The future of gaming communities is here.</p>
+        <div class="flex justify-center space-x-8 text-sm text-gray-500">
+          <span>Web3 Native</span>
+          <span>•</span>
+          <span>Enterprise Ready</span>
+          <span>•</span>
+          <span>Community Governed</span>
+          <span>•</span>
+          <span>100% Complete</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Analytics Platform
+    class AnalyticsPlatform {
+      constructor() {
+        this.init();
+      }
+      
+      init() {
+        this.initializeUI();
+        this.setupRealTimeUpdates();
+        this.loadAnalyticsData();
+      }
+      
+      initializeUI() {
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        }
+      }
+      
+      setupRealTimeUpdates() {
+        // Update analytics every 30 seconds
+        setInterval(() => {
+          this.updateRealTimeMetrics();
+        }, 30000);
+        
+        // Update charts every 5 minutes
+        setInterval(() => {
+          this.updateCharts();
+        }, 300000);
+      }
+      
+      updateRealTimeMetrics() {
+        const metrics = {
+          'active-users': () => 24800 + Math.floor(Math.random() * 200),
+          'transactions': () => 156000 + Math.floor(Math.random() * 1000),
+          'revenue': () => '$' + (847 + Math.floor(Math.random() * 50)) + 'K',
+          'growth': () => '+' + (24 + Math.floor(Math.random() * 5)) + '%',
+          'connections': () => 1247 + Math.floor(Math.random() * 50),
+          'response-time': () => (140 + Math.floor(Math.random() * 20)) + 'ms',
+          'cache-rate': () => (85 + Math.floor(Math.random() * 5)).toFixed(1) + '%',
+          'error-rate': () => '0.0' + Math.floor(Math.random() * 5) + '%',
+          'session-duration': () => (28 + Math.floor(Math.random() * 3)).toFixed(1) + ' min',
+          'bounce-rate': () => (23 + Math.floor(Math.random() * 3)).toFixed(1) + '%'
+        };
+        
+        Object.entries(metrics).forEach(([id, valueFn]) => {
+          const element = document.getElementById(id);
+          if (element && typeof valueFn === 'function') {
+            const newValue = valueFn();
+            if (typeof newValue === 'number') {
+              element.textContent = newValue.toLocaleString();
+            } else {
+              element.textContent = newValue;
+            }
+          }
+        });
+      }
+      
+      updateCharts() {
+        // Update chart bars with animation
+        const bars = document.querySelectorAll('.chart-bar');
+        bars.forEach(bar => {
+          const randomHeight = Math.floor(Math.random() * 70) + 30;
+          bar.style.height = randomHeight + '%';
+        });
+      }
+      
+      loadAnalyticsData() {
+        // Initial data load
+        this.updateRealTimeMetrics();
+        
+        // Show loading notification
+        this.showNotification('📊 Real-time analytics loaded!', 'success');
+      }
+      
+      showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-medium z-50 transition-all transform translate-x-full ${
+          type === 'success' ? 'bg-gaming-accent text-black' :
+          type === 'error' ? 'bg-gaming-red' :
+          type === 'warning' ? 'bg-gaming-yellow text-black' :
+          'bg-gaming-blue'
+        }`;
+        
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.classList.remove('translate-x-full');
+        }, 100);
+        
+        setTimeout(() => {
+          notification.classList.add('translate-x-full');
+          setTimeout(() => {
+            if (document.body.contains(notification)) {
+              document.body.removeChild(notification);
+            }
+          }, 300);
+        }, 4000);
+      }
+    }
+    
+    // Universal navigation handler for both SPA and multi-page modes
+    function handleNavigation(event, pageUrl) {
+      // Check if SPA router is available and ready
+      if (window.router && window.router.push && typeof window.router.push === 'function') {
+        event.preventDefault();
+        const routePath = '/' + pageUrl.replace('.html', '').replace('index', 'dashboard');
+        window.router.push(routePath);
+      }
+      // If no SPA router, let the default link behavior happen (multi-page navigation)
+    }
+    
+    // Active navigation state management
+    function updateActiveNavigation(currentPage) {
+      // Remove active class from all nav links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('bg-gaming-accent', 'text-black', 'bg-gaming-red', 'text-white');
+        link.classList.add('text-gray-300');
+      });
+      
+      // Add active class to current page link with appropriate styling
+      const activeLink = document.querySelector(`.nav-link[href="${currentPage}"]`);
+      if (activeLink) {
+        activeLink.classList.remove('text-gray-300');
+        if (currentPage === 'analytics.html') {
+          activeLink.classList.add('bg-gaming-red', 'text-white');
+        } else {
+          activeLink.classList.add('bg-gaming-accent', 'text-black');
+        }
+      }
+    }
+    
+    // Make navigation functions globally available
+    window.handleNavigation = handleNavigation;
+    window.updateActiveNavigation = updateActiveNavigation;
+    
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      new AnalyticsPlatform();
+    });
+  </script>
+</body>
+</html>

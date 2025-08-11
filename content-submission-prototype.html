@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Submission Form - MLG.clan Xbox 360 Style</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Xbox 360 Dashboard Theme Variables */
+    :root {
+      --xbox-green: #10b981;
+      --xbox-green-dark: #065f46;
+      --xbox-green-light: #34d399;
+      --tile-gradient: linear-gradient(135deg, #065f46, #064e3b);
+      --hover-gradient: linear-gradient(135deg, #047857, #065f46);
+      --input-bg: #374151;
+      --input-border: #10b981;
+      --text-primary: #ffffff;
+      --text-secondary: #d1d5db;
+      --text-muted: #9ca3af;
+    }
+
+    /* Base Xbox Tile Styling */
+    .tile { 
+      transition: all 0.3s ease; 
+      background: var(--tile-gradient);
+      border: 1px solid var(--xbox-green);
+      border-radius: 12px;
+    }
+    .tile:hover { 
+      transform: scale(1.02); 
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    .xbox-green { color: var(--xbox-green); }
+
+    /* Content Type Blade Selector */
+    .blade-container {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .blade-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 24px;
+      min-width: 160px;
+      background: var(--input-bg);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-align: center;
+    }
+
+    .blade-item:hover {
+      transform: translateY(-3px);
+      border-color: var(--xbox-green);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .blade-item.active {
+      background: var(--tile-gradient);
+      border-color: var(--xbox-green);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .blade-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .blade-label {
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .blade-item.active .blade-label {
+      color: var(--xbox-green);
+    }
+
+    /* Form Section Styling */
+    .form-section {
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: var(--xbox-green);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-field {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .field-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    /* Xbox Input Styling */
+    .xbox-input,
+    .xbox-textarea,
+    .xbox-select {
+      width: 100%;
+      background: var(--input-bg);
+      border: 2px solid transparent;
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .xbox-input:focus,
+    .xbox-textarea:focus,
+    .xbox-select:focus {
+      outline: none;
+      border-color: var(--input-border);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .xbox-input::placeholder,
+    .xbox-textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .char-counter {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: right;
+      margin-top: 4px;
+      position: absolute;
+      right: 0;
+      bottom: -18px;
+    }
+
+    /* Upload Zone Styling */
+    .upload-zone {
+      margin-bottom: 24px;
+    }
+
+    .upload-dropzone {
+      border: 3px dashed #4b5563;
+      border-radius: 12px;
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(55, 65, 81, 0.3);
+    }
+
+    .upload-dropzone:hover,
+    .upload-dropzone.dragover {
+      border-color: var(--xbox-green);
+      background: rgba(16, 185, 129, 0.1);
+      transform: scale(1.02);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      color: var(--text-muted);
+    }
+
+    .upload-dropzone:hover .upload-icon {
+      color: var(--xbox-green);
+    }
+
+    .file-size-limit {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-top: 8px;
+    }
+
+    /* Platform Selector */
+    .platform-selector {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .platform-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 16px;
+      border: 2px solid #4b5563;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 80px;
+    }
+
+    .platform-option:hover {
+      border-color: var(--xbox-green);
+      transform: translateY(-2px);
+    }
+
+    .platform-option.selected {
+      border-color: var(--xbox-green);
+      background: rgba(16, 185, 129, 0.2);
+    }
+
+    .platform-icon {
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+    }
+
+    /* Tag Input System */
+    .tag-input-container {
+      position: relative;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      min-height: 32px;
+    }
+
+    .tag-item {
+      background: var(--xbox-green);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tag-remove {
+      cursor: pointer;
+      font-weight: bold;
+      opacity: 0.8;
+    }
+
+    .tag-remove:hover {
+      opacity: 1;
+    }
+
+    .tag-suggestions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .suggestion-tag {
+      background: rgba(75, 85, 99, 0.8);
+      color: var(--text-secondary);
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .suggestion-tag:hover {
+      background: var(--xbox-green);
+      color: white;
+    }
+
+    /* Radio Group Styling */
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .radio-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      padding: 12px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .radio-option:hover {
+      background: rgba(16, 185, 129, 0.1);
+    }
+
+    .radio-custom {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #4b5563;
+      border-radius: 50%;
+      position: relative;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .radio-option input[type="radio"] {
+      display: none;
+    }
+
+    .radio-option input[type="radio"]:checked + .radio-custom {
+      border-color: var(--xbox-green);
+      background: var(--xbox-green);
+    }
+
+    .radio-option input[type="radio"]:checked + .radio-custom::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .radio-label strong {
+      color: var(--text-primary);
+      display: block;
+    }
+
+    .radio-label small {
+      color: var(--text-muted);
+    }
+
+    /* Checkbox Styling */
+    .checkbox-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    .checkbox-custom {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #4b5563;
+      border-radius: 4px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .checkbox-option input[type="checkbox"] {
+      display: none;
+    }
+
+    .checkbox-option input[type="checkbox"]:checked + .checkbox-custom {
+      border-color: var(--xbox-green);
+      background: var(--xbox-green);
+    }
+
+    .checkbox-option input[type="checkbox"]:checked + .checkbox-custom::after {
+      content: '✓';
+      color: white;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.875rem;
+      font-weight: bold;
+    }
+
+    /* Button Styling */
+    .btn-primary {
+      background: linear-gradient(45deg, var(--xbox-green), var(--xbox-green-dark));
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 28px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--input-bg);
+      color: var(--text-secondary);
+      border: 2px solid #4b5563;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--xbox-green);
+      color: var(--xbox-green);
+      transform: translateY(-1px);
+    }
+
+    /* Submission Actions */
+    .submission-section {
+      background: var(--tile-gradient);
+      border: 1px solid var(--xbox-green);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+
+    .submission-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .submission-info {
+      text-align: center;
+    }
+
+    .upload-limits {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* Preview Section */
+    .preview-container {
+      min-height: 200px;
+      background: rgba(55, 65, 81, 0.5);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .preview-placeholder {
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .preview-icon {
+      font-size: 3rem;
+      margin-bottom: 8px;
+    }
+
+    /* Game Dropdown */
+    .game-search-container {
+      position: relative;
+    }
+
+    .game-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--input-bg);
+      border: 2px solid var(--xbox-green);
+      border-radius: 8px;
+      border-top: none;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 10;
+      display: none;
+    }
+
+    .game-dropdown.show {
+      display: block;
+    }
+
+    .game-option {
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .game-option:hover {
+      background: rgba(16, 185, 129, 0.2);
+    }
+
+    .game-option img {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .blade-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .blade-item {
+        width: 100%;
+        max-width: 300px;
+      }
+      
+      .platform-selector {
+        justify-content: center;
+      }
+      
+      .submission-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn-primary,
+      .btn-secondary {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    /* Animations */
+    @keyframes bladeGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+      50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.7); }
+    }
+
+    .blade-item.active {
+      animation: bladeGlow 3s ease-in-out infinite;
+    }
+
+    /* Focus States for Accessibility */
+    .blade-item:focus,
+    .platform-option:focus,
+    .xbox-input:focus,
+    .xbox-textarea:focus,
+    .xbox-select:focus,
+    .btn-primary:focus,
+    .btn-secondary:focus {
+      outline: 3px solid var(--xbox-green);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+  <div class="container mx-auto p-6 max-w-6xl">
+    <!-- Header -->
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold xbox-green mb-4 text-center">📤 Submit Content</h1>
+      <p class="text-center text-gray-300">Share your epic gaming moments with the MLG.clan community</p>
+    </header>
+
+    <!-- Content Type Selector (Xbox Blade Style) -->
+    <section class="content-type-selector mb-8">
+      <div class="blade-container">
+        <div class="blade-item active" data-type="clips">
+          <div class="blade-icon">🎮</div>
+          <div class="blade-label">Gaming Clips</div>
+        </div>
+        <div class="blade-item" data-type="screenshots">
+          <div class="blade-icon">📸</div>
+          <div class="blade-label">Screenshots</div>
+        </div>
+        <div class="blade-item" data-type="guides">
+          <div class="blade-icon">📖</div>
+          <div class="blade-label">Strategy Guides</div>
+        </div>
+        <div class="blade-item" data-type="reviews">
+          <div class="blade-icon">⭐</div>
+          <div class="blade-label">Game Reviews</div>
+        </div>
+      </div>
+    </section>
+
+    <form class="submission-form">
+      <!-- File Upload Zone -->
+      <section class="upload-zone tile">
+        <div class="upload-dropzone" id="file-dropzone">
+          <div class="upload-icon">📁</div>
+          <div class="upload-text">
+            <h3 class="text-xl font-semibold mb-2">Drop files here or click to browse</h3>
+            <p class="text-gray-300 mb-2">Supported formats: MP4, MOV, JPG, PNG, GIF</p>
+            <p class="file-size-limit">Max size: 100MB per file</p>
+          </div>
+          <input type="file" id="file-input" multiple accept="video/*,image/*" style="display: none;">
+        </div>
+      </section>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left Column: Main Form Fields -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Primary Information -->
+          <section class="form-section tile">
+            <h3 class="section-title">📝 Content Details</h3>
+            
+            <div class="form-field">
+              <label class="field-label">Title *</label>
+              <input type="text" class="xbox-input" placeholder="Amazing clutch play in ranked..." maxlength="100" required>
+              <div class="char-counter">0/100</div>
+            </div>
+            
+            <div class="form-field">
+              <label class="field-label">Description</label>
+              <textarea class="xbox-textarea" placeholder="Describe your epic gaming moment..." maxlength="500" rows="4"></textarea>
+              <div class="char-counter">0/500</div>
+            </div>
+          </section>
+
+          <!-- Game Selection -->
+          <section class="form-section tile">
+            <h3 class="section-title">🎮 Game Information</h3>
+            
+            <div class="form-field">
+              <label class="field-label">Game *</label>
+              <div class="game-search-container">
+                <input type="text" class="xbox-input" id="game-search" placeholder="Search for a game..." autocomplete="off" required>
+                <div class="game-dropdown" id="game-dropdown">
+                  <div class="game-option">
+                    <img src="https://via.placeholder.com/32x32/10b981/ffffff?text=COD" alt="Call of Duty">
+                    <span>Call of Duty: Modern Warfare III</span>
+                  </div>
+                  <div class="game-option">
+                    <img src="https://via.placeholder.com/32x32/10b981/ffffff?text=H5" alt="Halo 5">
+                    <span>Halo 5: Guardians</span>
+                  </div>
+                  <div class="game-option">
+                    <img src="https://via.placeholder.com/32x32/10b981/ffffff?text=R6" alt="Rainbow Six">
+                    <span>Rainbow Six Siege</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-field">
+              <label class="field-label">Platform</label>
+              <div class="platform-selector">
+                <div class="platform-option selected" data-platform="xbox">
+                  <div class="platform-icon">🎮</div>
+                  <span>Xbox</span>
+                </div>
+                <div class="platform-option" data-platform="playstation">
+                  <div class="platform-icon">🎮</div>
+                  <span>PlayStation</span>
+                </div>
+                <div class="platform-option" data-platform="pc">
+                  <div class="platform-icon">💻</div>
+                  <span>PC</span>
+                </div>
+                <div class="platform-option" data-platform="mobile">
+                  <div class="platform-icon">📱</div>
+                  <span>Mobile</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Category & Tags -->
+          <section class="form-section tile">
+            <h3 class="section-title">🏷️ Categories & Tags</h3>
+            
+            <div class="form-field">
+              <label class="field-label">Content Category</label>
+              <select class="xbox-select" id="content-category">
+                <option value="">Select category...</option>
+                <option value="highlights">Highlights</option>
+                <option value="gameplay">Full Gameplay</option>
+                <option value="tutorials">Tutorials</option>
+                <option value="funny">Funny Moments</option>
+                <option value="competitive">Competitive</option>
+                <option value="speedrun">Speedrun</option>
+              </select>
+            </div>
+            
+            <div class="form-field">
+              <label class="field-label">Tags</label>
+              <div class="tag-input-container">
+                <input type="text" class="xbox-input" id="tag-input" placeholder="Add tags (e.g. clutch, headshot)">
+                <div class="tag-list" id="selected-tags">
+                  <div class="tag-item">
+                    clutch
+                    <span class="tag-remove">×</span>
+                  </div>
+                  <div class="tag-item">
+                    headshot
+                    <span class="tag-remove">×</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tag-suggestions">
+                <span class="suggestion-tag">epic</span>
+                <span class="suggestion-tag">funny</span>
+                <span class="suggestion-tag">skilled</span>
+                <span class="suggestion-tag">competitive</span>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Right Column: Settings & Preview -->
+        <div class="space-y-6">
+          <!-- Privacy Settings -->
+          <section class="form-section tile">
+            <h3 class="section-title">🔒 Privacy & Settings</h3>
+            
+            <div class="form-field">
+              <label class="field-label">Visibility</label>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input type="radio" name="visibility" value="public" checked>
+                  <span class="radio-custom"></span>
+                  <div class="radio-label">
+                    <strong>Public</strong>
+                    <small>Everyone can see and vote</small>
+                  </div>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="visibility" value="clan-only">
+                  <span class="radio-custom"></span>
+                  <div class="radio-label">
+                    <strong>Clan Only</strong>
+                    <small>Only clan members can see</small>
+                  </div>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="visibility" value="friends">
+                  <span class="radio-custom"></span>
+                  <div class="radio-label">
+                    <strong>Friends</strong>
+                    <small>Only friends can see</small>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-field">
+              <label class="checkbox-option">
+                <input type="checkbox" id="allow-comments" checked>
+                <span class="checkbox-custom"></span>
+                Allow comments
+              </label>
+            </div>
+            
+            <div class="form-field">
+              <label class="checkbox-option">
+                <input type="checkbox" id="allow-downloads">
+                <span class="checkbox-custom"></span>
+                Allow downloads
+              </label>
+            </div>
+          </section>
+
+          <!-- Preview Area -->
+          <section class="form-section tile">
+            <h3 class="section-title">👁️ Preview</h3>
+            
+            <div class="preview-container" id="content-preview">
+              <div class="preview-placeholder">
+                <div class="preview-icon">👁️</div>
+                <p>Upload content to see preview</p>
+              </div>
+            </div>
+            
+            <div class="preview-meta" id="preview-metadata">
+              <p class="text-sm text-gray-400">Preview will show formatted post as others will see it</p>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Submission Actions -->
+      <section class="submission-section">
+        <div class="submission-actions">
+          <button type="button" class="btn-secondary">
+            💾 Save Draft
+          </button>
+          <button type="button" class="btn-secondary">
+            👁️ Preview Post
+          </button>
+          <button type="submit" class="btn-primary">
+            🚀 Submit Content
+          </button>
+        </div>
+        
+        <div class="submission-info">
+          <p class="upload-limits">
+            <span class="xbox-green">2/3</span> uploads remaining today
+          </p>
+        </div>
+      </section>
+    </form>
+  </div>
+
+  <script>
+    // Content Type Blade Selection
+    document.querySelectorAll('.blade-item').forEach(item => {
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.blade-item').forEach(b => b.classList.remove('active'));
+        item.classList.add('active');
+        
+        // Update form fields based on content type
+        const contentType = item.dataset.type;
+        console.log('Selected content type:', contentType);
+      });
+    });
+
+    // Platform Selection
+    document.querySelectorAll('.platform-option').forEach(option => {
+      option.addEventListener('click', () => {
+        document.querySelectorAll('.platform-option').forEach(p => p.classList.remove('selected'));
+        option.classList.add('selected');
+      });
+    });
+
+    // File Upload Zone
+    const dropzone = document.getElementById('file-dropzone');
+    const fileInput = document.getElementById('file-input');
+
+    dropzone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      handleFiles(files);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+      console.log('Files selected:', files);
+      // Handle file upload logic
+    }
+
+    // Game Search
+    const gameSearch = document.getElementById('game-search');
+    const gameDropdown = document.getElementById('game-dropdown');
+
+    gameSearch.addEventListener('input', () => {
+      if (gameSearch.value.length > 0) {
+        gameDropdown.classList.add('show');
+      } else {
+        gameDropdown.classList.remove('show');
+      }
+    });
+
+    gameSearch.addEventListener('blur', () => {
+      setTimeout(() => gameDropdown.classList.remove('show'), 200);
+    });
+
+    // Game Selection
+    document.querySelectorAll('.game-option').forEach(option => {
+      option.addEventListener('click', () => {
+        gameSearch.value = option.textContent.trim();
+        gameDropdown.classList.remove('show');
+      });
+    });
+
+    // Tag System
+    const tagInput = document.getElementById('tag-input');
+    const selectedTags = document.getElementById('selected-tags');
+
+    tagInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' || e.key === ',') {
+        e.preventDefault();
+        addTag(tagInput.value.trim());
+        tagInput.value = '';
+      }
+    });
+
+    // Suggestion tags
+    document.querySelectorAll('.suggestion-tag').forEach(tag => {
+      tag.addEventListener('click', () => {
+        addTag(tag.textContent);
+      });
+    });
+
+    function addTag(tagText) {
+      if (tagText && !isTagAlreadyAdded(tagText)) {
+        const tagElement = document.createElement('div');
+        tagElement.className = 'tag-item';
+        tagElement.innerHTML = `
+          ${tagText}
+          <span class="tag-remove" onclick="removeTag(this)">×</span>
+        `;
+        selectedTags.appendChild(tagElement);
+      }
+    }
+
+    function removeTag(element) {
+      element.parentElement.remove();
+    }
+
+    function isTagAlreadyAdded(tagText) {
+      const existingTags = Array.from(selectedTags.children);
+      return existingTags.some(tag => tag.textContent.replace('×', '').trim() === tagText);
+    }
+
+    // Character Counters
+    function setupCharacterCounter(inputId, counterId, maxLength) {
+      const input = document.getElementById(inputId);
+      const counter = document.getElementById(counterId);
+      
+      if (input && counter) {
+        input.addEventListener('input', () => {
+          const currentLength = input.value.length;
+          counter.textContent = `${currentLength}/${maxLength}`;
+          
+          if (currentLength > maxLength * 0.9) {
+            counter.style.color = '#ef4444';
+          } else {
+            counter.style.color = 'var(--text-muted)';
+          }
+        });
+      }
+    }
+
+    // Form Submission
+    document.querySelector('.submission-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // Validate form
+      if (validateForm()) {
+        console.log('Form submitted successfully!');
+        // Handle form submission
+        alert('Content submitted successfully! 🎉');
+      } else {
+        console.log('Form validation failed');
+      }
+    });
+
+    function validateForm() {
+      // Add validation logic
+      return true;
+    }
+
+    // Initialize character counters (would be setup for actual inputs with IDs)
+    // setupCharacterCounter('title-input', 'title-counter', 100);
+    // setupCharacterCounter('description-textarea', 'description-counter', 500);
+  </script>
+</body>
+</html>

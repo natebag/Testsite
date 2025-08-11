@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan Content Reporting & Moderation Queue - Wireframes & Visual Specifications</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* MLG.clan Design System - Xbox 360 Dashboard Aesthetic */
+        :root {
+            --xbox-green: #10b981;
+            --xbox-green-dark: #059669;
+            --xbox-green-light: #34d399;
+            --xbox-accent: #14532d;
+            --burn-red: #dc2626;
+            --burn-orange: #f59e0b;
+            --vault-purple: #8b5cf6;
+            --vault-blue: #3b82f6;
+            --gold-primary: #fbbf24;
+            --gold-secondary: #f59e0b;
+            --warning-yellow: #fbbf24;
+            --critical-red: #ef4444;
+            --tile-bg-primary: linear-gradient(135deg, #065f46, #064e3b);
+            --tile-bg-secondary: linear-gradient(135deg, #111827, #1f2937);
+            --tile-bg-danger: linear-gradient(135deg, #7f1d1d, #991b1b);
+            --tile-bg-warning: linear-gradient(135deg, #78350f, #92400e);
+            --tile-border: #10b981;
+            --tile-border-danger: #ef4444;
+            --tile-border-warning: #fbbf24;
+            --glass-bg: rgba(31, 41, 55, 0.8);
+            --glass-bg-danger: rgba(127, 29, 29, 0.8);
+            --grid-unit: 8px;
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-blade: 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        /* Xbox Blade System */
+        .xbox-blade {
+            background: var(--tile-bg-primary);
+            border: 1px solid var(--tile-border);
+            transition: all var(--transition-blade);
+            position: relative;
+            overflow: hidden;
+            border-radius: calc(var(--grid-unit) * 1);
+        }
+        
+        .xbox-blade::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.15), transparent);
+            transition: left var(--transition-blade);
+            z-index: 1;
+        }
+        
+        .xbox-blade:hover::before {
+            left: 100%;
+        }
+        
+        .xbox-blade:hover {
+            transform: translateX(12px) scale(1.01);
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.25);
+            border-color: var(--xbox-green-light);
+        }
+
+        /* Content Card System */
+        .content-card {
+            background: var(--tile-bg-secondary);
+            border: 1px solid #374151;
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            border-radius: calc(var(--grid-unit) * 1);
+        }
+        
+        .content-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--xbox-green), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.8s ease;
+        }
+        
+        .content-card:hover::after {
+            transform: translateX(100%);
+        }
+        
+        .content-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4), 0 0 20px rgba(16, 185, 129, 0.2);
+            border-color: var(--xbox-green);
+        }
+
+        /* Moderation-Specific Styles */
+        .moderation-card {
+            border-radius: calc(var(--grid-unit) * 1);
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .moderation-card.severity-low {
+            background: var(--tile-bg-secondary);
+            border: 1px solid #374151;
+        }
+        
+        .moderation-card.severity-medium {
+            background: var(--tile-bg-warning);
+            border: 1px solid var(--tile-border-warning);
+        }
+        
+        .moderation-card.severity-high {
+            background: var(--tile-bg-danger);
+            border: 1px solid var(--tile-border-danger);
+        }
+        
+        .moderation-card.severity-critical {
+            background: var(--tile-bg-danger);
+            border: 2px solid var(--critical-red);
+            animation: critical-pulse 2s infinite;
+        }
+
+        @keyframes critical-pulse {
+            0%, 100% { 
+                box-shadow: 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            50% { 
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+            }
+        }
+
+        /* Report Modal Styles */
+        .report-modal {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--tile-border);
+            border-radius: calc(var(--grid-unit) * 2);
+        }
+
+        .report-category-btn {
+            background: var(--tile-bg-secondary);
+            border: 1px solid #374151;
+            transition: all var(--transition-smooth);
+            border-radius: calc(var(--grid-unit) * 1);
+        }
+
+        .report-category-btn:hover {
+            border-color: var(--xbox-green);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .report-category-btn.selected {
+            background: var(--tile-bg-primary);
+            border-color: var(--xbox-green-light);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Batch Action Styles */
+        .batch-action-bar {
+            background: var(--tile-bg-primary);
+            border: 1px solid var(--tile-border);
+            border-radius: calc(var(--grid-unit) * 1);
+            transform: translateY(-100%);
+            transition: transform var(--transition-smooth);
+        }
+
+        .batch-action-bar.active {
+            transform: translateY(0);
+        }
+
+        /* Filter Pill Styles */
+        .filter-pill {
+            background: var(--tile-bg-secondary);
+            border: 1px solid #374151;
+            border-radius: calc(var(--grid-unit) * 3);
+            transition: all var(--transition-smooth);
+        }
+
+        .filter-pill.active {
+            background: var(--tile-bg-primary);
+            border-color: var(--xbox-green);
+            color: var(--xbox-green-light);
+        }
+
+        .filter-pill:hover {
+            border-color: var(--xbox-green);
+            transform: scale(1.05);
+        }
+
+        /* Vote Buttons */
+        .mod-vote-btn {
+            border-radius: calc(var(--grid-unit) * 1);
+            transition: all var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mod-vote-btn.keep {
+            background: linear-gradient(135deg, #065f46, #059669);
+            border: 1px solid var(--xbox-green);
+        }
+
+        .mod-vote-btn.remove {
+            background: linear-gradient(135deg, #7f1d1d, #dc2626);
+            border: 1px solid var(--burn-red);
+        }
+
+        .mod-vote-btn.escalate {
+            background: linear-gradient(135deg, #581c87, #8b5cf6);
+            border: 1px solid var(--vault-purple);
+        }
+
+        .mod-vote-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Status Indicators */
+        .status-indicator {
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            display: inline-block;
+            margin-right: calc(var(--grid-unit) * 1);
+        }
+
+        .status-active { background: var(--xbox-green); }
+        .status-reported { background: var(--warning-yellow); }
+        .status-voting { background: var(--vault-blue); }
+        .status-removed { background: var(--burn-red); }
+        .status-appealed { background: var(--vault-purple); }
+
+        /* Reputation Badge */
+        .reputation-badge {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            border-radius: calc(var(--grid-unit) * 1);
+            padding: calc(var(--grid-unit) * 0.5) calc(var(--grid-unit) * 1);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Progress Bars */
+        .vote-progress {
+            background: rgba(75, 85, 99, 0.5);
+            border-radius: calc(var(--grid-unit) * 0.5);
+            overflow: hidden;
+        }
+
+        .vote-progress-fill {
+            height: 4px;
+            transition: width var(--transition-smooth);
+            border-radius: calc(var(--grid-unit) * 0.5);
+        }
+
+        .vote-progress-fill.keep { background: var(--xbox-green); }
+        .vote-progress-fill.remove { background: var(--burn-red); }
+        .vote-progress-fill.escalate { background: var(--vault-purple); }
+
+        /* Utilities */
+        .xbox-green { color: var(--xbox-green); }
+        .text-burn { color: var(--burn-orange); }
+        .text-vault { color: var(--vault-purple); }
+        .text-warning { color: var(--warning-yellow); }
+        .text-critical { color: var(--critical-red); }
+        .bg-glass { background: var(--glass-bg); }
+
+        /* Component Demo Styles */
+        .wireframe-section {
+            border: 2px dashed #4b5563;
+            background: rgba(31, 41, 55, 0.3);
+            margin: 2rem 0;
+            padding: 2rem;
+            border-radius: calc(var(--grid-unit) * 1);
+        }
+
+        .component-demo {
+            border: 1px solid #374151;
+            background: #1f2937;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: calc(var(--grid-unit) * 1);
+        }
+
+        .spec-table {
+            background: #374151;
+            border-radius: calc(var(--grid-unit) * 1);
+            overflow: hidden;
+        }
+
+        .spec-table th {
+            background: var(--tile-bg-primary);
+            color: var(--xbox-green-light);
+            padding: calc(var(--grid-unit) * 1.5);
+            font-weight: 600;
+        }
+
+        .spec-table td {
+            padding: calc(var(--grid-unit) * 1.5);
+            border-top: 1px solid #4b5563;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-mono">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-8">
+            <h1 class="text-4xl font-bold xbox-green mb-2">MLG.clan Content Moderation System</h1>
+            <p class="text-gray-300">Wireframes & Visual Specifications for Sub-task 4.9</p>
+            <p class="text-sm text-gray-400">Xbox 360 Dashboard Aesthetic | Gaming Community Focus</p>
+        </header>
+
+        <!-- Table of Contents -->
+        <nav class="wireframe-section">
+            <h2 class="text-2xl font-bold xbox-green mb-4">📋 Table of Contents</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-300 mb-2">Core Components</h3>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#content-reporting-modal" class="xbox-green hover:text-green-300">1. Content Reporting Modal</a></li>
+                        <li><a href="#moderation-queue-dashboard" class="xbox-green hover:text-green-300">2. Moderation Queue Dashboard</a></li>
+                        <li><a href="#content-review-cards" class="xbox-green hover:text-green-300">3. Content Review Cards</a></li>
+                        <li><a href="#batch-moderation-tools" class="xbox-green hover:text-green-300">4. Batch Moderation Tools</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-300 mb-2">Advanced Features</h3>
+                    <ul class="space-y-1 text-sm">
+                        <li><a href="#analytics-dashboard" class="xbox-green hover:text-green-300">5. Analytics Dashboard</a></li>
+                        <li><a href="#appeal-process" class="xbox-green hover:text-green-300">6. Appeal Process Interface</a></li>
+                        <li><a href="#moderator-management" class="xbox-green hover:text-green-300">7. Moderator Role Management</a></li>
+                        <li><a href="#mobile-optimization" class="xbox-green hover:text-green-300">8. Mobile Optimization</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 1. Content Reporting Modal -->
+        <section id="content-reporting-modal" class="wireframe-section">
+            <h2 class="text-3xl font-bold xbox-green mb-6">🚨 1. Content Reporting Modal</h2>
+            
+            <div class="component-demo">
+                <h3 class="text-xl font-semibold text-gray-300 mb-4">Report Content Interface</h3>
+                
+                <!-- Modal Overlay Demo -->
+                <div class="relative bg-gray-800 rounded-lg p-6" style="min-height: 400px;">
+                    <!-- Simulated background content -->
+                    <div class="opacity-30 absolute inset-0 bg-gray-700 rounded-lg"></div>
+                    
+                    <!-- Report Modal -->
+                    <div class="report-modal relative z-10 max-w-lg mx-auto mt-8 p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h4 class="text-lg font-bold text-white flex items-center">
+                                🚨 <span class="ml-2">Report Content</span>
+                            </h4>
+                            <button class="text-gray-400 hover:text-white text-xl">×</button>
+                        </div>
+                        
+                        <!-- Violation Category Selection -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-gray-300 mb-3">Violation Category</label>
+                            <div class="grid grid-cols-1 gap-3">
+                                <button class="report-category-btn selected p-3 text-left">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-semibold text-white">🎮 Cheating/Exploits</div>
+                                            <div class="text-sm text-gray-400">Content promoting cheats or hacks</div>
+                                        </div>
+                                        <div class="text-critical font-bold">HIGH</div>
+                                    </div>
+                                </button>
+                                <button class="report-category-btn p-3 text-left">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-semibold text-white">💬 Harassment</div>
+                                            <div class="text-sm text-gray-400">Toxic behavior or hate speech</div>
+                                        </div>
+                                        <div class="text-critical font-bold">CRITICAL</div>
+                                    </div>
+                                </button>
+                                <button class="report-category-btn p-3 text-left">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-semibold text-white">🚫 Inappropriate Content</div>
+                                            <div class="text-sm text-gray-400">NSFW or offensive material</div>
+                                        </div>
+                                        <div class="text-critical font-bold">HIGH</div>
+                                    </div>
+                                </button>
+                                <button class="report-category-btn p-3 text-left">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <div class="font-semibold text-white">📧 Spam</div>
+                                            <div class="text-sm text-gray-400">Promotional or repetitive content</div>
+                                        </div>
+                                        <div class="text-warning font-bold">MEDIUM</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Description Field -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">Description</label>
+                            <textarea 
+                                class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white resize-none focus:border-xbox-green focus:outline-none" 
+                                rows="3" 
+                                placeholder="Provide additional details about this violation..."
+                            ></textarea>
+                            <div class="text-xs text-gray-400 mt-1">0/500 characters</div>
+                        </div>
+                        
+                        <!-- Submit Actions -->
+                        <div class="flex space-x-3">
+                            <button class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors">
+                                Cancel
+                            </button>
+                            <button class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition-colors font-semibold">
+                                Submit Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <h4 class="text-lg font-semibold text-gray-300 mb-3">Gaming-Specific Violation Categories</h4>
+                <div class="spec-table">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Category</th>
+                                <th class="text-center">Severity</th>
+                                <th class="text-center">Auto-Remove Threshold</th>
+                                <th class="text-left">Examples</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            <tr>
+                                <td class="text-white font-semibold">🎮 Cheating/Exploits</td>
+                                <td class="text-center text-critical font-bold">HIGH</td>
+                                <td class="text-center">7 reports</td>
+                                <td>Aimbot tutorials, wall hack guides, game exploits</td>
+                            </tr>
+                            <tr>
+                                <td class="text-white font-semibold">💬 Harassment</td>
+                                <td class="text-center text-critical font-bold">CRITICAL</td>
+                                <td class="text-center">5 reports</td>
+                                <td>Hate speech, targeted harassment, doxxing</td>
+                            </tr>
+                            <tr>
+                                <td class="text-white font-semibold">🚫 Inappropriate</td>
+                                <td class="text-center text-critical font-bold">HIGH</td>
+                                <td class="text-center">8 reports</td>
+                                <td>NSFW content, violence, disturbing material</td>
+                            </tr>
+                            <tr>
+                                <td class="text-white font-semibold">⚖️ Copyright</td>
+                                <td class="text-center text-critical font-bold">HIGH</td>
+                                <td class="text-center">6 reports</td>
+                                <td>Stolen content, unauthorized music, gameplay footage</td>
+                            </tr>
+                            <tr>
+                                <td class="text-white font-semibold">📧 Spam</td>
+                                <td class="text-center text-warning font-bold">MEDIUM</td>
+                                <td class="text-center">10 reports</td>
+                                <td>Promotional content, repetitive posts</td>
+                            </tr>
+                            <tr>
+                                <td class="text-white font-semibold">📊 Low Quality</td>
+                                <td class="text-center text-gray-400">LOW</td>
+                                <td class="text-center">15 reports</td>
+                                <td>Poor gameplay, clickbait, irrelevant content</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Moderation Queue Dashboard -->
+        <section id="moderation-queue-dashboard" class="wireframe-section">
+            <h2 class="text-3xl font-bold xbox-green mb-6">⚖️ 2. Moderation Queue Dashboard</h2>
+            
+            <div class="component-demo">
+                <h3 class="text-xl font-semibold text-gray-300 mb-4">Community Moderator Interface</h3>
+                
+                <!-- Dashboard Header -->
+                <div class="bg-gray-800 rounded-lg p-4 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-bold text-white flex items-center">
+                            ⚖️ <span class="ml-2">Moderation Queue</span>
+                        </h4>
+                        <div class="flex items-center space-x-4">
+                            <div class="reputation-badge">Expert Reviewer</div>
+                            <div class="text-sm text-gray-400">Vote Weight: 3.0x</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Queue Statistics -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        <div class="bg-gray-700 rounded-lg p-3">
+                            <div class="text-2xl font-bold xbox-green">47</div>
+                            <div class="text-sm text-gray-400">Pending Reports</div>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-3">
+                            <div class="text-2xl font-bold text-vault">12</div>
+                            <div class="text-sm text-gray-400">Active Votes</div>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-3">
+                            <div class="text-2xl font-bold text-burn">8</div>
+                            <div class="text-sm text-gray-400">Critical Issues</div>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-3">
+                            <div class="text-2xl font-bold text-warning">3</div>
+                            <div class="text-sm text-gray-400">Appeals</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Filters and Search -->
+                    <div class="flex flex-wrap items-center gap-3 mb-4">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-400">Filter:</span>
+                            <button class="filter-pill active px-3 py-1 text-sm">All</button>
+                            <button class="filter-pill px-3 py-1 text-sm">Critical</button>
+                            <button class="filter-pill px-3 py-1 text-sm">High Priority</button>
+                            <button class="filter-pill px-3 py-1 text-sm">Voting Active</button>
+                        </div>
+                        <div class="flex-1 max-w-md">
+                            <input 
+                                type="text" 
+                                placeholder="Search content, reporter, or reason..." 
+                                class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-1 text-sm focus:border-xbox-green focus:outline-none"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Batch Action Bar (Hidden by default) -->
+                <div class="batch-action-bar p-4 mb-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-sm font-semibold">3 items selected</span>
+                            <button class="mod-vote-btn keep px-3 py-1 text-sm font-semibold">Keep All</button>
+                            <button class="mod-vote-btn remove px-3 py-1 text-sm font-semibold">Remove All</button>
+                            <button class="mod-vote-btn escalate px-3 py-1 text-sm font-semibold">Escalate All</button>
+                        </div>
+                        <button class="text-gray-400 hover:text-white">
+                            <span class="text-sm">Clear Selection</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Content Review Cards -->
+        <section id="content-review-cards" class="wireframe-section">
+            <h2 class="text-3xl font-bold xbox-green mb-6">📋 3. Content Review Cards</h2>
+            
+            <div class="component-demo">
+                <h3 class="text-xl font-semibold text-gray-300 mb-4">Moderation Review Interface</h3>
+                
+                <div class="space-y-4">
+                    <!-- Critical Severity Content -->
+                    <div class="moderation-card severity-critical p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" class="w-4 h-4 rounded bg-gray-700 border-gray-600">
+                                <div class="flex items-center space-x-2">
+                                    <span class="status-indicator status-reported"></span>
+                                    <span class="text-critical font-bold text-sm">HARASSMENT</span>
+                                    <span class="text-xs text-gray-400">Reported 45min ago</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm text-gray-300">Content ID: #gc_4891</div>
+                                <div class="text-xs text-gray-400">5 reports</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Content Preview -->
+                        <div class="bg-gray-800 rounded-lg p-4 mb-4">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <div class="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center">
+                                    🎮
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-white">MLG Clutch Compilation</div>
+                                    <div class="text-sm text-gray-400">by ToxicPlayer_2023</div>
+                                </div>
+                            </div>
+                            <div class="text-sm text-gray-300 bg-gray-900 rounded p-2">
+                                "Get rekt noobs! Your mom's credit card won't save you now..."
+                            </div>
+                        </div>
+                        
+                        <!-- Report Details -->
+                        <div class="bg-gray-800 rounded-lg p-4 mb-4">
+                            <h5 class="font-semibold text-white mb-2">Report Summary</h5>
+                            <div class="text-sm space-y-1">
+                                <div><strong>Primary Reason:</strong> Harassment, hate speech targeting other players</div>
+                                <div><strong>Reporter:</strong> CommunityMember_456 (Trusted)</div>
+                                <div><strong>Evidence:</strong> Screenshots of comment section</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Voting Progress -->
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm font-semibold text-white">Community Votes</span>
+                                <span class="text-xs text-gray-400">12 total votes</span>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-sm w-16 text-xbox-green">Keep</span>
+                                    <div class="flex-1 vote-progress">
+                                        <div class="vote-progress-fill keep" style="width: 25%;"></div>
+                                    </div>
+                                    <span class="text-sm text-xbox-green">3 (25%)</span>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-sm w-16 text-burn">Remove</span>
+                                    <div class="flex-1 vote-progress">
+                                        <div class="vote-progress-fill remove" style="width: 67%;"></div>
+                                    </div>
+                                    <span class="text-sm text-burn">8 (67%)</span>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="text-sm w-16 text-vault">Escalate</span>
+                                    <div class="flex-1 vote-progress">
+                                        <div class="vote-progress-fill escalate" style="width: 8%;"></div>
+                                    </div>
+                                    <span class="text-sm text-vault">1 (8%)</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Vote Actions -->
+                        <div class="flex space-x-3">
+                            <button class="mod-vote-btn keep flex-1 py-2 px-4 text-sm font-semibold">
+                                Keep Content (1 MLG)
+                            </button>
+                            <button class="mod-vote-btn remove flex-1 py-2 px-4 text-sm font-semibold">
+                                Remove Content (2 MLG)
+                            </button>
+                            <button class="mod-vote-btn escalate flex-1 py-2 px-4 text-sm font-semibold">
+                                Escalate Review (3 MLG)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Medium Severity Content -->
+                    <div class="moderation-card severity-medium p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" class="w-4 h-4 rounded bg-gray-700 border-gray-600">
+                                <div class="flex items-center space-x-2">
+                                    <span class="status-indicator status-voting"></span>
+                                    <span class="text-warning font-bold text-sm">SPAM</span>
+                                    <span class="text-xs text-gray-400">Voting active</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-sm text-gray-300">Content ID: #gc_4890</div>
+                                <div class="text-xs text-gray-400">3 reports</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Simplified Content Preview -->
+                        <div class="bg-gray-800 rounded-lg p-4 mb-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center text-sm">
+                                        📊
+                                    </div>
+                                    <div>
+                                        <div class="font-semibold text-white text-sm">NEW CRYPTO GAMING COIN!</div>
+                                        <div class="text-xs text-gray-400">by CryptoPromoter_99</div>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-gray-400">2h ago</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Vote Actions -->
+                        <div class="flex space-x-2">
+                            <button class="mod-vote-btn keep flex-1 py-1.5 px-3 text-xs font-semibold">
+                                Keep (1 MLG)
+                            </button>
+                            <button class="mod-vote-btn remove flex-1 py-1.5 px-3 text-xs font-semibold">
+                                Remove (2 MLG)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Batch Moderation Tools -->
+        <section id="batch-moderation-tools" class="wireframe-section">
+            <h2 class="text-3xl font-bold xbox-green mb-6">⚡ 4. Batch Moderation Tools</h2>
+            
+            <div class="component-demo">
+                <h3 class="text-xl font-semibold text-gray-300 mb-4">Efficient Mass Actions</h3>
+                
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="font-semibold text-white">Batch Operations</h4>
+                        <div class="text-sm text-gray-400">5 items selected</div>
+                    </div>
+                    
+                    <!-- Selection Summary -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <div class="text-lg font-bold text-critical">3</div>
+                            <div class="text-sm text-gray-400">High Severity</div>
+                            <div class="text-xs text-gray-500">Harassment, Inappropriate</div>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <div class="text-lg font-bold text-warning">2</div>
+                            <div class="text-sm text-gray-400">Medium Severity</div>
+                            <div class="text-xs text-gray-500">Spam, Low Quality</div>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <div class="text-lg font-bold xbox-green">25</div>
+                            <div class="text-sm text-gray-400">Total MLG Cost</div>
+                            <div class="text-xs text-gray-500">With Expert discount</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Batch Actions -->
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-sm">✓</div>
+                                <div>
+                                    <div class="font-semibold text-white">Approve All Selected</div>
+                                    <div class="text-sm text-gray-400">Keep all 5 items (5 MLG total)</div>
+                                </div>
+                            </div>
+                            <button class="mod-vote-btn keep px-4 py-2 text-sm font-semibold">
+                                Execute
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center text-sm">✕</div>
+                                <div>
+                                    <div class="font-semibold text-white">Remove All Selected</div>
+                                    <div class="text-sm text-gray-400">Remove all 5 items (10 MLG total)</div>
+                                </div>
+                            </div>
+                            <button class="mod-vote-btn remove px-4 py-2 text-sm font-semibold">
+                                Execute
+                            </button>
+                        </div>
+                        
+                        <div class="flex items-center justify-between p-4 bg-gray-700 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-sm">↗</div>
+                                <div>
+                                    <div class="font-semibold text-white">Escalate for Expert Review</div>
+                                    <div class="text-sm text-gray-400">Escalate high-severity items (9 MLG total)</div>
+                                </div>
+                            </div>
+                            <button class="mod-vote-btn escalate px-4 py-2 text-sm font-semibold">
+                                Execute
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Analytics Dashboard -->
+        <section id="analytics-dashboard" class="wireframe-section">
+            <h2 class="text-3xl font-bold xbox-green mb-6">📊 5. Moderation Analytics Dashboard</h2>
+            
+            <div class="component-demo">
+                <h3 class="text-xl font-semibold text-gray-300 mb-4">Community Transparency & Statistics</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- System Health Metrics -->
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <h4 class="font-semibold text-white mb-4 flex items-center">
+                            🏥 <span class="ml-2">System Health</span>
+                        </h4>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300">Consensus Rate</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-24 bg-gray-600 rounded-full h-2">
+                                        <div class="bg-xbox-green h-2 rounded-full" style="width: 87%;"></div>
+                                    </div>
+                                    <span class="text-xbox-green font-semibold">87%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300">False Positive Rate</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-24 bg-gray-600 rounded-full h-2">
+                                        <div class="bg-yellow-500 h-2 rounded-full" style="width: 12%;"></div>
+                                    </div>
+                                    <span class="text-yellow-500 font-semibold">12%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300">Appeal Success Rate</span>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-24 bg-gray-600 rounded-full h-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" style="width: 25%;"></div>
+                                    </div>
+                                    <span class="text-blue-500 font-semibold">25%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 p-3 bg-gray-700 rounded-lg">
+                            <div class="text-lg font-bold xbox-green">8.7/10</div>
+                            <div class="text-sm text-gray-400">Overall Health Score</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Activity Metrics -->
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <h4 class="font-semibold text-white mb-4 flex items-center">
+                            📈 <span class="ml-2">Community Activity</span>
+                        </h4>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center p-3 bg-gray-700 rounded-lg">
+                                <div class="text-2xl font-bold xbox-green">1,247</div>
+                                <div class="text-sm text-gray-400">Reports This Week</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-700 rounded-lg">
+                                <div class="text-2xl font-bold text-vault">3,891</div>
+                                <div class="text-sm text-gray-400">Community Votes</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-700 rounded-lg">
+                                <div class="text-2xl font-bold text-burn">156</div>
+                                <div class="text-sm text-gray-400">MLG Tokens Burned</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-700 rounded-lg">
+                                <div class="text-2xl font-bold text-warning">89</div>
+                                <div class="text-sm text-gray-400">Active Moderators</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Category Breakdown -->
+                <div class="bg-gray-800 rounded-lg p-6 mt-6">
+                    <h4 class="font-semibold text-white mb-4">Report Category Distribution (Last 30 Days)</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-2 rounded-lg bg-red-600 flex items-center justify-center text-2xl">🎮</div>
+                            <div class="font-semibold text-white">Cheating</div>
+                            <div class="text-2xl font-bold text-critical">34%</div>
+                            <div class="text-xs text-gray-400">425 reports</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-2 rounded-lg bg-red-700 flex items-center justify-center text-2xl">💬</div>
+                            <div class="font-semibold text-white">Harassment</div>
+                            <div class="text-2xl font-bold text-critical">28%</div>
+                            <div class="text-xs text-gray-400">349 reports</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-2 rounded-lg bg-orange-600 flex items-center justify-center text-2xl">📧</div>
+                            <div class="font-semibold text-white">Spam</div>
+                            <div class="text-2xl font-bold text-warning">19%</div>
+                            <div class="text-xs text-gray-400">237 reports</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-2 rounded-lg bg-red-600 flex items-center justify-center text-2xl">🚫</div>
+                            <div class="font-semibold text-white">Inappropriate</div>
+                            <div class="text-2xl font-bold text-critical">12%</div>
+                            <div class="text-xs text-gray-400">150 reports</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-2 rounded-lg bg-gray-600 flex items-center justify-center text-2xl">📊</div>
+                            <div class="font-semibold text-white">Low Quality</div>
+                            <div class="text-2xl font-bold text-gray-400">5%</div>
+                            <div class="text-xs text-gray-400">62 reports</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-2 rounded-lg bg-orange-700 flex items-center justify-center text-2xl">⚖️</div>
+                            <div class="font-semibold text-white">Copyright</div>
+                            <div class="text-2xl font-bold text-warning">2%</div>
+                            <div class="text-xs text-gray-400">24 reports</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Appeal Process Interface -->
+        <section id="appeal-process" class="wireframe-section">
+            <h2 class="text-3xl font-bold xbox-green mb-6">⚖️ 6. Appeal Process Interface</h2>
+            
+            <div class="component-demo">
+                <h3 class="text-xl font-semibold text-gray-300 mb-4">Content Appeal & Review</h3>
+                
+                <!-- Appeal Submission Form -->
+                <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                    <h4 class="font-semibold text-white mb-4 flex items-center">
+                        📝 <span class="ml-2">Submit Appeal</span>
+                    </h4>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-semibold text-white">Removed Content: #gc_4891</span>
+                                <span class="text-xs text-gray-400">Removed 2 days ago</span>
+                            </div>
+                            <div class="text-sm text-gray-300">Reason: Community vote - Harassment</div>
+                            <div class="text-sm text-red-400">Appeal deadline: 5 days remaining</div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">Appeal Type</label>
+                            <select class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white focus:border-xbox-green focus:outline-none">
+                                <option>False Positive - Content was incorrectly removed</option>
+                                <option>Insufficient Evidence - Report lacked evidence</option>
+                                <option>Policy Misapplication - Rules were misapplied</option>
+                                <option>Technical Error - System error occurred</option>
+                                <option>Bias Claim - Unfair moderation decision</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-300 mb-2">Evidence & Explanation</label>
+                            <textarea 
+                                class="w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-white resize-none focus:border-xbox-green focus:outline-none" 
+                                rows="4" 
+                                placeholder="Provide detailed explanation and evidence for your appeal..."
+                            ></textarea>
+                        </div>
+                        
+                        <div class="bg-yellow-900 border border-yellow-600 rounded-lg p-4">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-yellow-400">⚠️</span>
+                                <span class="font-semibold text-yellow-200">Appeal Requirements</span>
+                            </div>
+                            <ul class="text-sm text-yellow-100 space-y-1">
+                                <li>• 5 MLG token stake required (refunded if appeal successful)</li>
+                                <li>• Community review process (48-72 hour decision)</li>
+                                <li>• Provide concrete evidence supporting your case</li>
+                                <li>• One appeal per content item</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="flex space-x-3">
+                            <button class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-colors">
+                                Cancel
+                            </button>
+                            <button class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-4 rounded-lg transition-colors font-semibold">
+                                Submit Appeal (5 MLG)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Appeal Review Interface -->
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h4 class="font-semibold text-white mb-4 flex items-center">
+                        🔍 <span class="ml-2">Review Appeal</span>
+                    </h4>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-gray-700 rounded-lg p-4">
+                                <h5 class="font-semibold text-white mb-2">Original Decision</h5>
+                                <div class="text-sm space-y-1">
+                                    <div><strong>Action:</strong> Content Removed</div>
+                                    <div><strong>Reason:</strong> Harassment (Community Vote)</div>
+                                    <div><strong>Vote Result:</strong> 8 Remove, 3 Keep (67% Remove)</div>
+                                    <div><strong>Date:</strong> 2 days ago</div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-700 rounded-lg p-4">
+                                <h5 class="font-semibold text-white mb-2">Appeal Details</h5>
+                                <div class="text-sm space-y-1">
+                                    <div><strong>Type:</strong> False Positive</div>
+                                    <div><strong>Submitted:</strong> 6 hours ago</div>
+                                    <div><strong>Stake:</strong> 5 MLG (ToxicPlayer_2023)</div>
+                                    <div><strong>Status:</strong> Under Community Review</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <h5 class="font-semibold text-white mb-2">Appeal Argument</h5>
+                            <div class="text-sm text-gray-300 bg-gray-800 rounded p-3">
+                                "The reported comment was taken out of context. This was friendly trash talk between clan members during a competitive match. We have evidence of our positive relationship and this type of banter is normal in our gaming community..."
+                            </div>
+                        </div>
+                        
+                        <!-- Appeal Voting -->
+                        <div class="border-t border-gray-600 pt-4">
+                            <h5 class="font-semibold text-white mb-3">Community Appeal Vote</h5>
+                            <div class="flex space-x-3">
+                                <button class="mod-vote-btn keep flex-1 py-2 px-4 text-sm font-semibold">
+                                    Uphold Appeal (5 MLG)
+                                </button>
+                                <button class="mod-vote-btn remove flex-1 py-2 px-4 text-sm font-semibold">
+                                    Reject Appeal (5 MLG)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Moderator Role Management -->
+        <section id="moderator-management" class="wireframe-section">
+            <h2 class="text-3xl font-bold xbox-green mb-6">👑 7. Community Moderator Role Management</h2>
+            
+            <div class="component-demo">
+                <h3 class="text-xl font-semibold text-gray-300 mb-4">Role Progression & Permissions</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Role Hierarchy -->
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <h4 class="font-semibold text-white mb-4">Community Role Hierarchy</h4>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-900 to-yellow-800 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-yellow-600 rounded-lg flex items-center justify-center">👑</div>
+                                    <div>
+                                        <div class="font-semibold text-white">Expert Reviewer</div>
+                                        <div class="text-sm text-yellow-200">2500+ Reputation</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xl font-bold text-yellow-200">3.0x</div>
+                                    <div class="text-xs text-yellow-300">Vote Weight</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-purple-900 to-purple-800 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">⚖️</div>
+                                    <div>
+                                        <div class="font-semibold text-white">Community Moderator</div>
+                                        <div class="text-sm text-purple-200">1000+ Reputation</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xl font-bold text-purple-200">2.0x</div>
+                                    <div class="text-xs text-purple-300">Vote Weight</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-blue-900 to-blue-800 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">🛡️</div>
+                                    <div>
+                                        <div class="font-semibold text-white">Trusted Member</div>
+                                        <div class="text-sm text-blue-200">200+ Reputation</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xl font-bold text-blue-200">1.5x</div>
+                                    <div class="text-xs text-blue-300">Vote Weight</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-gray-600 rounded-lg flex items-center justify-center">👤</div>
+                                    <div>
+                                        <div class="font-semibold text-white">Community Member</div>
+                                        <div class="text-sm text-gray-300">25+ Reputation</div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xl font-bold text-gray-300">1.0x</div>
+                                    <div class="text-xs text-gray-400">Vote Weight</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Permission Matrix -->
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <h4 class="font-semibold text-white mb-4">Permission Matrix</h4>
+                        
+                        <div class="spec-table">
+                            <table class="w-full text-sm">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left">Action</th>
+                                        <th class="text-center w-8">👤</th>
+                                        <th class="text-center w-8">🛡️</th>
+                                        <th class="text-center w-8">⚖️</th>
+                                        <th class="text-center w-8">👑</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Report Content</td>
+                                        <td class="text-center">✅</td>
+                                        <td class="text-center">✅</td>
+                                        <td class="text-center">✅</td>
+                                        <td class="text-center">✅</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Vote on Reports</td>
+                                        <td class="text-center">✅</td>
+                                        <td class="text-center">✅</td>
+                                        <td class="text-center">✅</td>
+                                        <td class="text-center">✅</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Escalate Reviews</td>
+                                        <td class="text-center">❌</td>
+                                        <td class="text-center">✅</td>
+                                        <td class="text-center">✅</td>
+                                        <td class="text-center">✅</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Override Decisions</td>
+                                        <td class="text-center">❌</td>
+                                        <td class="text-center">❌</td>
+                                        <td class="text-center">✅</td>
+                                        <td class="text-center">✅</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Review Appeals</td>
+                                        <td class="text-center">❌</td>
+                                        <td class="text-center">❌</td>
+                                        <td class="text-center">✅</td>
+                                        <td class="text-center">✅</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Set Policy</td>
+                                        <td class="text-center">❌</td>
+                                        <td class="text-center">❌</td>
+                                        <td class="text-center">❌</td>
+                                        <td class="text-center">✅</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Individual Moderator Profile -->
+                <div class="bg-gray-800 rounded-lg p-6 mt-6">
+                    <h4 class="font-semibold text-white mb-4">Moderator Performance Profile</h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="w-20 h-20 mx-auto mb-3 rounded-full bg-gradient-to-r from-purple-500 to-purple-700 flex items-center justify-center text-2xl">
+                                ⚖️
+                            </div>
+                            <div class="font-semibold text-white">ModeratorPro_2023</div>
+                            <div class="reputation-badge mt-2">Community Moderator</div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">Reputation Score</span>
+                                <span class="font-semibold xbox-green">1,847</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">Total Votes Cast</span>
+                                <span class="font-semibold text-white">2,341</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">Voting Accuracy</span>
+                                <span class="font-semibold xbox-green">89.3%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-300">MLG Tokens Burned</span>
+                                <span class="font-semibold text-burn">4,892</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="text-center p-3 bg-gray-700 rounded-lg">
+                                <div class="text-lg font-bold xbox-green">94%</div>
+                                <div class="text-sm text-gray-400">Community Consensus</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-700 rounded-lg">
+                                <div class="text-lg font-bold text-vault">156</div>
+                                <div class="text-sm text-gray-400">Reports Handled</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-700 rounded-lg">
+                                <div class="text-lg font-bold text-warning">23</div>
+                                <div class="text-sm text-gray-400">Appeals Reviewed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. Mobile Optimization -->
+        <section id="mobile-optimization" class="wireframe-section">
+            <h2 class="text-3xl font-bold xbox-green mb-6">📱 8. Mobile-Optimized Moderation</h2>
+            
+            <div class="component-demo">
+                <h3 class="text-xl font-semibold text-gray-300 mb-4">On-the-Go Moderation Interface</h3>
+                
+                <div class="max-w-sm mx-auto bg-gray-900 rounded-2xl p-4 border-2 border-gray-600">
+                    <!-- Mobile Header -->
+                    <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-700">
+                        <h4 class="font-bold text-white text-lg">MLG Queue</h4>
+                        <div class="flex items-center space-x-2">
+                            <span class="status-indicator status-reported"></span>
+                            <span class="text-sm font-semibold text-warning">23</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile Stats -->
+                    <div class="grid grid-cols-3 gap-2 mb-4">
+                        <div class="bg-gray-800 rounded-lg p-2 text-center">
+                            <div class="text-lg font-bold text-critical">8</div>
+                            <div class="text-xs text-gray-400">Critical</div>
+                        </div>
+                        <div class="bg-gray-800 rounded-lg p-2 text-center">
+                            <div class="text-lg font-bold text-vault">12</div>
+                            <div class="text-xs text-gray-400">Voting</div>
+                        </div>
+                        <div class="bg-gray-800 rounded-lg p-2 text-center">
+                            <div class="text-lg font-bold xbox-green">3</div>
+                            <div class="text-xs text-gray-400">Appeals</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile Filter Pills -->
+                    <div class="flex space-x-2 mb-4 overflow-x-auto">
+                        <button class="filter-pill active px-3 py-1 text-xs whitespace-nowrap">All</button>
+                        <button class="filter-pill px-3 py-1 text-xs whitespace-nowrap">Critical</button>
+                        <button class="filter-pill px-3 py-1 text-xs whitespace-nowrap">High</button>
+                    </div>
+                    
+                    <!-- Mobile Content Card -->
+                    <div class="space-y-3">
+                        <div class="moderation-card severity-critical p-4">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center space-x-2">
+                                    <span class="status-indicator status-reported"></span>
+                                    <span class="text-critical font-bold text-xs">HARASSMENT</span>
+                                </div>
+                                <span class="text-xs text-gray-400">2h ago</span>
+                            </div>
+                            
+                            <div class="flex items-center space-x-2 mb-3">
+                                <div class="w-8 h-8 bg-gray-600 rounded-lg flex items-center justify-center text-xs">🎮</div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-white text-sm truncate">Epic Fail Compilation</div>
+                                    <div class="text-xs text-gray-400">by ToxicUser_123</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Mobile Vote Progress -->
+                            <div class="mb-3">
+                                <div class="flex justify-between text-xs text-gray-400 mb-1">
+                                    <span>Community Vote</span>
+                                    <span>8 votes</span>
+                                </div>
+                                <div class="flex space-x-1">
+                                    <div class="flex-1 vote-progress">
+                                        <div class="vote-progress-fill keep" style="width: 25%;"></div>
+                                    </div>
+                                    <div class="flex-1 vote-progress">
+                                        <div class="vote-progress-fill remove" style="width: 75%;"></div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between text-xs mt-1">
+                                    <span class="xbox-green">25% Keep</span>
+                                    <span class="text-burn">75% Remove</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Mobile Vote Actions -->
+                            <div class="grid grid-cols-2 gap-2">
+                                <button class="mod-vote-btn keep py-2 px-3 text-xs font-semibold">
+                                    Keep (1 MLG)
+                                </button>
+                                <button class="mod-vote-btn remove py-2 px-3 text-xs font-semibold">
+                                    Remove (2 MLG)
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Compact Card -->
+                        <div class="moderation-card severity-medium p-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2 flex-1">
+                                    <div class="w-6 h-6 bg-gray-600 rounded flex items-center justify-center text-xs">📧</div>
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-white text-xs truncate">Crypto Gaming Promo</div>
+                                        <div class="text-xs text-warning">SPAM • 3 reports</div>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-1 ml-2">
+                                    <button class="mod-vote-btn keep w-8 h-8 text-xs">✓</button>
+                                    <button class="mod-vote-btn remove w-8 h-8 text-xs">✕</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile Batch Actions -->
+                    <div class="mt-4 pt-3 border-t border-gray-700">
+                        <button class="w-full bg-xbox-green text-black py-2 rounded-lg font-semibold text-sm">
+                            Quick Actions
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <h4 class="text-lg font-semibold text-gray-300 mb-3">Mobile-Specific Features</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <h5 class="font-semibold text-white mb-2">✋ Swipe Gestures</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Swipe right to approve content</li>
+                            <li>• Swipe left to remove content</li>
+                            <li>• Swipe up for detailed view</li>
+                            <li>• Long press for batch selection</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <h5 class="font-semibold text-white mb-2">📳 Push Notifications</h5>
+                        <ul class="text-sm text-gray-300 space-y-1">
+                            <li>• Critical content alerts</li>
+                            <li>• Appeal deadline reminders</li>
+                            <li>• Community consensus notifications</li>
+                            <li>• Role progression updates</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Specifications -->
+        <section class="wireframe-section">
+            <h2 class="text-3xl font-bold xbox-green mb-6">⚙️ Technical Specifications</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-300 mb-4">Responsive Breakpoints</h3>
+                    <div class="spec-table">
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th class="text-left">Breakpoint</th>
+                                    <th class="text-center">Min Width</th>
+                                    <th class="text-left">Layout Changes</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr>
+                                    <td class="font-semibold">Mobile</td>
+                                    <td class="text-center">320px</td>
+                                    <td>Single column, swipe gestures, compact cards</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Tablet</td>
+                                    <td class="text-center">768px</td>
+                                    <td>Two column grid, tablet-optimized controls</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Desktop</td>
+                                    <td class="text-center">1024px</td>
+                                    <td>Multi-column layout, full dashboard view</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Large Desktop</td>
+                                    <td class="text-center">1440px</td>
+                                    <td>Wide grid layout, side-by-side comparisons</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-300 mb-4">Animation Specifications</h3>
+                    <div class="spec-table">
+                        <table class="w-full">
+                            <thead>
+                                <tr>
+                                    <th class="text-left">Animation</th>
+                                    <th class="text-center">Duration</th>
+                                    <th class="text-left">Easing</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                <tr>
+                                    <td class="font-semibold">Blade Hover</td>
+                                    <td class="text-center">0.6s</td>
+                                    <td>cubic-bezier(0.25, 0.46, 0.45, 0.94)</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Card Hover</td>
+                                    <td class="text-center">0.3s</td>
+                                    <td>cubic-bezier(0.4, 0, 0.2, 1)</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Vote Animation</td>
+                                    <td class="text-center">0.6s</td>
+                                    <td>ease-out</td>
+                                </tr>
+                                <tr>
+                                    <td class="font-semibold">Critical Pulse</td>
+                                    <td class="text-center">2s</td>
+                                    <td>infinite</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <h3 class="text-xl font-semibold text-gray-300 mb-4">Accessibility Requirements</h3>
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-white mb-3">WCAG AA Compliance</h4>
+                            <ul class="text-sm text-gray-300 space-y-2">
+                                <li>✅ Color contrast ratio ≥ 4.5:1 for normal text</li>
+                                <li>✅ Color contrast ratio ≥ 3:1 for large text</li>
+                                <li>✅ Keyboard navigation support for all interactive elements</li>
+                                <li>✅ Focus indicators with 2px outline minimum</li>
+                                <li>✅ Alternative text for all severity icons and status indicators</li>
+                                <li>✅ Semantic HTML structure with proper headings</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-white mb-3">Screen Reader Support</h4>
+                            <ul class="text-sm text-gray-300 space-y-2">
+                                <li>✅ ARIA labels for complex UI elements</li>
+                                <li>✅ Live regions for vote count updates</li>
+                                <li>✅ Role attributes for custom components</li>
+                                <li>✅ Skip navigation links for efficiency</li>
+                                <li>✅ Status announcements for moderation actions</li>
+                                <li>✅ Descriptive button text instead of icons only</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation Notes -->
+        <section class="wireframe-section">
+            <h2 class="text-3xl font-bold xbox-green mb-6">💡 Implementation Notes</h2>
+            
+            <div class="space-y-6">
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-lg font-semibold text-white mb-3">🔗 Integration with Existing Systems</h3>
+                    <ul class="text-sm text-gray-300 space-y-2">
+                        <li><strong>Content Moderation System:</strong> Leverage existing ContentModerationSystem class from sub-task 4.6</li>
+                        <li><strong>MLG Token Integration:</strong> Use existing token burn mechanisms for moderation vote costs</li>
+                        <li><strong>Wallet Integration:</strong> Integrate with Phantom wallet system for transaction signing</li>
+                        <li><strong>Voting System:</strong> Extend existing SolanaVotingSystem for moderation voting</li>
+                        <li><strong>User Reputation:</strong> Utilize existing reputation system for vote weighting</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-lg font-semibold text-white mb-3">🎨 Design System Consistency</h3>
+                    <ul class="text-sm text-gray-300 space-y-2">
+                        <li><strong>Xbox Blade Navigation:</strong> Maintain horizontal slide transitions and green glow effects</li>
+                        <li><strong>Tile-based Layout:</strong> Use consistent 8px grid system and card hover animations</li>
+                        <li><strong>Color Palette:</strong> Leverage Xbox green (#10b981), burn red (#dc2626), and vault purple (#8b5cf6)</li>
+                        <li><strong>Typography:</strong> Consistent with existing Tailwind font classes and Xbox aesthetic</li>
+                        <li><strong>Status Indicators:</strong> Maintain circular status dots with consistent color meanings</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <h3 class="text-lg font-semibold text-white mb-3">⚡ Performance Considerations</h3>
+                    <ul class="text-sm text-gray-300 space-y-2">
+                        <li><strong>Lazy Loading:</strong> Implement virtual scrolling for large moderation queues</li>
+                        <li><strong>Real-time Updates:</strong> Use WebSocket connections for live vote count updates</li>
+                        <li><strong>Caching Strategy:</strong> Cache moderation statistics and user reputation data</li>
+                        <li><strong>Image Optimization:</strong> Compress content thumbnails and implement progressive loading</li>
+                        <li><strong>Bundle Splitting:</strong> Load moderation interface components only when needed</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

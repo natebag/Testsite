@@ -1,0 +1,45 @@
+{
+  "name": "MLGClan",
+  "displayName": "MLG.clan",
+  "version": "1.0.0",
+  "versionCode": 1,
+  "buildNumber": 1,
+  "orientation": "portrait",
+  "icon": "./assets/icon.png",
+  "splash": {
+    "image": "./assets/splash.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#1a1a1a"
+  },
+  "platforms": ["ios", "android"],
+  "ios": {
+    "bundleIdentifier": "com.mlgclan.mobile",
+    "buildNumber": "1.0.0",
+    "supportsTablet": true,
+    "infoPlist": {
+      "NSCameraUsageDescription": "MLG.clan needs camera access to capture gaming moments and create content.",
+      "NSMicrophoneUsageDescription": "MLG.clan needs microphone access for voice communication and content creation.",
+      "NSPhotoLibraryUsageDescription": "MLG.clan needs photo library access to share gaming content.",
+      "NSFaceIDUsageDescription": "MLG.clan uses Face ID for secure wallet authentication.",
+      "NSLocationWhenInUseUsageDescription": "MLG.clan uses location for gaming events and tournaments."
+    }
+  },
+  "android": {
+    "package": "com.mlgclan.mobile",
+    "versionCode": 1,
+    "permissions": [
+      "CAMERA",
+      "RECORD_AUDIO",
+      "READ_EXTERNAL_STORAGE",
+      "WRITE_EXTERNAL_STORAGE",
+      "ACCESS_FINE_LOCATION",
+      "USE_BIOMETRIC",
+      "USE_FINGERPRINT",
+      "INTERNET",
+      "ACCESS_NETWORK_STATE",
+      "WAKE_LOCK",
+      "RECEIVE_BOOT_COMPLETED",
+      "VIBRATE"
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "name": "mlg-clan-api",
+  "version": "1.0.0",
+  "description": "RESTful API for MLG.clan gaming platform with Solana wallet integration",
+  "main": "src/api/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/api/server.js",
+    "dev": "nodemon src/api/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/api --ext .js",
+    "lint:fix": "eslint src/api --ext .js --fix",
+    "docs": "swagger-jsdoc -d swaggerConfig.js src/api/routes/*.js -o api-docs.json"
+  },
+  "keywords": [
+    "api",
+    "gaming",
+    "solana",
+    "blockchain",
+    "clan",
+    "voting",
+    "content"
+  ],
+  "author": "Claude Code - API Architect",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-slow-down": "^1.6.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "bcrypt": "^5.1.1",
+    "uuid": "^9.0.1",
+    "dotenv": "^16.3.1",
+    "@solana/web3.js": "^1.87.6",
+    "tweetnacl": "^1.0.3",
+    "bs58": "^5.0.0",
+    "pg": "^8.11.3",
+    "redis": "^4.6.11",
+    "rate-limit-redis": "^4.2.0",
+    "socket.io": "^4.7.4",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.33.1",
+    "nodemailer": "^6.9.7",
+    "winston": "^3.11.0",
+    "morgan": "^1.10.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "eslint": "^8.56.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "@types/jest": "^29.5.11"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mlg-clan/api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mlg-clan/api/issues"
+  },
+  "homepage": "https://github.com/mlg-clan/api#readme"
+}

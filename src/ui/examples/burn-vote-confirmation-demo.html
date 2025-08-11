@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLG.clan Burn Vote Confirmation Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .demo-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .demo-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .demo-title {
+      font-size: 2.5rem;
+      color: #10b981;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .demo-subtitle {
+      font-size: 1.2rem;
+      color: #9ca3af;
+      margin-bottom: 20px;
+    }
+
+    .demo-description {
+      max-width: 600px;
+      margin: 0 auto;
+      color: #d1d5db;
+      line-height: 1.6;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .demo-card {
+      background: rgba(31, 41, 55, 0.8);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .demo-card:hover {
+      border-color: rgba(16, 185, 129, 0.5);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      color: #10b981;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .card-description {
+      color: #9ca3af;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .card-details {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+    }
+
+    .detail-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .detail-label {
+      color: #d1d5db;
+    }
+
+    .detail-value {
+      color: #34d399;
+      font-weight: 600;
+    }
+
+    .demo-button {
+      width: 100%;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: linear-gradient(45deg, #10b981, #059669);
+      color: white;
+    }
+
+    .demo-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .demo-button:active {
+      transform: translateY(0);
+    }
+
+    .demo-button.danger {
+      background: linear-gradient(45deg, #dc2626, #b91c1c);
+    }
+
+    .demo-button.danger:hover {
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+    }
+
+    .demo-button.warning {
+      background: linear-gradient(45deg, #f59e0b, #d97706);
+    }
+
+    .demo-button.warning:hover {
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    }
+
+    .status-section {
+      background: rgba(31, 41, 55, 0.6);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 30px;
+    }
+
+    .status-title {
+      font-size: 1.2rem;
+      color: #10b981;
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+    }
+
+    .status-label {
+      color: #9ca3af;
+      font-size: 0.9rem;
+    }
+
+    .status-value {
+      color: #34d399;
+      font-weight: 600;
+    }
+
+    .logs-section {
+      margin-top: 30px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      padding: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .logs-title {
+      color: #10b981;
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .log-entry {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #d1d5db;
+      margin-bottom: 4px;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .log-entry.success {
+      background: rgba(16, 185, 129, 0.1);
+      color: #34d399;
+    }
+
+    .log-entry.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #fca5a5;
+    }
+
+    .log-entry.warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: #fbbf24;
+    }
+
+    @media (max-width: 768px) {
+      .demo-title {
+        font-size: 2rem;
+      }
+      
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .status-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <!-- Header -->
+    <div class="demo-header">
+      <h1 class="demo-title">🔥 MLG Burn Vote Confirmation</h1>
+      <p class="demo-subtitle">Interactive Demo - Xbox 360 Aesthetic</p>
+      <p class="demo-description">
+        Experience the burn vote confirmation system with progressive MLG token pricing,
+        multi-stage confirmations, transaction simulation, and comprehensive error handling.
+        All with authentic Xbox 360 retro gaming aesthetics.
+      </p>
+    </div>
+
+    <!-- Demo Scenarios -->
+    <div class="demo-grid">
+      <!-- Standard Burn Vote -->
+      <div class="demo-card">
+        <div class="card-title">Standard Burn Vote</div>
+        <div class="card-description">
+          Simple confirmation for low-value burns (1-3 MLG tokens).
+          Single confirmation step with transaction preview.
+        </div>
+        <div class="card-details">
+          <div class="detail-row">
+            <span class="detail-label">MLG Cost:</span>
+            <span class="detail-value">2 MLG</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Vote Weight:</span>
+            <span class="detail-value">2x multiplier</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">User Balance:</span>
+            <span class="detail-value">10 MLG</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Confirmations:</span>
+            <span class="detail-value">1 stage</span>
+          </div>
+        </div>
+        <button class="demo-button" onclick="showStandardBurn()">
+          Try Standard Burn
+        </button>
+      </div>
+
+      <!-- High-Value Burn Vote -->
+      <div class="demo-card">
+        <div class="card-title">High-Value Burn Vote</div>
+        <div class="card-description">
+          Multi-stage confirmation for significant burns (4-10 MLG tokens).
+          Requires multiple acknowledgments before proceeding.
+        </div>
+        <div class="card-details">
+          <div class="detail-row">
+            <span class="detail-label">MLG Cost:</span>
+            <span class="detail-value">4 MLG</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Vote Weight:</span>
+            <span class="detail-value">4x multiplier</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">User Balance:</span>
+            <span class="detail-value">15 MLG</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Confirmations:</span>
+            <span class="detail-value">2 stages</span>
+          </div>
+        </div>
+        <button class="demo-button warning" onclick="showHighValueBurn()">
+          Try High-Value Burn
+        </button>
+      </div>
+
+      <!-- Legendary Burn Vote -->
+      <div class="demo-card">
+        <div class="card-title">Legendary Burn Vote</div>
+        <div class="card-description">
+          Maximum security for legendary burns (11+ MLG tokens).
+          Three-stage confirmation with detailed warnings.
+        </div>
+        <div class="card-details">
+          <div class="detail-row">
+            <span class="detail-label">MLG Cost:</span>
+            <span class="detail-value">12 MLG</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Vote Weight:</span>
+            <span class="detail-value">12x multiplier</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">User Balance:</span>
+            <span class="detail-value">20 MLG</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Confirmations:</span>
+            <span class="detail-value">3 stages</span>
+          </div>
+        </div>
+        <button class="demo-button danger" onclick="showLegendaryBurn()">
+          Try Legendary Burn
+        </button>
+      </div>
+
+      <!-- Insufficient Balance -->
+      <div class="demo-card">
+        <div class="card-title">Insufficient Balance</div>
+        <div class="card-description">
+          Demonstrates error handling when user lacks sufficient MLG tokens.
+          Shows balance requirements and earning suggestions.
+        </div>
+        <div class="card-details">
+          <div class="detail-row">
+            <span class="detail-label">MLG Cost:</span>
+            <span class="detail-value">5 MLG</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">User Balance:</span>
+            <span class="detail-value" style="color: #fca5a5;">2.5 MLG</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Shortfall:</span>
+            <span class="detail-value" style="color: #fca5a5;">-2.5 MLG</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Status:</span>
+            <span class="detail-value" style="color: #fca5a5;">Cannot afford</span>
+          </div>
+        </div>
+        <button class="demo-button danger" onclick="showInsufficientBalance()">
+          Try Insufficient Balance
+        </button>
+      </div>
+
+      <!-- Network Error -->
+      <div class="demo-card">
+        <div class="card-title">Network Error Simulation</div>
+        <div class="card-description">
+          Simulates network connectivity issues and transaction failures.
+          Shows error recovery options and retry mechanisms.
+        </div>
+        <div class="card-details">
+          <div class="detail-row">
+            <span class="detail-label">Scenario:</span>
+            <span class="detail-value">Network Timeout</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Error Type:</span>
+            <span class="detail-value">Simulation Failed</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Recovery:</span>
+            <span class="detail-value">Retry Available</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Timeout:</span>
+            <span class="detail-value">10 seconds</span>
+          </div>
+        </div>
+        <button class="demo-button danger" onclick="showNetworkError()">
+          Simulate Network Error
+        </button>
+      </div>
+
+      <!-- Success Flow -->
+      <div class="demo-card">
+        <div class="card-title">Success Flow Demo</div>
+        <div class="card-description">
+          Complete successful burn vote with celebration animation.
+          Shows transaction confirmation and final results.
+        </div>
+        <div class="card-details">
+          <div class="detail-row">
+            <span class="detail-label">MLG Cost:</span>
+            <span class="detail-value">3 MLG</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Success Rate:</span>
+            <span class="detail-value">100%</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Animation:</span>
+            <span class="detail-value">Xbox Style</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Auto-close:</span>
+            <span class="detail-value">5 seconds</span>
+          </div>
+        </div>
+        <button class="demo-button" onclick="showSuccessFlow()">
+          Demo Success Flow
+        </button>
+      </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="status-section">
+      <div class="status-title">System Status</div>
+      <div class="status-grid">
+        <div class="status-item">
+          <span class="status-label">Active Modals:</span>
+          <span class="status-value" id="activeModals">0</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Total Demos Run:</span>
+          <span class="status-value" id="demosRun">0</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Success Rate:</span>
+          <span class="status-value" id="successRate">0%</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">System Ready:</span>
+          <span class="status-value" id="systemReady">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Logs -->
+    <div class="logs-section">
+      <div class="logs-title">Activity Logs</div>
+      <div id="activityLogs">
+        <div class="log-entry">System initialized - waiting for user interaction...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo JavaScript -->
+  <script type="module">
+    // Demo state
+    let demosRun = 0;
+    let successfulDemos = 0;
+    let activeModals = 0;
+
+    // Mock burn vote confirmation system for demo
+    class DemoBurnVoteConfirmationSystem {
+      constructor() {
+        this.activeModals = new Map();
+        this.initializeCSS();
+        this.logActivity('Demo system initialized', 'success');
+        this.updateStatus();
+      }
+
+      initializeCSS() {
+        // CSS would be injected here - using external for demo
+      }
+
+      async showBurnVoteConfirmation(contentId, options) {
+        if (this.activeModals.has(contentId)) {
+          this.logActivity(`Modal ${contentId} already active`, 'warning');
+          return;
+        }
+
+        this.logActivity(`Showing burn vote confirmation for ${contentId}`, 'success');
+        
+        try {
+          const modal = this.createModal(contentId, options);
+          document.body.appendChild(modal);
+          
+          setTimeout(() => modal.classList.add('show'), 10);
+          
+          this.activeModals.set(contentId, modal);
+          activeModals++;
+          demosRun++;
+          
+          this.updateStatus();
+          
+          // Handle different scenarios
+          if (options.simulateError) {
+            setTimeout(() => {
+              this.showError(contentId, options.errorType);
+            }, 2000);
+          } else if (options.simulateSuccess) {
+            setTimeout(() => {
+              this.showSuccess(contentId, options);
+              successfulDemos++;
+            }, 3000);
+          }
+
+        } catch (error) {
+          this.logActivity(`Error showing modal: ${error.message}`, 'error');
+        }
+      }
+
+      createModal(contentId, options) {
+        const modal = document.createElement('div');
+        modal.className = 'burn-vote-modal-overlay';
+        modal.id = `burn-vote-modal-${contentId}`;
+        
+        const isHighValue = options.mlgCost >= 4;
+        const isLegendary = options.mlgCost >= 11;
+        const canAfford = options.userBalance >= options.mlgCost;
+        
+        modal.innerHTML = `
+          <div class="burn-vote-modal-container">
+            <header class="modal-header">
+              <h2 class="modal-title">Confirm MLG Burn Vote</h2>
+              <button class="modal-close" onclick="closeDemoModal('${contentId}')">&times;</button>
+            </header>
+            
+            <main class="modal-content">
+              <section class="content-preview">
+                <div class="content-preview-title">Voting on: ${options.contentTitle}</div>
+                <div class="content-preview-details">
+                  <div>Type: ${options.contentType}</div>
+                  <div>Vote Weight: ${options.voteWeight}x multiplier</div>
+                  <div>MLG Cost: ${options.mlgCost} tokens</div>
+                </div>
+              </section>
+              
+              <section class="transaction-simulation">
+                <div class="simulation-title">
+                  ⚡ Transaction Preview
+                  <span class="simulation-accuracy high">high</span>
+                </div>
+                <div class="simulation-row">
+                  <span>MLG Tokens to Burn:</span>
+                  <span>${options.mlgCost} MLG</span>
+                </div>
+                <div class="simulation-row">
+                  <span>Network Fee (SOL):</span>
+                  <span>~0.001 SOL</span>
+                </div>
+                <div class="simulation-row">
+                  <span>Vote Weight Gained:</span>
+                  <span>${options.voteWeight}x</span>
+                </div>
+                <div class="simulation-row simulation-total">
+                  <span>Your MLG Balance After:</span>
+                  <span>${Math.max(0, options.userBalance - options.mlgCost).toFixed(2)} MLG</span>
+                </div>
+              </section>
+              
+              <section class="burn-warning" role="alert">
+                <div class="burn-warning-content">
+                  <div class="burn-warning-icon">🔥</div>
+                  <div>⚠️ PERMANENT ACTION ⚠️</div>
+                  <div>These ${options.mlgCost} MLG tokens will be burned forever.</div>
+                </div>
+              </section>
+              
+              ${isHighValue ? this.createConfirmationSection(contentId, options.mlgCost, isLegendary) : ''}
+              
+              ${!canAfford ? this.createInsufficientBalanceSection(options) : ''}
+            </main>
+            
+            <footer class="modal-actions">
+              <button class="btn-cancel" onclick="closeDemoModal('${contentId}')">Cancel</button>
+              <button class="btn-confirm ${isHighValue ? '' : 'burn-effect'}" 
+                      onclick="confirmDemoBurn('${contentId}')" 
+                      ${!canAfford ? 'disabled' : ''}>
+                ${!canAfford ? 'Insufficient MLG' : `Burn ${options.mlgCost} MLG & Vote`}
+              </button>
+            </footer>
+          </div>
+        `;
+
+        return modal;
+      }
+
+      createConfirmationSection(contentId, mlgCost, isLegendary) {
+        const confirmations = [
+          `I understand this will permanently burn ${mlgCost} MLG tokens`,
+          `I confirm I want to spend ${mlgCost} MLG tokens for this vote`,
+          `I acknowledge this action cannot be undone or reversed`
+        ];
+
+        if (isLegendary) {
+          confirmations.push(`I understand this is a high-value transaction (${mlgCost} MLG)`);
+        }
+
+        return `
+          <section class="multi-stage-confirmation">
+            <div class="confirmation-stage-title">
+              Multiple Confirmations Required (${isLegendary ? '3' : '2'} stages)
+            </div>
+            ${confirmations.slice(0, isLegendary ? 3 : 2).map((text, i) => `
+              <div class="confirmation-item">
+                <input type="checkbox" id="confirm-${contentId}-${i}" class="confirmation-checkbox" 
+                       onchange="updateConfirmButton('${contentId}')">
+                <label for="confirm-${contentId}-${i}" class="confirmation-label">${text}</label>
+              </div>
+            `).join('')}
+          </section>
+        `;
+      }
+
+      createInsufficientBalanceSection(options) {
+        const shortfall = options.mlgCost - options.userBalance;
+        return `
+          <section class="insufficient-balance-warning" role="alert">
+            <div class="error-content" style="text-align: center; padding: 20px;">
+              <div class="error-icon" style="font-size: 3rem; margin-bottom: 16px;">💸</div>
+              <div class="error-message" style="color: #ef4444; font-size: 1.2rem; font-weight: bold; margin-bottom: 8px;">
+                Insufficient MLG Balance
+              </div>
+              <div class="error-details" style="color: #d1d5db; font-size: 0.9rem;">
+                <div>You have: ${options.userBalance.toFixed(2)} MLG</div>
+                <div>Required: ${options.mlgCost} MLG</div>
+                <div>Shortfall: ${shortfall.toFixed(2)} MLG</div>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      showSuccess(contentId, options) {
+        const modal = this.activeModals.get(contentId);
+        if (!modal) return;
+
+        const container = modal.querySelector('.burn-vote-modal-container');
+        container.innerHTML = `
+          <div class="success-modal" style="text-align: center; padding: 40px;">
+            <div class="success-icon" style="font-size: 4rem; color: #10b981; margin-bottom: 24px;">🎉</div>
+            <div class="success-message" style="color: #34d399; font-size: 1.5rem; font-weight: bold; margin-bottom: 12px;">
+              Burn Vote Successful!
+            </div>
+            <div class="success-details" style="color: #d1d5db; font-size: 0.9rem; margin-bottom: 24px;">
+              <div>Burned: ${options.mlgCost} MLG tokens</div>
+              <div>Vote Weight: ${options.voteWeight}x</div>
+              <div>Transaction: tx_demo_${Date.now().toString().slice(-6)}</div>
+              <div>Confirmed in: 5 seconds</div>
+            </div>
+            <div class="modal-actions">
+              <button class="btn-confirm" onclick="closeDemoModal('${contentId}')">Awesome!</button>
+            </div>
+          </div>
+        `;
+
+        this.logActivity(`Burn vote successful: ${options.mlgCost} MLG burned`, 'success');
+
+        // Auto-close after delay
+        setTimeout(() => {
+          this.closeModal(contentId);
+        }, 5000);
+      }
+
+      showError(contentId, errorType) {
+        const modal = this.activeModals.get(contentId);
+        if (!modal) return;
+
+        const errorMessages = {
+          'network': { icon: '🌐', title: 'Network Error', desc: 'Unable to connect to Solana network' },
+          'simulation': { icon: '⚠️', title: 'Simulation Failed', desc: 'Could not simulate transaction' },
+          'timeout': { icon: '⏱️', title: 'Transaction Timeout', desc: 'Transaction took too long to process' }
+        };
+
+        const error = errorMessages[errorType] || errorMessages.network;
+        const container = modal.querySelector('.burn-vote-modal-container');
+        
+        container.innerHTML = `
+          <div class="error-modal" style="text-align: center; padding: 40px;">
+            <div class="error-icon" style="font-size: 4rem; color: #ef4444; margin-bottom: 24px;">${error.icon}</div>
+            <div class="error-message" style="color: #ef4444; font-size: 1.5rem; font-weight: bold; margin-bottom: 12px;">
+              ${error.title}
+            </div>
+            <div class="error-details" style="color: #d1d5db; font-size: 0.9rem; margin-bottom: 24px;">
+              ${error.desc}
+            </div>
+            <div class="modal-actions">
+              <button class="btn-cancel" onclick="closeDemoModal('${contentId}')">Cancel</button>
+              <button class="btn-confirm" onclick="retryDemoBurn('${contentId}')">Retry</button>
+            </div>
+          </div>
+        `;
+
+        this.logActivity(`Error occurred: ${error.title}`, 'error');
+      }
+
+      closeModal(contentId) {
+        const modal = this.activeModals.get(contentId);
+        if (!modal) return;
+
+        modal.classList.remove('show');
+        setTimeout(() => {
+          if (modal.parentNode) {
+            modal.parentNode.removeChild(modal);
+          }
+          this.activeModals.delete(contentId);
+          activeModals--;
+          this.updateStatus();
+        }, 300);
+
+        this.logActivity(`Modal ${contentId} closed`);
+      }
+
+      logActivity(message, type = 'info') {
+        const logs = document.getElementById('activityLogs');
+        const entry = document.createElement('div');
+        entry.className = `log-entry ${type}`;
+        entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        logs.appendChild(entry);
+        logs.scrollTop = logs.scrollHeight;
+      }
+
+      updateStatus() {
+        document.getElementById('activeModals').textContent = activeModals;
+        document.getElementById('demosRun').textContent = demosRun;
+        document.getElementById('successRate').textContent = 
+          demosRun > 0 ? `${Math.round((successfulDemos / demosRun) * 100)}%` : '0%';
+        document.getElementById('systemReady').textContent = 'Ready';
+      }
+    }
+
+    // Initialize demo system
+    const demoSystem = new DemoBurnVoteConfirmationSystem();
+
+    // Global functions for demo buttons
+    window.showStandardBurn = () => {
+      demoSystem.showBurnVoteConfirmation('standard-clip', {
+        mlgCost: 2,
+        voteWeight: 2,
+        userBalance: 10,
+        contentTitle: 'Epic Gaming Moment',
+        contentType: 'clip',
+        simulateSuccess: true
+      });
+    };
+
+    window.showHighValueBurn = () => {
+      demoSystem.showBurnVoteConfirmation('high-value-clip', {
+        mlgCost: 4,
+        voteWeight: 4,
+        userBalance: 15,
+        contentTitle: 'Legendary Clutch Play',
+        contentType: 'clip'
+      });
+    };
+
+    window.showLegendaryBurn = () => {
+      demoSystem.showBurnVoteConfirmation('legendary-clip', {
+        mlgCost: 12,
+        voteWeight: 12,
+        userBalance: 20,
+        contentTitle: 'Ultimate Gaming Achievement',
+        contentType: 'clip'
+      });
+    };
+
+    window.showInsufficientBalance = () => {
+      demoSystem.showBurnVoteConfirmation('insufficient-clip', {
+        mlgCost: 5,
+        voteWeight: 5,
+        userBalance: 2.5,
+        contentTitle: 'Expensive Vote',
+        contentType: 'clip'
+      });
+    };
+
+    window.showNetworkError = () => {
+      demoSystem.showBurnVoteConfirmation('error-clip', {
+        mlgCost: 3,
+        voteWeight: 3,
+        userBalance: 10,
+        contentTitle: 'Network Test',
+        contentType: 'clip',
+        simulateError: true,
+        errorType: 'network'
+      });
+    };
+
+    window.showSuccessFlow = () => {
+      demoSystem.showBurnVoteConfirmation('success-clip', {
+        mlgCost: 3,
+        voteWeight: 3,
+        userBalance: 10,
+        contentTitle: 'Success Demo',
+        contentType: 'clip',
+        simulateSuccess: true
+      });
+    };
+
+    window.closeDemoModal = (contentId) => {
+      demoSystem.closeModal(contentId);
+    };
+
+    window.confirmDemoBurn = (contentId) => {
+      const modal = document.getElementById(`burn-vote-modal-${contentId}`);
+      const checkboxes = modal.querySelectorAll('.confirmation-checkbox');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      
+      if (checkboxes.length > 0 && !allChecked) {
+        alert('Please complete all confirmation checkboxes first.');
+        return;
+      }
+
+      demoSystem.logActivity(`Processing burn vote for ${contentId}...`);
+      
+      // Simulate processing
+      setTimeout(() => {
+        const options = {
+          mlgCost: parseInt(modal.querySelector('.btn-confirm').textContent.match(/\d+/)[0]),
+          voteWeight: parseInt(modal.querySelector('.btn-confirm').textContent.match(/\d+/)[0])
+        };
+        demoSystem.showSuccess(contentId, options);
+        successfulDemos++;
+        demoSystem.updateStatus();
+      }, 2000);
+    };
+
+    window.retryDemoBurn = (contentId) => {
+      demoSystem.closeModal(contentId);
+      setTimeout(() => {
+        window.showStandardBurn();
+      }, 500);
+    };
+
+    window.updateConfirmButton = (contentId) => {
+      const modal = document.getElementById(`burn-vote-modal-${contentId}`);
+      const checkboxes = modal.querySelectorAll('.confirmation-checkbox');
+      const confirmButton = modal.querySelector('.btn-confirm');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      
+      confirmButton.disabled = !allChecked;
+      if (allChecked) {
+        confirmButton.classList.add('burn-effect');
+      } else {
+        confirmButton.classList.remove('burn-effect');
+      }
+    };
+  </script>
+</body>
+</html>

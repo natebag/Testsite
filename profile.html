@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile - Gaming Profile Management | MLG.clan</title>
+  
+  <!-- Meta Tags -->
+  <meta name="description" content="User Profile - Manage your gaming profile, achievements, wallet, and clan memberships on MLG.clan platform.">
+  <meta name="keywords" content="profile, user, gaming, achievements, wallet, MLG, clan, esports, dashboard">
+  <meta name="author" content="MLG.clan Development Team">
+  
+  <!-- Security Headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.tailwindcss.com https://unpkg.com https://cdn.socket.io; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; img-src 'self' data: blob: https:; connect-src 'self' wss: https: ws://localhost:3000; frame-src 'self' https://www.youtube.com https://player.twitch.tv https://www.tiktok.com; font-src 'self' data:;">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👤</text></svg>">
+  
+  <!-- Standardized Module Loading System -->
+  <script src="src/js/page-loader.js"></script>
+
+  <!-- Page Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'gaming-bg': '#0a0a0f',
+            'gaming-surface': '#1a1a2e',
+            'gaming-accent': '#00ff88',
+            'gaming-purple': '#8b5cf6',
+            'gaming-blue': '#3b82f6',
+            'gaming-yellow': '#fbbf24',
+            'gaming-red': '#ef4444'
+          },
+          animation: {
+            'pulse-neon': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow': 'glow 2s ease-in-out infinite alternate',
+            'float': 'float 6s ease-in-out infinite'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Gaming Theme Styles */
+    :root {
+      --neon-green: #00ff88;
+      --neon-blue: #00ffff;
+      --neon-purple: #8b5cf6;
+      --dark-bg: #0a0a0f;
+      --card-bg: #1a1a2e;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    .neon-glow {
+      box-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 30px var(--neon-green);
+      border: 1px solid var(--neon-green);
+    }
+    
+    .card-glow {
+      background: rgba(26, 26, 46, 0.95);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      backdrop-filter: blur(15px);
+      transition: all 0.3s ease;
+    }
+    
+    .card-glow:hover {
+      border-color: rgba(0, 255, 136, 0.5);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    @keyframes glow {
+      from { box-shadow: 0 0 10px var(--neon-green); }
+      to { box-shadow: 0 0 20px var(--neon-green), 0 0 30px var(--neon-green); }
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .status-online {
+      position: relative;
+    }
+    
+    .status-online::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 12px;
+      height: 12px;
+      background: var(--neon-green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    
+    .loading-spinner {
+      border: 2px solid rgba(0, 255, 136, 0.1);
+      border-left: 2px solid var(--neon-green);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .achievement-badge {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .achievement-badge::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, var(--neon-green), var(--neon-blue), var(--neon-purple));
+      border-radius: 8px;
+      z-index: -1;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    .profile-avatar {
+      position: relative;
+      background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
+      border-radius: 50%;
+      padding: 3px;
+    }
+
+    .profile-avatar::before {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      background: linear-gradient(135deg, var(--neon-green), var(--neon-blue), var(--neon-purple));
+      border-radius: 50%;
+      z-index: -1;
+      animation: pulse-neon 2s infinite;
+    }
+
+    .skill-progress {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .skill-fill {
+      background: linear-gradient(90deg, var(--neon-green), var(--neon-blue));
+      height: 100%;
+      transition: width 0.3s ease;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body class="bg-gaming-bg text-white min-h-screen">
+  
+  <!-- Navigation Header -->
+  <nav class="bg-black bg-opacity-60 backdrop-blur-md border-b border-gaming-accent border-opacity-20 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <a href="index.html" onclick="handleNavigation(event, 'index.html')" class="text-2xl font-bold text-gaming-accent flex items-center space-x-2 hover:text-green-400 transition-colors">
+              <span class="animate-pulse">🎮</span>
+              <span>MLG.clan</span>
+            </a>
+          </div>
+          <div class="hidden md:block ml-10">
+            <div class="flex items-baseline space-x-4">
+              <a href="index.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'index.html')">Dashboard</a>
+              <a href="voting.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'voting.html')">Vote Vault</a>
+              <a href="clans.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'clans.html')">Clans</a>
+              <a href="content.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'content.html')">Content Hub</a>
+              <a href="dao.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'dao.html')">DAO</a>
+              <a href="analytics.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'analytics.html')">Analytics</a>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <!-- System Status -->
+          <div id="system-status" class="flex items-center space-x-2">
+            <div class="status-online">
+              <i data-lucide="activity" class="w-4 h-4 text-gaming-accent"></i>
+            </div>
+            <span class="text-sm text-gaming-accent font-medium">All Systems Online</span>
+          </div>
+          
+          <!-- Wallet Connection -->
+          <button id="wallet-connect" class="bg-gaming-purple hover:bg-purple-600 px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2">
+            <i data-lucide="wallet" class="w-4 h-4"></i>
+            <span>Connect Phantom</span>
+          </button>
+          
+          <!-- User Info (Hidden by default) -->
+          <div id="user-info" class="hidden flex items-center space-x-3">
+            <div class="flex items-center space-x-2 bg-gaming-surface px-3 py-1 rounded-lg">
+              <div class="w-6 h-6 bg-gradient-to-r from-gaming-accent to-gaming-blue rounded-full"></div>
+              <span id="user-address" class="text-sm font-mono"></span>
+            </div>
+            <div class="text-right">
+              <div class="text-xs text-gray-400">MLG Balance</div>
+              <div id="mlg-balance" class="text-sm font-bold text-gaming-yellow">0</div>
+            </div>
+            <a href="profile.html" onclick="handleNavigation(event, 'profile.html')" class="text-gaming-accent hover:text-green-400 transition-colors">
+              <i data-lucide="user" class="w-5 h-5"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Profile Header -->
+  <section class="relative py-16 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-gaming-bg via-gaming-surface to-gaming-bg opacity-50"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Profile Banner -->
+      <div class="card-glow rounded-xl p-8 mb-8">
+        <div class="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+          
+          <!-- Avatar -->
+          <div class="profile-avatar w-32 h-32 flex items-center justify-center">
+            <div class="w-28 h-28 bg-gaming-bg rounded-full flex items-center justify-center">
+              <i data-lucide="user" class="w-12 h-12 text-gaming-accent"></i>
+            </div>
+          </div>
+          
+          <!-- Profile Info -->
+          <div class="flex-1 text-center md:text-left">
+            <div class="flex flex-col md:flex-row md:items-center md:space-x-4 mb-4">
+              <h1 class="text-4xl font-bold text-gaming-accent" id="profile-name">ProGamer2024</h1>
+              <div class="flex items-center justify-center md:justify-start space-x-2 mt-2 md:mt-0">
+                <div class="bg-gaming-purple px-3 py-1 rounded-full text-sm font-bold">Diamond</div>
+                <div class="status-online">
+                  <div class="bg-gaming-accent px-3 py-1 rounded-full text-black text-sm font-bold">Online</div>
+                </div>
+              </div>
+            </div>
+            
+            <p class="text-gray-300 mb-4 text-lg" id="profile-bio">
+              Professional esports player | MLG Elite Clan Member | Content Creator
+            </p>
+            
+            <!-- Quick Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-gaming-accent" id="profile-level">47</div>
+                <div class="text-sm text-gray-400">Level</div>
+              </div>
+              <div class="text-center">
+                <div class="text-2xl font-bold text-gaming-blue" id="profile-wins">1,247</div>
+                <div class="text-sm text-gray-400">Wins</div>
+              </div>
+              <div class="text-center">
+                <div class="text-2xl font-bold text-gaming-purple" id="profile-tournaments">23</div>
+                <div class="text-sm text-gray-400">Tournaments</div>
+              </div>
+              <div class="text-center">
+                <div class="text-2xl font-bold text-gaming-yellow" id="profile-earnings">$12.4K</div>
+                <div class="text-sm text-gray-400">Earnings</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="flex flex-col space-y-3">
+            <button id="edit-profile" class="bg-gaming-accent hover:bg-green-400 text-black px-6 py-2 rounded-lg font-bold transition-colors">
+              <i data-lucide="edit" class="w-4 h-4 inline mr-2"></i>
+              Edit Profile
+            </button>
+            <button id="share-profile" class="bg-gaming-surface hover:bg-gaming-blue px-6 py-2 rounded-lg font-bold transition-colors">
+              <i data-lucide="share" class="w-4 h-4 inline mr-2"></i>
+              Share Profile
+            </button>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left Column -->
+        <div class="space-y-8">
+          
+          <!-- Wallet & Assets -->
+          <div class="card-glow rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gaming-yellow mb-4 flex items-center">
+              <i data-lucide="wallet" class="w-5 h-5 mr-2"></i>
+              Wallet & Assets
+            </h3>
+            <div class="space-y-4">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-300">MLG Tokens</span>
+                <span class="text-gaming-yellow font-bold" id="wallet-mlg">1,250</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-300">SOL Balance</span>
+                <span class="text-gaming-blue font-bold" id="wallet-sol">2.45</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-300">Staked in Clan</span>
+                <span class="text-gaming-purple font-bold" id="staked-amount">500</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-300">NFT Collection</span>
+                <span class="text-gaming-accent font-bold" id="nft-count">7</span>
+              </div>
+              
+              <div class="border-t border-gray-600 pt-4">
+                <div class="text-sm text-gray-400 mb-2">Wallet Address</div>
+                <div class="bg-gaming-surface rounded p-2 text-xs font-mono" id="wallet-address">
+                  BQH7...x9K2 
+                  <button class="ml-2 text-gaming-accent hover:text-green-400">
+                    <i data-lucide="copy" class="w-3 h-3 inline"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Clan Membership -->
+          <div class="card-glow rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gaming-purple mb-4 flex items-center">
+              <i data-lucide="users" class="w-5 h-5 mr-2"></i>
+              Clan Membership
+            </h3>
+            <div class="text-center">
+              <div class="w-16 h-16 bg-gradient-to-r from-gaming-purple to-gaming-blue rounded-full mx-auto mb-3 flex items-center justify-center">
+                <i data-lucide="shield" class="w-8 h-8 text-white"></i>
+              </div>
+              <h4 class="font-bold text-lg text-gaming-purple">MLG Elite</h4>
+              <p class="text-sm text-gray-400 mb-4">Diamond Tier • Member since Mar 2024</p>
+              
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="bg-gaming-surface rounded p-2">
+                  <div class="text-gaming-accent font-bold">Captain</div>
+                  <div class="text-gray-400">Role</div>
+                </div>
+                <div class="bg-gaming-surface rounded p-2">
+                  <div class="text-gaming-blue font-bold">#12</div>
+                  <div class="text-gray-400">Clan Rank</div>
+                </div>
+              </div>
+              
+              <button class="w-full bg-gaming-purple hover:bg-purple-600 px-4 py-2 rounded-lg font-bold mt-4 transition-colors">
+                View Clan Details
+              </button>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="card-glow rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gaming-blue mb-4 flex items-center">
+              <i data-lucide="activity" class="w-5 h-5 mr-2"></i>
+              Recent Activity
+            </h3>
+            <div class="space-y-3">
+              <div class="flex items-center space-x-3 p-2 bg-gaming-surface rounded">
+                <i data-lucide="vote" class="w-4 h-4 text-gaming-accent"></i>
+                <div class="flex-1">
+                  <div class="text-sm font-medium">Voted on content</div>
+                  <div class="text-xs text-gray-400">2 hours ago</div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3 p-2 bg-gaming-surface rounded">
+                <i data-lucide="trophy" class="w-4 h-4 text-gaming-yellow"></i>
+                <div class="flex-1">
+                  <div class="text-sm font-medium">Won tournament match</div>
+                  <div class="text-xs text-gray-400">1 day ago</div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3 p-2 bg-gaming-surface rounded">
+                <i data-lucide="upload" class="w-4 h-4 text-gaming-blue"></i>
+                <div class="flex-1">
+                  <div class="text-sm font-medium">Uploaded content</div>
+                  <div class="text-xs text-gray-400">2 days ago</div>
+                </div>
+              </div>
+              <div class="flex items-center space-x-3 p-2 bg-gaming-surface rounded">
+                <i data-lucide="coins" class="w-4 h-4 text-gaming-purple"></i>
+                <div class="flex-1">
+                  <div class="text-sm font-medium">Staked 100 MLG</div>
+                  <div class="text-xs text-gray-400">3 days ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Middle Column -->
+        <div class="space-y-8">
+          
+          <!-- Gaming Skills -->
+          <div class="card-glow rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gaming-accent mb-4 flex items-center">
+              <i data-lucide="gamepad-2" class="w-5 h-5 mr-2"></i>
+              Gaming Skills
+            </h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-sm font-medium">Valorant</span>
+                  <span class="text-sm text-gaming-accent font-bold">Radiant</span>
+                </div>
+                <div class="skill-progress h-2">
+                  <div class="skill-fill" style="width: 95%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-sm font-medium">Rocket League</span>
+                  <span class="text-sm text-gaming-blue font-bold">Grand Champion</span>
+                </div>
+                <div class="skill-progress h-2">
+                  <div class="skill-fill" style="width: 88%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-sm font-medium">CS:GO</span>
+                  <span class="text-sm text-gaming-purple font-bold">Global Elite</span>
+                </div>
+                <div class="skill-progress h-2">
+                  <div class="skill-fill" style="width: 82%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between items-center mb-2">
+                  <span class="text-sm font-medium">Fortnite</span>
+                  <span class="text-sm text-gaming-yellow font-bold">Champion</span>
+                </div>
+                <div class="skill-progress h-2">
+                  <div class="skill-fill" style="width: 75%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Achievements -->
+          <div class="card-glow rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gaming-yellow mb-4 flex items-center">
+              <i data-lucide="award" class="w-5 h-5 mr-2"></i>
+              Achievements
+            </h3>
+            <div class="grid grid-cols-3 gap-4">
+              <div class="achievement-badge bg-gaming-surface rounded-lg p-3 text-center">
+                <i data-lucide="trophy" class="w-8 h-8 text-gaming-yellow mx-auto mb-2"></i>
+                <div class="text-xs font-bold">Tournament Winner</div>
+              </div>
+              <div class="achievement-badge bg-gaming-surface rounded-lg p-3 text-center">
+                <i data-lucide="target" class="w-8 h-8 text-gaming-red mx-auto mb-2"></i>
+                <div class="text-xs font-bold">Headshot King</div>
+              </div>
+              <div class="achievement-badge bg-gaming-surface rounded-lg p-3 text-center">
+                <i data-lucide="users" class="w-8 h-8 text-gaming-purple mx-auto mb-2"></i>
+                <div class="text-xs font-bold">Team Player</div>
+              </div>
+              <div class="achievement-badge bg-gaming-surface rounded-lg p-3 text-center">
+                <i data-lucide="flame" class="w-8 h-8 text-gaming-accent mx-auto mb-2"></i>
+                <div class="text-xs font-bold">Vote Burner</div>
+              </div>
+              <div class="achievement-badge bg-gaming-surface rounded-lg p-3 text-center">
+                <i data-lucide="star" class="w-8 h-8 text-gaming-blue mx-auto mb-2"></i>
+                <div class="text-xs font-bold">Rising Star</div>
+              </div>
+              <div class="achievement-badge bg-gaming-surface rounded-lg p-3 text-center">
+                <i data-lucide="clock" class="w-8 h-8 text-gray-400 mx-auto mb-2"></i>
+                <div class="text-xs font-bold text-gray-400">Locked</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Statistics -->
+          <div class="card-glow rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gaming-blue mb-4 flex items-center">
+              <i data-lucide="bar-chart-3" class="w-5 h-5 mr-2"></i>
+              Statistics
+            </h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-gaming-surface rounded-lg p-3 text-center">
+                <div class="text-2xl font-bold text-gaming-accent">89%</div>
+                <div class="text-xs text-gray-400">Win Rate</div>
+              </div>
+              <div class="bg-gaming-surface rounded-lg p-3 text-center">
+                <div class="text-2xl font-bold text-gaming-blue">2.4</div>
+                <div class="text-xs text-gray-400">K/D Ratio</div>
+              </div>
+              <div class="bg-gaming-surface rounded-lg p-3 text-center">
+                <div class="text-2xl font-bold text-gaming-purple">247</div>
+                <div class="text-xs text-gray-400">Hours Played</div>
+              </div>
+              <div class="bg-gaming-surface rounded-lg p-3 text-center">
+                <div class="text-2xl font-bold text-gaming-yellow">156</div>
+                <div class="text-xs text-gray-400">Matches Won</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column -->
+        <div class="space-y-8">
+          
+          <!-- Content & Contributions -->
+          <div class="card-glow rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gaming-blue mb-4 flex items-center">
+              <i data-lucide="video" class="w-5 h-5 mr-2"></i>
+              Content & Contributions
+            </h3>
+            <div class="space-y-4">
+              
+              <!-- Content Stats -->
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gaming-surface rounded-lg p-3 text-center">
+                  <div class="text-xl font-bold text-gaming-blue">23</div>
+                  <div class="text-xs text-gray-400">Videos Uploaded</div>
+                </div>
+                <div class="bg-gaming-surface rounded-lg p-3 text-center">
+                  <div class="text-xl font-bold text-gaming-purple">847</div>
+                  <div class="text-xs text-gray-400">Votes Cast</div>
+                </div>
+              </div>
+
+              <!-- Recent Content -->
+              <div class="space-y-3">
+                <h4 class="text-sm font-bold text-gray-300">Recent Uploads</h4>
+                <div class="flex items-center space-x-3 p-2 bg-gaming-surface rounded">
+                  <div class="w-12 h-8 bg-gradient-to-r from-red-500 to-purple-600 rounded"></div>
+                  <div class="flex-1">
+                    <div class="text-sm font-medium">Epic 1v5 Clutch</div>
+                    <div class="text-xs text-gray-400">2 days ago • 847 votes</div>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-3 p-2 bg-gaming-surface rounded">
+                  <div class="w-12 h-8 bg-gradient-to-r from-blue-500 to-teal-600 rounded"></div>
+                  <div class="flex-1">
+                    <div class="text-sm font-medium">Perfect Rocket League Goal</div>
+                    <div class="text-xs text-gray-400">1 week ago • 623 votes</div>
+                  </div>
+                </div>
+              </div>
+              
+              <button class="w-full bg-gaming-blue hover:bg-blue-600 px-4 py-2 rounded-lg font-bold transition-colors">
+                Upload New Content
+              </button>
+            </div>
+          </div>
+
+          <!-- Friends & Following -->
+          <div class="card-glow rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gaming-purple mb-4 flex items-center">
+              <i data-lucide="user-plus" class="w-5 h-5 mr-2"></i>
+              Friends & Following
+            </h3>
+            <div class="space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gaming-surface rounded-lg p-3 text-center">
+                  <div class="text-xl font-bold text-gaming-purple">47</div>
+                  <div class="text-xs text-gray-400">Friends</div>
+                </div>
+                <div class="bg-gaming-surface rounded-lg p-3 text-center">
+                  <div class="text-xl font-bold text-gaming-accent">156</div>
+                  <div class="text-xs text-gray-400">Following</div>
+                </div>
+              </div>
+              
+              <div class="space-y-2">
+                <h4 class="text-sm font-bold text-gray-300">Recently Online</h4>
+                <div class="flex items-center space-x-2 p-2 bg-gaming-surface rounded">
+                  <div class="w-6 h-6 bg-gradient-to-r from-gaming-accent to-gaming-blue rounded-full"></div>
+                  <span class="text-sm flex-1">AerialMaster</span>
+                  <div class="w-2 h-2 bg-gaming-accent rounded-full"></div>
+                </div>
+                <div class="flex items-center space-x-2 p-2 bg-gaming-surface rounded">
+                  <div class="w-6 h-6 bg-gradient-to-r from-gaming-purple to-gaming-red rounded-full"></div>
+                  <span class="text-sm flex-1">HeadshotHero</span>
+                  <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                </div>
+                <div class="flex items-center space-x-2 p-2 bg-gaming-surface rounded">
+                  <div class="w-6 h-6 bg-gradient-to-r from-gaming-yellow to-gaming-red rounded-full"></div>
+                  <span class="text-sm flex-1">ClanLeader99</span>
+                  <div class="w-2 h-2 bg-gaming-accent rounded-full"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settings & Preferences -->
+          <div class="card-glow rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gaming-accent mb-4 flex items-center">
+              <i data-lucide="settings" class="w-5 h-5 mr-2"></i>
+              Settings & Preferences
+            </h3>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-sm">Public Profile</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" class="sr-only peer" checked>
+                  <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gaming-accent"></div>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm">Show Online Status</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" class="sr-only peer" checked>
+                  <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gaming-accent"></div>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm">Tournament Notifications</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" class="sr-only peer" checked>
+                  <div class="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gaming-accent"></div>
+                </label>
+              </div>
+              
+              <button class="w-full bg-gaming-surface hover:bg-gaming-accent hover:text-black px-4 py-2 rounded-lg font-bold transition-colors">
+                Advanced Settings
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-black bg-opacity-80 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center">
+        <a href="index.html" onclick="handleNavigation(event, 'index.html')" class="text-2xl font-bold mb-4 text-gaming-accent hover:text-green-400 transition-colors inline-block">🎮 MLG.clan</a>
+        <p class="text-gray-400 mb-6">The future of gaming communities is here.</p>
+        <div class="flex justify-center space-x-8 text-sm text-gray-500">
+          <span>Web3 Native</span>
+          <span>•</span>
+          <span>Enterprise Ready</span>
+          <span>•</span>
+          <span>Community Governed</span>
+          <span>•</span>
+          <span>100% Complete</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Profile Platform
+    class ProfilePlatform {
+      constructor() {
+        this.userProfile = {
+          name: 'ProGamer2024',
+          level: 47,
+          wins: 1247,
+          tournaments: 23,
+          earnings: 12400,
+          mlgBalance: 1250,
+          solBalance: 2.45,
+          stakedAmount: 500,
+          nftCount: 7
+        };
+        this.init();
+      }
+      
+      init() {
+        this.initializeUI();
+        this.setupEventListeners();
+        this.loadProfileData();
+      }
+      
+      initializeUI() {
+        if (typeof lucide !== 'undefined') {
+          lucide.createIcons();
+        }
+        this.updateProfileDisplay();
+      }
+      
+      setupEventListeners() {
+        // Edit profile button
+        document.getElementById('edit-profile').addEventListener('click', () => {
+          this.openEditModal();
+        });
+        
+        // Share profile button
+        document.getElementById('share-profile').addEventListener('click', () => {
+          this.shareProfile();
+        });
+        
+        // Copy wallet address
+        document.querySelector('#wallet-address button').addEventListener('click', () => {
+          this.copyWalletAddress();
+        });
+      }
+      
+      updateProfileDisplay() {
+        // Update profile stats
+        document.getElementById('profile-level').textContent = this.userProfile.level;
+        document.getElementById('profile-wins').textContent = this.userProfile.wins.toLocaleString();
+        document.getElementById('profile-tournaments').textContent = this.userProfile.tournaments;
+        document.getElementById('profile-earnings').textContent = '$' + (this.userProfile.earnings / 1000).toFixed(1) + 'K';
+        
+        // Update wallet info
+        document.getElementById('wallet-mlg').textContent = this.userProfile.mlgBalance.toLocaleString();
+        document.getElementById('wallet-sol').textContent = this.userProfile.solBalance.toFixed(2);
+        document.getElementById('staked-amount').textContent = this.userProfile.stakedAmount.toLocaleString();
+        document.getElementById('nft-count').textContent = this.userProfile.nftCount;
+      }
+      
+      openEditModal() {
+        this.showNotification('🛠️ Profile editor opening soon!', 'info');
+        // In a real implementation, this would open a modal with editable fields
+      }
+      
+      shareProfile() {
+        const profileUrl = window.location.origin + '/profile?user=' + this.userProfile.name;
+        
+        if (navigator.share) {
+          navigator.share({
+            title: `${this.userProfile.name}'s MLG.clan Profile`,
+            text: `Check out my gaming profile on MLG.clan!`,
+            url: profileUrl
+          });
+        } else {
+          // Fallback to clipboard
+          navigator.clipboard.writeText(profileUrl).then(() => {
+            this.showNotification('📋 Profile link copied to clipboard!', 'success');
+          });
+        }
+      }
+      
+      copyWalletAddress() {
+        const fullAddress = 'BQH7x8K9m2N3p4Q5r6S7t8U9v0W1x2Y3z4A5b6C7d8E9f0G1h2I3j4K5l6M7n8O9p0Q1r2S3t4U5v6W7x8Y9z0A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8S9t0U1v2W3x9K2';
+        
+        navigator.clipboard.writeText(fullAddress).then(() => {
+          this.showNotification('📋 Wallet address copied!', 'success');
+        }).catch(() => {
+          this.showNotification('❌ Failed to copy address', 'error');
+        });
+      }
+      
+      loadProfileData() {
+        // In a real implementation, this would fetch data from the backend
+        this.showNotification('👤 Profile loaded successfully!', 'success');
+      }
+      
+      showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white font-medium z-50 transition-all transform translate-x-full ${
+          type === 'success' ? 'bg-gaming-accent text-black' :
+          type === 'error' ? 'bg-gaming-red' :
+          type === 'warning' ? 'bg-gaming-yellow text-black' :
+          'bg-gaming-blue'
+        }`;
+        
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+          notification.classList.remove('translate-x-full');
+        }, 100);
+        
+        setTimeout(() => {
+          notification.classList.add('translate-x-full');
+          setTimeout(() => {
+            if (document.body.contains(notification)) {
+              document.body.removeChild(notification);
+            }
+          }, 300);
+        }, 4000);
+      }
+    }
+    
+    // Universal navigation handler for both SPA and multi-page modes
+    function handleNavigation(event, pageUrl) {
+      // Check if SPA router is available and ready
+      if (window.router && window.router.push && typeof window.router.push === 'function') {
+        event.preventDefault();
+        const routePath = '/' + pageUrl.replace('.html', '').replace('index', 'dashboard');
+        window.router.push(routePath);
+      }
+      // If no SPA router, let the default link behavior happen (multi-page navigation)
+    }
+    
+    // Active navigation state management for profile page
+    function updateActiveNavigation(currentPage) {
+      // Remove active class from all nav links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('bg-gaming-accent', 'text-black');
+        link.classList.add('text-gray-300');
+      });
+      
+      // Profile page doesn't have a nav link in the main menu
+      // but we can highlight the profile icon in the user menu
+      if (currentPage === 'profile.html') {
+        const profileIcon = document.querySelector('a[href="profile.html"]');
+        if (profileIcon) {
+          profileIcon.classList.add('text-gaming-accent');
+          profileIcon.classList.remove('text-gray-300');
+        }
+      }
+    }
+    
+    // Make navigation functions globally available
+    window.handleNavigation = handleNavigation;
+    window.updateActiveNavigation = updateActiveNavigation;
+    
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      new ProfilePlatform();
+    });
+  </script>
+</body>
+</html>
