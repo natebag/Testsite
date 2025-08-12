@@ -7151,9 +7151,8 @@ export { ACCOUNT_CREATION_EVENTS };
 export { ACCOUNT_CREATION_CONFIG };
 
 /**
- * Enhanced balance and account management exports
+ * Enhanced balance and account management exports - already exported above
  */
-export { BALANCE_CONFIG, BALANCE_EVENTS };
 
 /**
  * ====================================================================
