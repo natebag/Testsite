@@ -40,7 +40,9 @@
       "Bash(npm run test-voting:*)",
       "Bash(timeout 5 curl -s \"http://localhost:3000\")",
       "Bash(npm run test:coverage:*)",
-      "Bash(npx jest:*)"
+      "Bash(npx jest:*)",
+      "Bash(npm run build:*)",
+      "Bash(timeout 10 npm run dev:frontend)"
     ],
     "deny": []
   }

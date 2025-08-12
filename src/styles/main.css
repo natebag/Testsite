@@ -1,0 +1,340 @@
+/**
+ * MLG.clan Main Stylesheet
+ * 
+ * Consolidated styles for the entire application
+ * Optimized for build system processing
+ */
+
+/* Tailwind CSS is loaded via CDN in HTML for now */
+
+/* Core Variables */
+:root {
+  /* Gaming Colors */
+  --gaming-bg: #0a0a0f;
+  --gaming-surface: #1a1a2e;
+  --gaming-accent: #00ff88;
+  --gaming-purple: #8b5cf6;
+  --gaming-blue: #3b82f6;
+  --gaming-yellow: #fbbf24;
+  --gaming-red: #ef4444;
+  
+  /* Xbox 360 Theme Colors */
+  --xbox-green: #107c10;
+  --xbox-green-light: #16c60c;
+  --xbox-green-dark: #0e6b0e;
+  
+  /* Tile System Colors */
+  --tile-bg-primary: rgba(26, 26, 46, 0.8);
+  --tile-bg-secondary: rgba(16, 124, 16, 0.1);
+  --tile-border: rgba(0, 255, 136, 0.3);
+  --tile-hover: rgba(0, 255, 136, 0.1);
+  
+  /* Token Burn Colors */
+  --burn-red: #ff4444;
+  --burn-orange: #ff8800;
+  --burn-yellow: #ffaa00;
+  
+  /* Animation Durations */
+  --animation-fast: 0.2s;
+  --animation-normal: 0.3s;
+  --animation-slow: 0.6s;
+  
+  /* Shadows and Effects */
+  --glow-primary: 0 0 20px rgba(0, 255, 136, 0.3);
+  --glow-burn: 0 0 25px rgba(255, 68, 68, 0.4);
+  --glow-wallet: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--gaming-bg);
+  color: white;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Gaming UI Components */
+.card-glow {
+  background: var(--tile-bg-primary);
+  border: 1px solid var(--tile-border);
+  backdrop-filter: blur(10px);
+  transition: all var(--animation-normal) ease;
+}
+
+.card-glow:hover {
+  border-color: var(--gaming-accent);
+  box-shadow: var(--glow-primary);
+  transform: translateY(-2px);
+}
+
+/* Tile System Base */
+.tile-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.tile {
+  background: var(--tile-bg-primary);
+  border: 2px solid var(--tile-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all var(--animation-normal) ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tile::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+  transition: left var(--animation-slow) ease;
+}
+
+.tile:hover::before {
+  left: 100%;
+}
+
+.tile:hover {
+  border-color: var(--gaming-accent);
+  box-shadow: var(--glow-primary);
+  transform: scale(1.02);
+}
+
+/* Button Styles */
+.btn-primary {
+  background: linear-gradient(45deg, var(--gaming-accent), var(--xbox-green-light));
+  color: black;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--animation-normal) ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-primary);
+}
+
+.btn-secondary {
+  background: var(--tile-bg-primary);
+  color: var(--gaming-accent);
+  border: 2px solid var(--gaming-accent);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--animation-normal) ease;
+}
+
+.btn-secondary:hover {
+  background: var(--gaming-accent);
+  color: black;
+}
+
+.btn-burn {
+  background: linear-gradient(45deg, var(--burn-red), var(--burn-orange));
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--animation-normal) ease;
+  animation: burn-pulse 3s infinite;
+}
+
+.btn-burn:hover {
+  transform: scale(1.05);
+  box-shadow: var(--glow-burn);
+}
+
+/* Wallet UI Styles */
+.wallet-connected {
+  background: var(--gaming-purple);
+  box-shadow: var(--glow-wallet);
+}
+
+.wallet-address {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+}
+
+/* Vote System Styles */
+.vote-button {
+  background: var(--tile-bg-primary);
+  border: 2px solid var(--xbox-green);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  color: var(--gaming-accent);
+  cursor: pointer;
+  transition: all var(--animation-normal) ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.vote-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-primary);
+  border-color: var(--xbox-green-light);
+}
+
+.vote-button.voted {
+  background: var(--gaming-accent);
+  color: black;
+  box-shadow: var(--glow-primary);
+}
+
+/* Loading States */
+.loading-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid rgba(0, 255, 136, 0.3);
+  border-top: 3px solid var(--gaming-accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Animations */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: var(--glow-primary); }
+  50% { box-shadow: 0 0 30px rgba(0, 255, 136, 0.6); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes burn-pulse {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 68, 68, 0.3); }
+  50% { box-shadow: var(--glow-burn); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .tile-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .tile {
+    padding: 1rem;
+  }
+  
+  .btn-primary,
+  .btn-secondary,
+  .btn-burn {
+    padding: 0.875rem 1.25rem;
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tile {
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+  
+  .wallet-address {
+    font-size: 0.75rem;
+  }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: var(--gaming-bg);
+    color: white;
+  }
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .tile::before {
+    display: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .card-glow {
+    border-width: 2px;
+  }
+  
+  .tile {
+    border-width: 3px;
+  }
+  
+  .btn-primary,
+  .btn-secondary,
+  .btn-burn {
+    border-width: 2px;
+  }
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--gaming-accent);
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .tile,
+  .card-glow {
+    border: 1px solid #ccc;
+    box-shadow: none;
+    background: white;
+    color: black;
+  }
+  
+  .btn-primary,
+  .btn-secondary,
+  .btn-burn {
+    background: white;
+    border: 1px solid black;
+    color: black;
+  }
+}

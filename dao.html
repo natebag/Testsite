@@ -27,37 +27,12 @@
   <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
   
   <!-- API Client -->
-  <script src="src/js/api-client.js"></script>
+  <script src="src/js/mlg-api-client-consolidated.js"></script>
   <script src="src/js/mlg-websocket-manager.js"></script>
   
-  <!-- Voting Integration System -->
-  <script type="module">
-    import { getVotingIntegration, initializeVotingIntegration } from './src/js/mlg-voting-integration.js';
-    import { getWalletManager } from './src/wallet/phantom-wallet.js';
-    
-    // Make voting system available globally for this page
-    window.getVotingIntegration = getVotingIntegration;
-    window.getWalletManager = getWalletManager;
-    
-    // Initialize voting when page loads
-    document.addEventListener('DOMContentLoaded', async () => {
-      try {
-        console.log('🏛️ Initializing voting system for DAO page...');
-        
-        // Initialize wallet manager if not already available
-        if (!window.phantomWalletManager) {
-          window.phantomWalletManager = getWalletManager();
-        }
-        
-        // Initialize voting integration
-        window.MLGVotingIntegration = await initializeVotingIntegration();
-        console.log('✅ DAO voting system ready');
-        
-      } catch (error) {
-        console.error('❌ Failed to initialize DAO voting system:', error);
-      }
-    });
-  </script>
+  <!-- Consolidated Wallet & Voting Integration -->
+  <script src="src/js/mlg-wallet-init-consolidated.js"></script>
+  <meta name="mlg-wallet-auto-init" content="true">
 
   <!-- Tailwind Configuration -->
   <script>
