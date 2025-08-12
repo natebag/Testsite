@@ -1,0 +1,342 @@
+# MLG.clan Gaming Platform - Artillery WebSocket Load Testing
+# Real-time gaming features stress testing
+
+config:
+  target: "ws://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: "Warm up"
+    - duration: 120  
+      arrivalRate: 25
+      name: "Ramp up gaming load"
+    - duration: 300
+      arrivalRate: 50
+      name: "Peak gaming activity"
+    - duration: 180
+      arrivalRate: 75
+      name: "Tournament rush hour"
+    - duration: 120
+      arrivalRate: 25
+      name: "Cool down"
+  processor: "./gaming-processor.js"
+  variables:
+    baseUrl: "http://localhost:3000"
+    apiUrl: "http://localhost:3000/api"
+  payload:
+    - path: "../fixtures/test-data.json"
+  pool: 50
+
+# Custom metrics for gaming scenarios
+metrics:
+  - name: "vote_processing_time"
+    unit: "milliseconds"
+  - name: "clan_battle_updates"
+    unit: "count"
+  - name: "tournament_bracket_updates" 
+    unit: "count"
+  - name: "leaderboard_refresh_rate"
+    unit: "per_second"
+  - name: "real_time_chat_latency"
+    unit: "milliseconds"
+
+scenarios:
+  # Scenario 1: Real-time Voting with WebSocket Updates
+  - name: "Real-time Voting Flow"
+    weight: 30
+    engine: ws
+    flow:
+      - connect:
+          url: "ws://localhost:3000/ws"
+          headers:
+            Authorization: "Bearer {{ $processEnvironment.TEST_AUTH_TOKEN }}"
+      - think: 1
+      - send:
+          payload: |
+            {
+              "type": "join_voting_room",
+              "contentId": "{{ content[0].id }}",
+              "userId": "{{ users[0].id }}"
+            }
+      - wait:
+          seconds: 2
+      - loop:
+        - send:
+            payload: |
+              {
+                "type": "submit_vote",
+                "contentId": "{{ content[0].id }}",
+                "userId": "{{ users[0].id }}",
+                "voteType": "up",
+                "tokensToBurn": 10,
+                "walletSignature": "{{ generateMockSignature() }}"
+              }
+        - wait:
+            seconds: 1
+        - send:
+            payload: |
+              {
+                "type": "get_vote_results",
+                "contentId": "{{ content[0].id }}"
+              }
+        - wait:
+            seconds: 2
+        count: 5
+      - send:
+          payload: |
+            {
+              "type": "leave_voting_room",
+              "contentId": "{{ content[0].id }}",
+              "userId": "{{ users[0].id }}"
+            }
+
+  # Scenario 2: Tournament Real-time Updates
+  - name: "Tournament Live Updates"
+    weight: 25
+    engine: ws
+    flow:
+      - connect:
+          url: "ws://localhost:3000/ws"
+          headers:
+            Authorization: "Bearer {{ $processEnvironment.TEST_AUTH_TOKEN }}"
+      - send:
+          payload: |
+            {
+              "type": "join_tournament",
+              "tournamentId": "test_tournament_1",
+              "userId": "{{ users[0].id }}"
+            }
+      - wait:
+          seconds: 1
+      - loop:
+        - send:
+            payload: |
+              {
+                "type": "get_tournament_bracket",
+                "tournamentId": "test_tournament_1"
+              }
+        - wait:
+            seconds: 3
+        - send:
+            payload: |
+              {
+                "type": "submit_match_result",
+                "tournamentId": "test_tournament_1", 
+                "matchId": "match_{{ $randomInt(1, 10) }}",
+                "result": "{{ $randomString(1, 'win,lose') }}"
+              }
+        - wait:
+            seconds: 2
+        count: 8
+      - send:
+          payload: |
+            {
+              "type": "leave_tournament",
+              "tournamentId": "test_tournament_1",
+              "userId": "{{ users[0].id }}"
+            }
+
+  # Scenario 3: Clan Battle Real-time Coordination
+  - name: "Clan Battle Coordination"
+    weight: 20
+    engine: ws
+    flow:
+      - connect:
+          url: "ws://localhost:3000/ws"
+          headers:
+            Authorization: "Bearer {{ $processEnvironment.TEST_AUTH_TOKEN }}"
+      - send:
+          payload: |
+            {
+              "type": "join_clan_battle",
+              "battleId": "battle_{{ $randomInt(1, 5) }}",
+              "clanId": "{{ clans[0].id }}",
+              "userId": "{{ users[0].id }}"
+            }
+      - wait:
+          seconds: 1
+      - loop:
+        - send:
+            payload: |
+              {
+                "type": "clan_battle_action",
+                "battleId": "battle_{{ $randomInt(1, 5) }}",
+                "action": "attack",
+                "target": "enemy_base",
+                "power": {{ $randomInt(50, 200) }}
+              }
+        - wait:
+            seconds: 2
+        - send:
+            payload: |
+              {
+                "type": "get_battle_status",
+                "battleId": "battle_{{ $randomInt(1, 5) }}"
+              }
+        - wait:
+            seconds: 1
+        count: 10
+      - send:
+          payload: |
+            {
+              "type": "leave_clan_battle",
+              "battleId": "battle_{{ $randomInt(1, 5) }}",
+              "userId": "{{ users[0].id }}"
+            }
+
+  # Scenario 4: Real-time Leaderboard Updates
+  - name: "Dynamic Leaderboard Updates"
+    weight: 15
+    engine: ws
+    flow:
+      - connect:
+          url: "ws://localhost:3000/ws"
+          headers:
+            Authorization: "Bearer {{ $processEnvironment.TEST_AUTH_TOKEN }}"
+      - send:
+          payload: |
+            {
+              "type": "subscribe_leaderboard",
+              "leaderboardType": "global",
+              "userId": "{{ users[0].id }}"
+            }
+      - wait:
+          seconds: 1
+      - loop:
+        - send:
+            payload: |
+              {
+                "type": "update_user_score",
+                "userId": "{{ users[0].id }}",
+                "scoreIncrease": {{ $randomInt(10, 100) }},
+                "activity": "{{ $randomString(1, 'vote,create,share,invite') }}"
+              }
+        - wait:
+            seconds: 2
+        - send:
+            payload: |
+              {
+                "type": "get_leaderboard_position",
+                "userId": "{{ users[0].id }}",
+                "leaderboardType": "global"
+              }
+        - wait:
+            seconds: 1
+        count: 15
+      - send:
+          payload: |
+            {
+              "type": "unsubscribe_leaderboard",
+              "leaderboardType": "global",
+              "userId": "{{ users[0].id }}"
+            }
+
+  # Scenario 5: Gaming Chat and Social Features
+  - name: "Gaming Chat and Social"
+    weight: 10
+    engine: ws
+    flow:
+      - connect:
+          url: "ws://localhost:3000/ws"
+          headers:
+            Authorization: "Bearer {{ $processEnvironment.TEST_AUTH_TOKEN }}"
+      - send:
+          payload: |
+            {
+              "type": "join_chat_room",
+              "roomType": "clan",
+              "roomId": "{{ clans[0].id }}",
+              "userId": "{{ users[0].id }}"
+            }
+      - wait:
+          seconds: 1
+      - loop:
+        - send:
+            payload: |
+              {
+                "type": "send_message",
+                "roomType": "clan",
+                "roomId": "{{ clans[0].id }}",
+                "message": "Gaming message {{ $randomInt(1, 1000) }}",
+                "userId": "{{ users[0].id }}"
+              }
+        - wait:
+            seconds: 3
+        - send:
+            payload: |
+              {
+                "type": "send_reaction",
+                "messageId": "msg_{{ $randomInt(1, 100) }}",
+                "reaction": "🎮",
+                "userId": "{{ users[0].id }}"
+              }
+        - wait:
+            seconds: 2
+        count: 6
+      - send:
+          payload: |
+            {
+              "type": "leave_chat_room",
+              "roomType": "clan",
+              "roomId": "{{ clans[0].id }}",
+              "userId": "{{ users[0].id }}"
+            }
+
+# HTTP scenarios for API testing alongside WebSocket
+  - name: "Mixed HTTP API Calls"
+    weight: 100
+    engine: http
+    flow:
+      - post:
+          url: "/api/auth/login"
+          json:
+            username: "{{ users[0].username }}"
+            password: "loadtest123"
+            walletAddress: "{{ users[0].walletAddress }}"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+      - get:
+          url: "/api/content/trending"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+      - think: 2
+      - get:
+          url: "/api/leaderboard/global"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+      - think: 1
+      - post:
+          url: "/api/voting/burn-vote"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            contentId: "{{ content[0].id }}"
+            voteType: "up"
+            tokensToBurn: 10
+            walletSignature: "{{ generateMockSignature() }}"
+      - think: 3
+      - get:
+          url: "/api/users/{{ users[0].id }}/stats"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+
+# Performance expectations and thresholds  
+expect:
+  - statusCode: 200
+  - contentType: json
+  - maxResponseTime: 500
+
+# Monitoring hooks
+hooks:
+  beforeScenario: "logScenarioStart"
+  afterScenario: "logScenarioEnd"
+  beforeRequest: "addTimestamp" 
+  afterResponse: "captureMetrics"
+
+# Plugins for enhanced monitoring
+plugins:
+  expect: {}
+  metrics-by-endpoint: {}
+  helloworld:
+    greeting: "🎮 MLG.clan Load Testing"

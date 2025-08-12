@@ -1,0 +1,1376 @@
+/**
+ * MLG.clan Mobile Native Features Stylesheet
+ * 
+ * Comprehensive mobile-specific features for the MLG.clan gaming platform
+ * Includes PWA enhancements, native mobile APIs, gaming-optimized sharing,
+ * device camera integration, and mobile gaming utility features
+ * 
+ * Features:
+ * - Gaming-optimized mobile sharing
+ * - Progressive Web App (PWA) enhancement
+ * - Mobile gaming native features
+ * - Gaming social integration
+ * - Mobile gaming utility features
+ * 
+ * @author Claude Code - Frontend Production Engineer
+ * @version 1.0.0
+ */
+
+/* ==================================================
+   CSS CUSTOM PROPERTIES
+   ================================================== */
+
+:root {
+  /* Mobile Native Feature Colors */
+  --mobile-primary: #00ff88;
+  --mobile-secondary: #1a1a2e;
+  --mobile-accent: #8b5cf6;
+  --mobile-warning: #fbbf24;
+  --mobile-danger: #ef4444;
+  --mobile-success: #10b981;
+  
+  /* Gaming Platform Colors */
+  --gaming-bg: #0a0a0f;
+  --gaming-surface: #1a1a2e;
+  --gaming-accent: #00ff88;
+  --gaming-purple: #8b5cf6;
+  --gaming-blue: #3b82f6;
+  --gaming-yellow: #fbbf24;
+  --gaming-red: #ef4444;
+  --gaming-orange: #f97316;
+  
+  /* Xbox 360 Theme */
+  --xbox-green: #107c10;
+  --xbox-green-light: #00ff88;
+  --xbox-green-dark: #0c5d0c;
+  
+  /* PWA Feature Dimensions */
+  --share-button-size: 56px;
+  --install-banner-height: 80px;
+  --camera-overlay-height: 120px;
+  --qr-scanner-size: 280px;
+  --notification-height: 64px;
+  
+  /* Native Feature Spacing */
+  --mobile-spacing-xs: 0.25rem;
+  --mobile-spacing-sm: 0.5rem;
+  --mobile-spacing-md: 1rem;
+  --mobile-spacing-lg: 1.5rem;
+  --mobile-spacing-xl: 2rem;
+  
+  /* Animation Timing */
+  --animation-quick: 150ms;
+  --animation-normal: 300ms;
+  --animation-slow: 500ms;
+  --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Z-Index Stack */
+  --z-pwa-install: 1000;
+  --z-share-overlay: 1010;
+  --z-camera-overlay: 1020;
+  --z-notification: 1030;
+  --z-qr-scanner: 1040;
+  --z-haptic-feedback: 1050;
+}
+
+/* ==================================================
+   PROGRESSIVE WEB APP (PWA) FEATURES
+   ================================================== */
+
+/* PWA Install Banner */
+.pwa-install-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, var(--gaming-surface) 0%, rgba(26, 26, 46, 0.98) 100%);
+  border-top: 2px solid var(--gaming-accent);
+  backdrop-filter: blur(20px);
+  padding: var(--mobile-spacing-lg);
+  z-index: var(--z-pwa-install);
+  transform: translateY(100%);
+  transition: transform var(--animation-normal) var(--animation-easing);
+  box-shadow: 0 -8px 32px rgba(0, 255, 136, 0.1);
+}
+
+.pwa-install-banner.visible {
+  transform: translateY(0);
+}
+
+.pwa-install-banner.gaming-mode {
+  background: linear-gradient(135deg, var(--xbox-green-dark) 0%, rgba(16, 124, 16, 0.98) 100%);
+  border-color: var(--xbox-green-light);
+}
+
+.pwa-banner-content {
+  display: flex;
+  align-items: center;
+  gap: var(--mobile-spacing-lg);
+  max-width: 100%;
+}
+
+.pwa-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(45deg, var(--gaming-accent), var(--xbox-green-light));
+  border-radius: 16px;
+  color: black;
+  font-size: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+  flex-shrink: 0;
+}
+
+.pwa-banner-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-banner-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.25rem 0;
+  background: linear-gradient(90deg, var(--gaming-accent), var(--xbox-green-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pwa-banner-description {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.pwa-banner-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mobile-spacing-sm);
+  flex-shrink: 0;
+}
+
+.pwa-install-btn {
+  background: linear-gradient(135deg, var(--gaming-accent), var(--xbox-green-light));
+  color: black;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--animation-normal) var(--animation-easing);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+  white-space: nowrap;
+}
+
+.pwa-install-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.4);
+}
+
+.pwa-dismiss-btn {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all var(--animation-normal) var(--animation-easing);
+}
+
+.pwa-dismiss-btn:hover {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* PWA Offline Indicator */
+.pwa-offline-indicator {
+  position: fixed;
+  top: env(safe-area-inset-top, 1rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(239, 68, 68, 0.95);
+  color: white;
+  padding: var(--mobile-spacing-sm) var(--mobile-spacing-lg);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: var(--z-notification);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  opacity: 0;
+  transform: translateX(-50%) translateY(-100%);
+  transition: all var(--animation-normal) var(--animation-easing);
+}
+
+.pwa-offline-indicator.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.pwa-update-available {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 1rem) + 1rem);
+  left: 1rem;
+  right: 1rem;
+  background: linear-gradient(135deg, var(--gaming-accent) 0%, var(--xbox-green-light) 100%);
+  color: black;
+  padding: var(--mobile-spacing-lg);
+  border-radius: 16px;
+  font-weight: 600;
+  text-align: center;
+  z-index: var(--z-notification);
+  box-shadow: 0 8px 24px rgba(0, 255, 136, 0.4);
+  transform: translateY(200%);
+  transition: transform var(--animation-normal) var(--animation-easing);
+}
+
+.pwa-update-available.visible {
+  transform: translateY(0);
+}
+
+.pwa-update-btn {
+  background: rgba(0, 0, 0, 0.2);
+  color: black;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  margin-top: var(--mobile-spacing-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--animation-normal) var(--animation-easing);
+}
+
+.pwa-update-btn:active {
+  transform: scale(0.95);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* ==================================================
+   GAMING-OPTIMIZED MOBILE SHARING
+   ================================================== */
+
+/* Native Share Button */
+.gaming-share-fab {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 1rem) + 5rem);
+  right: 1rem;
+  width: var(--share-button-size);
+  height: var(--share-button-size);
+  background: linear-gradient(45deg, var(--gaming-purple), var(--gaming-blue));
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: var(--z-share-overlay);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+  transition: all var(--animation-normal) var(--animation-easing);
+}
+
+.gaming-share-fab:active {
+  transform: scale(0.9);
+}
+
+.gaming-share-fab:hover {
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Share Options Menu */
+.share-options-menu {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 1rem) + 8rem);
+  right: 1rem;
+  background: var(--gaming-surface);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 16px;
+  padding: var(--mobile-spacing-lg);
+  min-width: 200px;
+  z-index: var(--z-share-overlay);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+  transition: all var(--animation-normal) var(--animation-bounce);
+  pointer-events: none;
+}
+
+.share-options-menu.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.share-option-item {
+  display: flex;
+  align-items: center;
+  gap: var(--mobile-spacing-md);
+  padding: var(--mobile-spacing-md);
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--animation-quick) var(--animation-easing);
+  width: 100%;
+  text-align: left;
+}
+
+.share-option-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.share-option-item:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.share-option-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--gaming-accent);
+  color: black;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.share-option-text {
+  flex: 1;
+}
+
+.share-option-label {
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.share-option-description {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Gaming Achievement Share Card */
+.gaming-achievement-share {
+  background: linear-gradient(135deg, var(--gaming-surface) 0%, rgba(26, 26, 46, 0.95) 100%);
+  border: 2px solid var(--gaming-accent);
+  border-radius: 16px;
+  padding: var(--mobile-spacing-xl);
+  margin: var(--mobile-spacing-lg);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.gaming-achievement-share::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    var(--gaming-accent), 
+    var(--gaming-purple),
+    var(--gaming-blue),
+    var(--gaming-accent)
+  );
+  border-radius: 18px;
+  z-index: -1;
+  animation: border-flow 3s linear infinite;
+}
+
+@keyframes border-flow {
+  0%, 100% { 
+    background-position: 0% 50%; 
+  }
+  50% { 
+    background-position: 100% 50%; 
+  }
+}
+
+.achievement-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(45deg, var(--gaming-yellow), var(--gaming-orange));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  margin: 0 auto var(--mobile-spacing-lg);
+  box-shadow: 0 8px 24px rgba(251, 191, 36, 0.4);
+}
+
+.achievement-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gaming-accent);
+  margin-bottom: var(--mobile-spacing-sm);
+}
+
+.achievement-description {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: var(--mobile-spacing-lg);
+  line-height: 1.5;
+}
+
+.achievement-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--mobile-spacing-md);
+  margin-bottom: var(--mobile-spacing-lg);
+}
+
+.achievement-stat {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--gaming-accent);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ==================================================
+   DEVICE CAMERA INTEGRATION
+   ================================================== */
+
+.camera-capture-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: var(--z-camera-overlay);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--animation-normal) var(--animation-easing);
+}
+
+.camera-capture-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.camera-header {
+  background: var(--gaming-surface);
+  padding: var(--mobile-spacing-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.camera-title {
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.camera-close-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all var(--animation-quick) var(--animation-easing);
+}
+
+.camera-close-btn:hover {
+  border-color: var(--gaming-red);
+  color: var(--gaming-red);
+}
+
+.camera-preview {
+  flex: 1;
+  position: relative;
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-overlay-frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 280px;
+  height: 280px;
+  border: 3px solid var(--gaming-accent);
+  border-radius: 16px;
+  pointer-events: none;
+}
+
+.camera-overlay-frame::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 19px;
+  animation: pulse-frame 2s ease-in-out infinite;
+}
+
+@keyframes pulse-frame {
+  0%, 100% { 
+    border-color: rgba(0, 255, 136, 0.3); 
+  }
+  50% { 
+    border-color: rgba(0, 255, 136, 0.8); 
+  }
+}
+
+.camera-controls {
+  background: var(--gaming-surface);
+  padding: var(--mobile-spacing-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mobile-spacing-xl);
+  border-top: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.camera-capture-btn {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(45deg, var(--gaming-accent), var(--xbox-green-light));
+  border: 4px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--animation-quick) var(--animation-easing);
+  position: relative;
+}
+
+.camera-capture-btn:active {
+  transform: scale(0.9);
+}
+
+.camera-capture-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  background: black;
+  border-radius: 50%;
+}
+
+.camera-flip-btn,
+.camera-gallery-btn {
+  width: 56px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  transition: all var(--animation-quick) var(--animation-easing);
+}
+
+.camera-flip-btn:hover,
+.camera-gallery-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--gaming-accent);
+  color: var(--gaming-accent);
+}
+
+/* ==================================================
+   QR CODE SCANNER
+   ================================================== */
+
+.qr-scanner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: var(--z-qr-scanner);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--animation-normal) var(--animation-easing);
+}
+
+.qr-scanner-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.qr-scanner-header {
+  background: var(--gaming-surface);
+  padding: var(--mobile-spacing-lg);
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.qr-scanner-title {
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 var(--mobile-spacing-sm) 0;
+}
+
+.qr-scanner-instructions {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.qr-scanner-area {
+  flex: 1;
+  position: relative;
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-scanner-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.qr-scanner-frame {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--qr-scanner-size);
+  height: var(--qr-scanner-size);
+  border: 3px solid var(--gaming-accent);
+  border-radius: 16px;
+  background: transparent;
+}
+
+.qr-scanner-frame::before,
+.qr-scanner-frame::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 4px solid var(--gaming-accent);
+}
+
+.qr-scanner-frame::before {
+  top: -4px;
+  left: -4px;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 16px 0 0 0;
+}
+
+.qr-scanner-frame::after {
+  bottom: -4px;
+  right: -4px;
+  border-left: none;
+  border-top: none;
+  border-radius: 0 0 16px 0;
+}
+
+.qr-scanner-corners {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 30px;
+  height: 30px;
+  border: 4px solid var(--gaming-accent);
+  border-left: none;
+  border-bottom: none;
+  border-radius: 0 16px 0 0;
+}
+
+.qr-scanner-corners:nth-child(2) {
+  top: auto;
+  right: auto;
+  bottom: -4px;
+  left: -4px;
+  border: 4px solid var(--gaming-accent);
+  border-right: none;
+  border-top: none;
+  border-radius: 0 0 0 16px;
+}
+
+.qr-scan-line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gaming-accent), transparent);
+  animation: qr-scan-animation 2s linear infinite;
+}
+
+@keyframes qr-scan-animation {
+  0% { top: 0; opacity: 1; }
+  50% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.qr-scanner-actions {
+  background: var(--gaming-surface);
+  padding: var(--mobile-spacing-xl);
+  display: flex;
+  justify-content: center;
+  gap: var(--mobile-spacing-lg);
+  border-top: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.qr-scanner-btn {
+  background: linear-gradient(135deg, var(--gaming-accent), var(--xbox-green-light));
+  color: black;
+  border: none;
+  border-radius: 12px;
+  padding: var(--mobile-spacing-md) var(--mobile-spacing-xl);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--animation-normal) var(--animation-easing);
+}
+
+.qr-scanner-btn:active {
+  transform: scale(0.95);
+}
+
+.qr-scanner-btn.secondary {
+  background: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.qr-scanner-btn.secondary:hover {
+  border-color: var(--gaming-accent);
+  color: var(--gaming-accent);
+}
+
+/* ==================================================
+   HAPTIC FEEDBACK INDICATORS
+   ================================================== */
+
+.haptic-feedback-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  background: rgba(0, 255, 136, 0.2);
+  border: 2px solid var(--gaming-accent);
+  border-radius: 50%;
+  z-index: var(--z-haptic-feedback);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.5);
+  transition: all var(--animation-quick) var(--animation-easing);
+}
+
+.haptic-feedback-overlay.active {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.haptic-feedback-overlay.success {
+  border-color: var(--gaming-success);
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.haptic-feedback-overlay.warning {
+  border-color: var(--gaming-warning);
+  background: rgba(251, 191, 36, 0.2);
+}
+
+.haptic-feedback-overlay.error {
+  border-color: var(--gaming-danger);
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.haptic-pulse {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: inherit;
+  animation: haptic-pulse-animation 0.3s ease-out;
+}
+
+@keyframes haptic-pulse-animation {
+  0% { 
+    transform: scale(1); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: scale(1.5); 
+    opacity: 0; 
+  }
+}
+
+/* ==================================================
+   MOBILE CLIPBOARD INTEGRATION
+   ================================================== */
+
+.clipboard-toast {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 1rem) + 2rem);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gaming-surface);
+  border: 1px solid var(--gaming-accent);
+  border-radius: 12px;
+  padding: var(--mobile-spacing-md) var(--mobile-spacing-lg);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: var(--z-notification);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+  opacity: 0;
+  transform: translateX(-50%) translateY(100%);
+  transition: all var(--animation-normal) var(--animation-easing);
+}
+
+.clipboard-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.clipboard-toast.success {
+  border-color: var(--gaming-success);
+  background: linear-gradient(135deg, var(--gaming-success) 0%, rgba(16, 185, 129, 0.1) 100%);
+}
+
+.clipboard-toast.error {
+  border-color: var(--gaming-danger);
+  background: linear-gradient(135deg, var(--gaming-danger) 0%, rgba(239, 68, 68, 0.1) 100%);
+}
+
+/* Clipboard Action Buttons */
+.clipboard-copy-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all var(--animation-quick) var(--animation-easing);
+  margin-left: var(--mobile-spacing-sm);
+}
+
+.clipboard-copy-btn:hover {
+  border-color: var(--gaming-accent);
+  color: var(--gaming-accent);
+}
+
+.clipboard-copy-btn:active {
+  transform: scale(0.95);
+}
+
+.clipboard-copy-btn.copied {
+  border-color: var(--gaming-success);
+  color: var(--gaming-success);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+/* ==================================================
+   FILE SYSTEM INTEGRATION
+   ================================================== */
+
+.file-upload-drop-zone {
+  border: 2px dashed rgba(0, 255, 136, 0.3);
+  border-radius: 16px;
+  padding: var(--mobile-spacing-xl);
+  text-align: center;
+  background: rgba(26, 26, 46, 0.5);
+  transition: all var(--animation-normal) var(--animation-easing);
+  position: relative;
+  overflow: hidden;
+}
+
+.file-upload-drop-zone.dragover {
+  border-color: var(--gaming-accent);
+  background: rgba(0, 255, 136, 0.1);
+  transform: scale(1.02);
+}
+
+.file-upload-icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(45deg, var(--gaming-accent), var(--xbox-green-light));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: black;
+  margin: 0 auto var(--mobile-spacing-lg);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+}
+
+.file-upload-text {
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: var(--mobile-spacing-sm);
+}
+
+.file-upload-hint {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+  margin-bottom: var(--mobile-spacing-lg);
+}
+
+.file-upload-browse-btn {
+  background: linear-gradient(135deg, var(--gaming-accent), var(--xbox-green-light));
+  color: black;
+  border: none;
+  border-radius: 12px;
+  padding: var(--mobile-spacing-md) var(--mobile-spacing-xl);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--animation-normal) var(--animation-easing);
+}
+
+.file-upload-browse-btn:active {
+  transform: scale(0.95);
+}
+
+/* File Preview Grid */
+.file-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--mobile-spacing-md);
+  margin-top: var(--mobile-spacing-lg);
+}
+
+.file-preview-item {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--gaming-surface);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.file-preview-icon {
+  font-size: 2rem;
+  color: var(--gaming-accent);
+}
+
+.file-preview-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  background: var(--gaming-danger);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  transition: all var(--animation-quick) var(--animation-easing);
+}
+
+.file-preview-remove:active {
+  transform: scale(0.9);
+}
+
+/* ==================================================
+   PUSH NOTIFICATION STYLES
+   ================================================== */
+
+.push-notification-permission {
+  background: linear-gradient(135deg, var(--gaming-surface) 0%, rgba(26, 26, 46, 0.95) 100%);
+  border: 1px solid var(--gaming-accent);
+  border-radius: 16px;
+  padding: var(--mobile-spacing-xl);
+  margin: var(--mobile-spacing-lg);
+  text-align: center;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 255, 136, 0.1);
+}
+
+.notification-icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(45deg, var(--gaming-yellow), var(--gaming-orange));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto var(--mobile-spacing-lg);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+}
+
+.notification-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: var(--mobile-spacing-sm);
+}
+
+.notification-description {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: var(--mobile-spacing-lg);
+  line-height: 1.5;
+}
+
+.notification-actions {
+  display: flex;
+  gap: var(--mobile-spacing-md);
+  justify-content: center;
+}
+
+.notification-allow-btn {
+  background: linear-gradient(135deg, var(--gaming-accent), var(--xbox-green-light));
+  color: black;
+  border: none;
+  border-radius: 12px;
+  padding: var(--mobile-spacing-md) var(--mobile-spacing-xl);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--animation-normal) var(--animation-easing);
+}
+
+.notification-deny-btn {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: var(--mobile-spacing-md) var(--mobile-spacing-xl);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--animation-normal) var(--animation-easing);
+}
+
+.notification-deny-btn:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+  color: white;
+}
+
+/* ==================================================
+   BATTERY OPTIMIZATION
+   ================================================== */
+
+.battery-saver-mode {
+  /* Reduce animations and effects when battery is low */
+}
+
+.battery-saver-mode .pwa-install-banner,
+.battery-saver-mode .gaming-share-fab,
+.battery-saver-mode .camera-capture-overlay,
+.battery-saver-mode .qr-scanner-overlay {
+  animation: none !important;
+  transition: opacity 0.1s ease !important;
+}
+
+.battery-saver-mode .haptic-feedback-overlay {
+  display: none !important;
+}
+
+.battery-saver-mode .achievement-icon,
+.battery-saver-mode .pwa-icon,
+.battery-saver-mode .notification-icon {
+  box-shadow: none !important;
+}
+
+/* ==================================================
+   RESPONSIVE BREAKPOINTS
+   ================================================== */
+
+/* Small Mobile Devices (320px - 480px) */
+@media (max-width: 480px) {
+  .pwa-banner-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .pwa-banner-actions {
+    flex-direction: row;
+    width: 100%;
+  }
+  
+  .pwa-install-btn,
+  .pwa-dismiss-btn {
+    flex: 1;
+  }
+  
+  .camera-overlay-frame,
+  .qr-scanner-frame {
+    width: 240px;
+    height: 240px;
+  }
+  
+  .achievement-stats {
+    grid-template-columns: 1fr;
+    gap: var(--mobile-spacing-sm);
+  }
+  
+  .file-preview-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Medium Mobile Devices (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .pwa-banner-content {
+    align-items: center;
+  }
+  
+  .pwa-banner-actions {
+    flex-direction: row;
+  }
+  
+  .share-options-menu {
+    min-width: 250px;
+  }
+  
+  .camera-overlay-frame,
+  .qr-scanner-frame {
+    width: 320px;
+    height: 320px;
+  }
+  
+  .file-preview-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Tablet Devices (769px+) */
+@media (min-width: 769px) {
+  .pwa-install-banner {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%) translateY(100%);
+    max-width: 500px;
+    border-radius: 16px 16px 0 0;
+  }
+  
+  .pwa-install-banner.visible {
+    transform: translateX(-50%) translateY(0);
+  }
+  
+  .gaming-share-fab {
+    bottom: calc(env(safe-area-inset-bottom, 1rem) + 2rem);
+  }
+  
+  .share-options-menu {
+    bottom: calc(env(safe-area-inset-bottom, 1rem) + 5rem);
+    min-width: 300px;
+  }
+  
+  .file-preview-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+/* ==================================================
+   ACCESSIBILITY FEATURES
+   ================================================== */
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .pwa-install-banner,
+  .share-options-menu,
+  .camera-capture-overlay,
+  .qr-scanner-overlay {
+    border-width: 3px;
+  }
+  
+  .gaming-achievement-share {
+    border-width: 4px;
+  }
+  
+  .file-upload-drop-zone {
+    border-width: 3px;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .pwa-install-banner,
+  .gaming-share-fab,
+  .share-options-menu,
+  .camera-capture-overlay,
+  .qr-scanner-overlay,
+  .haptic-feedback-overlay,
+  .clipboard-toast {
+    animation: none !important;
+    transition: opacity 0.1s ease !important;
+  }
+  
+  .qr-scan-line {
+    animation: none !important;
+    display: none;
+  }
+  
+  .haptic-pulse {
+    animation: none !important;
+  }
+  
+  .gaming-achievement-share::before {
+    animation: none !important;
+    background: var(--gaming-accent);
+  }
+}
+
+/* Focus Styles for Keyboard Navigation */
+.pwa-install-btn:focus-visible,
+.pwa-dismiss-btn:focus-visible,
+.gaming-share-fab:focus-visible,
+.share-option-item:focus-visible,
+.camera-capture-btn:focus-visible,
+.camera-flip-btn:focus-visible,
+.qr-scanner-btn:focus-visible,
+.file-upload-browse-btn:focus-visible,
+.notification-allow-btn:focus-visible,
+.notification-deny-btn:focus-visible {
+  outline: 3px solid var(--gaming-accent);
+  outline-offset: 2px;
+}
+
+/* ==================================================
+   PRINT STYLES
+   ================================================== */
+
+@media print {
+  .pwa-install-banner,
+  .gaming-share-fab,
+  .share-options-menu,
+  .camera-capture-overlay,
+  .qr-scanner-overlay,
+  .haptic-feedback-overlay,
+  .clipboard-toast,
+  .pwa-offline-indicator,
+  .pwa-update-available {
+    display: none !important;
+  }
+  
+  .gaming-achievement-share {
+    background: white;
+    color: black;
+    border: 2px solid black;
+  }
+  
+  .achievement-title {
+    color: black;
+  }
+  
+  .stat-value {
+    color: black;
+  }
+}
+
+/* ==================================================
+   ANIMATION KEYFRAMES
+   ================================================== */
+
+@keyframes pulse-frame {
+  0%, 100% { 
+    border-color: rgba(0, 255, 136, 0.3);
+    transform: scale(1);
+  }
+  50% { 
+    border-color: rgba(0, 255, 136, 0.8);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes border-flow {
+  0% { 
+    background-position: 0% 50%; 
+  }
+  50% { 
+    background-position: 100% 50%; 
+  }
+  100% { 
+    background-position: 200% 50%; 
+  }
+}
+
+@keyframes qr-scan-animation {
+  0% { 
+    top: 10%; 
+    opacity: 0; 
+  }
+  20% { 
+    opacity: 1; 
+  }
+  80% { 
+    opacity: 1; 
+  }
+  100% { 
+    top: 90%; 
+    opacity: 0; 
+  }
+}
+
+@keyframes haptic-pulse-animation {
+  0% { 
+    transform: scale(0.8); 
+    opacity: 1; 
+  }
+  50% { 
+    transform: scale(1.2); 
+    opacity: 0.7; 
+  }
+  100% { 
+    transform: scale(2); 
+    opacity: 0; 
+  }
+}

@@ -7,7 +7,7 @@ import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, extname } from 'path';
 import { gzipSync } from 'zlib';
 
-const DIST_DIR = './dist';
+const DIST_DIR = './temp/dist';
 const PERFORMANCE_BUDGETS = {
   // Performance budgets in KB (gzipped)
   maxBundleSize: 250, // Individual bundle max

@@ -7,6 +7,10 @@
 
 // Import core styles
 import './styles/main.css'
+import './styles/lazy-loading.css'
+
+// Import advanced code splitting system (Task 17.7)
+import './shared/performance/CodeSplittingIntegration.js'
 
 // Import state management system
 import './shared/utils/state/index.js'
@@ -23,6 +27,9 @@ import './shared/utils/offline/mlg-fallback-system.js'
 import './shared/utils/loading/mlg-loading-states.js'
 import './shared/utils/error/mlg-error-logger.js'
 import './shared/utils/error/mlg-error-system.js'
+
+// Import lazy loading system
+import './shared/utils/lazy-loading/index.js'
 
 // Import UI components
 import './shared/components/gaming-loading-states.js'

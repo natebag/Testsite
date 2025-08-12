@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLG Mobile Typography & Button Integration Examples</title>
+  
+  <!-- Load the mobile typography system -->
+  <link rel="stylesheet" href="../../styles/main.css">
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      margin: 0;
+    }
+    
+    .example-section {
+      margin-bottom: 40px;
+      padding: 20px;
+      background: rgba(26, 26, 46, 0.8);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .example-title {
+      color: #00ff88;
+      margin-bottom: 20px;
+      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+      padding-bottom: 10px;
+    }
+    
+    .code-example {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      margin: 15px 0;
+      overflow-x: auto;
+    }
+    
+    .demo-container {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+    
+    .mode-selector {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(26, 26, 46, 0.95);
+      border: 2px solid #00ff88;
+      border-radius: 12px;
+      padding: 15px;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+    
+    .mode-selector select {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid #00ff88;
+      border-radius: 6px;
+      color: white;
+      padding: 8px 12px;
+      width: 150px;
+    }
+  </style>
+</head>
+<body>
+  
+  <!-- Gaming Mode Selector -->
+  <div class="mode-selector">
+    <label style="display: block; margin-bottom: 8px; color: #00ff88; font-weight: bold;">Gaming Mode:</label>
+    <select id="gamingModeSelect">
+      <option value="default">Default</option>
+      <option value="tournament">Tournament</option>
+      <option value="clan">Clan</option>
+      <option value="voting">Voting</option>
+      <option value="profile">Profile</option>
+      <option value="social">Social</option>
+    </select>
+  </div>
+
+  <div class="gaming-text-hero" style="text-align: center; margin-bottom: 40px; color: #00ff88;">
+    MLG Mobile Typography & Button Examples
+  </div>
+
+  <!-- Typography Examples -->
+  <div class="example-section">
+    <h2 class="example-title gaming-text-heading">Gaming Typography Scale</h2>
+    
+    <div class="demo-container">
+      <div class="gaming-text-display">Display Text (3.2rem)</div>
+      <div class="gaming-text-hero">Hero Text (2.4rem)</div>
+      <div class="gaming-text-heading">Heading Text (1.8rem)</div>
+      <div class="gaming-text-title">Title Text (1.4rem)</div>
+      <div class="gaming-text-emphasis">Emphasis Text (1.15rem)</div>
+      <div class="gaming-text-body">Body Text (1rem)</div>
+      <div class="gaming-text-small">Small Text (0.85rem)</div>
+      <div class="gaming-text-micro">Micro Text (0.7rem)</div>
+    </div>
+
+    <div class="code-example">
+&lt;div class="gaming-text-display"&gt;Display Text&lt;/div&gt;
+&lt;div class="gaming-text-hero"&gt;Hero Text&lt;/div&gt;
+&lt;div class="gaming-text-heading"&gt;Heading Text&lt;/div&gt;
+&lt;div class="gaming-text-title"&gt;Title Text&lt;/div&gt;
+&lt;div class="gaming-text-emphasis"&gt;Emphasis Text&lt;/div&gt;
+&lt;div class="gaming-text-body"&gt;Body Text&lt;/div&gt;
+&lt;div class="gaming-text-small"&gt;Small Text&lt;/div&gt;
+&lt;div class="gaming-text-micro"&gt;Micro Text&lt;/div&gt;
+    </div>
+  </div>
+
+  <!-- Gaming Button Examples -->
+  <div class="example-section">
+    <h2 class="example-title gaming-text-heading">Gaming Button System</h2>
+    
+    <div class="demo-container">
+      <h3 class="gaming-text-title">Button Sizes</h3>
+      <div class="gaming-btn-group-horizontal" style="margin-bottom: 20px;">
+        <button class="gaming-btn gaming-btn-primary gaming-btn-mini">Mini</button>
+        <button class="gaming-btn gaming-btn-primary gaming-btn-standard">Standard</button>
+        <button class="gaming-btn gaming-btn-primary gaming-btn-important">Important</button>
+        <button class="gaming-btn gaming-btn-primary gaming-btn-critical">Critical</button>
+        <button class="gaming-btn gaming-btn-primary gaming-btn-hero">Hero</button>
+      </div>
+      
+      <h3 class="gaming-text-title">Button Variants</h3>
+      <div class="gaming-btn-group-horizontal" style="flex-wrap: wrap;">
+        <button class="gaming-btn gaming-btn-primary">Primary</button>
+        <button class="gaming-btn gaming-btn-secondary">Secondary</button>
+        <button class="gaming-btn gaming-btn-vote">Vote</button>
+        <button class="gaming-btn gaming-btn-super-vote">Super Vote</button>
+        <button class="gaming-btn gaming-btn-clan">Clan</button>
+        <button class="gaming-btn gaming-btn-tournament">Tournament</button>
+        <button class="gaming-btn gaming-btn-danger">Danger</button>
+        <button class="gaming-btn gaming-btn-success">Success</button>
+      </div>
+    </div>
+
+    <div class="code-example">
+&lt;!-- Button Sizes --&gt;
+&lt;button class="gaming-btn gaming-btn-primary gaming-btn-mini"&gt;Mini&lt;/button&gt;
+&lt;button class="gaming-btn gaming-btn-primary gaming-btn-standard"&gt;Standard&lt;/button&gt;
+&lt;button class="gaming-btn gaming-btn-primary gaming-btn-important"&gt;Important&lt;/button&gt;
+
+&lt;!-- Button Variants --&gt;
+&lt;button class="gaming-btn gaming-btn-primary"&gt;Primary&lt;/button&gt;
+&lt;button class="gaming-btn gaming-btn-vote"&gt;Vote&lt;/button&gt;
+&lt;button class="gaming-btn gaming-btn-super-vote"&gt;Super Vote&lt;/button&gt;
+    </div>
+  </div>
+
+  <!-- Gaming Content Examples -->
+  <div class="example-section">
+    <h2 class="example-title gaming-text-heading">Gaming Content Typography</h2>
+    
+    <div class="demo-container">
+      <h3 class="gaming-text-title">Tournament Bracket</h3>
+      <div style="margin-bottom: 20px;">
+        <div class="tournament-team-name">Team Alpha</div>
+        <div class="tournament-score">125</div>
+        <div class="tournament-bracket-text">vs</div>
+        <div class="tournament-team-name">Team Beta</div>
+        <div class="tournament-score">98</div>
+      </div>
+      
+      <h3 class="gaming-text-title">Leaderboard Entry</h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div class="leaderboard-rank">1</div>
+        <div class="leaderboard-player">ProGamer123</div>
+        <div class="leaderboard-score">15,420</div>
+        <div class="leaderboard-change up">+5</div>
+      </div>
+      
+      <h3 class="gaming-text-title">Clan Member</h3>
+      <div style="margin-bottom: 20px;">
+        <div class="clan-member-name">ClanMaster</div>
+        <div class="clan-role-text clan-role-leader">Leader</div>
+        <div class="clan-stats-text">Wins: 42 | KD: 2.5</div>
+      </div>
+      
+      <h3 class="gaming-text-title">Gaming Stats</h3>
+      <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+        <div>
+          <div class="gaming-stat-label">Kills</div>
+          <div class="gaming-stat-value">1,337</div>
+        </div>
+        <div>
+          <div class="gaming-stat-label">Deaths</div>
+          <div class="gaming-stat-value">420</div>
+        </div>
+        <div>
+          <div class="gaming-stat-label">K/D Ratio</div>
+          <div class="gaming-stat-value">3.18</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-example">
+&lt;!-- Tournament Bracket --&gt;
+&lt;div class="tournament-team-name"&gt;Team Alpha&lt;/div&gt;
+&lt;div class="tournament-score"&gt;125&lt;/div&gt;
+
+&lt;!-- Leaderboard Entry --&gt;
+&lt;div class="leaderboard-rank"&gt;1&lt;/div&gt;
+&lt;div class="leaderboard-player"&gt;ProGamer123&lt;/div&gt;
+&lt;div class="leaderboard-score"&gt;15,420&lt;/div&gt;
+&lt;div class="leaderboard-change up"&gt;+5&lt;/div&gt;
+
+&lt;!-- Clan Member --&gt;
+&lt;div class="clan-member-name"&gt;ClanMaster&lt;/div&gt;
+&lt;div class="clan-role-text clan-role-leader"&gt;Leader&lt;/div&gt;
+
+&lt;!-- Gaming Stats --&gt;
+&lt;div class="gaming-stat-label"&gt;Kills&lt;/div&gt;
+&lt;div class="gaming-stat-value"&gt;1,337&lt;/div&gt;
+    </div>
+  </div>
+
+  <!-- Voting Interface Example -->
+  <div class="example-section">
+    <h2 class="example-title gaming-text-heading">Voting Interface</h2>
+    
+    <div class="demo-container">
+      <div class="voting-proposal-title">Implement New Tournament Format</div>
+      <div class="voting-proposal-description">
+        This proposal suggests implementing a new double-elimination tournament format 
+        that would provide more competitive matches and better opportunities for teams 
+        to recover from early losses.
+      </div>
+      <div class="voting-stats-text">Votes: 42 | Ends in: 2 days</div>
+      <div class="voting-countdown">23:45:12</div>
+      
+      <div class="gaming-btn-group-horizontal" style="margin-top: 20px;">
+        <button class="gaming-btn gaming-btn-vote gaming-btn-important">Vote For</button>
+        <button class="gaming-btn gaming-btn-super-vote gaming-btn-important">Super Vote</button>
+        <button class="gaming-btn gaming-btn-secondary">Against</button>
+      </div>
+    </div>
+
+    <div class="code-example">
+&lt;div class="voting-proposal-title"&gt;Proposal Title&lt;/div&gt;
+&lt;div class="voting-proposal-description"&gt;Proposal description...&lt;/div&gt;
+&lt;div class="voting-stats-text"&gt;Votes: 42 | Ends in: 2 days&lt;/div&gt;
+&lt;div class="voting-countdown"&gt;23:45:12&lt;/div&gt;
+
+&lt;button class="gaming-btn gaming-btn-vote gaming-btn-important"&gt;Vote For&lt;/button&gt;
+&lt;button class="gaming-btn gaming-btn-super-vote gaming-btn-important"&gt;Super Vote&lt;/button&gt;
+    </div>
+  </div>
+
+  <!-- Accessibility Features -->
+  <div class="example-section">
+    <h2 class="example-title gaming-text-heading">Accessibility Features</h2>
+    
+    <div class="demo-container">
+      <h3 class="gaming-text-title">Focus Management</h3>
+      <div class="gaming-btn-group-horizontal" style="margin-bottom: 20px;">
+        <button class="gaming-btn gaming-btn-primary">Tab to Focus</button>
+        <button class="gaming-btn gaming-btn-secondary">Next Element</button>
+        <button class="gaming-btn gaming-btn-vote">Third Element</button>
+      </div>
+      
+      <h3 class="gaming-text-title">Screen Reader Support</h3>
+      <button class="gaming-btn gaming-btn-primary" aria-label="Vote for proposal about tournament format">
+        Vote
+        <span class="sr-only">for proposal about tournament format</span>
+      </button>
+      
+      <h3 class="gaming-text-title">High Contrast Mode</h3>
+      <button id="toggleHighContrast" class="gaming-btn gaming-btn-secondary">
+        Toggle High Contrast
+      </button>
+    </div>
+
+    <div class="code-example">
+&lt;!-- Proper ARIA labels --&gt;
+&lt;button class="gaming-btn gaming-btn-primary" aria-label="Vote for proposal"&gt;
+  Vote
+  &lt;span class="sr-only"&gt;for proposal about tournament format&lt;/span&gt;
+&lt;/button&gt;
+
+&lt;!-- Focus management --&gt;
+&lt;button class="gaming-btn gaming-btn-primary" tabindex="0"&gt;Focusable&lt;/button&gt;
+    </div>
+  </div>
+
+  <!-- JavaScript Integration Example -->
+  <div class="example-section">
+    <h2 class="example-title gaming-text-heading">JavaScript Integration</h2>
+    
+    <div class="demo-container">
+      <h3 class="gaming-text-title">Dynamic Button Creation</h3>
+      <div id="dynamicButtonContainer" style="margin-bottom: 20px;"></div>
+      <button id="createButton" class="gaming-btn gaming-btn-primary">Create Gaming Button</button>
+      
+      <h3 class="gaming-text-title">Typography Creation</h3>
+      <div id="dynamicTextContainer" style="margin-bottom: 20px;"></div>
+      <button id="createText" class="gaming-btn gaming-btn-secondary">Create Gaming Text</button>
+    </div>
+
+    <div class="code-example">
+// Create gaming button dynamically
+const button = window.MLGMobileUI.createGamingButton({
+  text: 'Dynamic Button',
+  type: 'primary',
+  size: 'important',
+  onClick: () => console.log('Button clicked!'),
+  ariaLabel: 'Dynamic gaming button'
+});
+
+// Create gaming text dynamically
+const text = window.MLGMobileUI.createGamingText({
+  text: 'Dynamic Gaming Text',
+  type: 'title',
+  color: 'accent'
+});
+
+// Set gaming mode
+window.MLGMobileUI.setGamingMode('tournament');
+    </div>
+  </div>
+
+  <!-- Testing Interface -->
+  <div class="example-section">
+    <h2 class="example-title gaming-text-heading">Testing Interface</h2>
+    
+    <div class="demo-container">
+      <div class="gaming-text-body" style="margin-bottom: 15px;">
+        Press <kbd style="background: #333; padding: 2px 6px; border-radius: 3px;">Ctrl+Shift+T</kbd> 
+        to open the comprehensive testing interface.
+      </div>
+      
+      <div class="gaming-btn-group-horizontal">
+        <button id="openTestInterface" class="gaming-btn gaming-btn-primary">Open Test Interface</button>
+        <button id="runQuickTest" class="gaming-btn gaming-btn-secondary">Run Quick Test</button>
+      </div>
+      
+      <div id="testResults" style="margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px; font-family: monospace; font-size: 12px; display: none;"></div>
+    </div>
+  </div>
+
+  <!-- Load the mobile gaming UI components -->
+  <script src="../mobile-gaming-ui-components.js"></script>
+  <script src="../../testing/mobile-typography-button-tests.js"></script>
+
+  <script>
+    // Gaming mode selector
+    document.getElementById('gamingModeSelect').addEventListener('change', (e) => {
+      if (window.MLGMobileUI) {
+        window.MLGMobileUI.setGamingMode(e.target.value);
+        console.log(`Gaming mode set to: ${e.target.value}`);
+      }
+    });
+
+    // High contrast toggle
+    document.getElementById('toggleHighContrast').addEventListener('click', () => {
+      document.body.classList.toggle('high-contrast-mode');
+      console.log('High contrast mode toggled');
+    });
+
+    // Dynamic button creation
+    document.getElementById('createButton').addEventListener('click', () => {
+      const container = document.getElementById('dynamicButtonContainer');
+      const button = window.MLGMobileUI.createGamingButton({
+        text: `Button ${container.children.length + 1}`,
+        type: ['primary', 'secondary', 'vote', 'clan'][Math.floor(Math.random() * 4)],
+        size: ['standard', 'important', 'critical'][Math.floor(Math.random() * 3)],
+        onClick: () => alert('Dynamic button clicked!'),
+        ripple: true
+      });
+      container.appendChild(button);
+    });
+
+    // Dynamic text creation
+    document.getElementById('createText').addEventListener('click', () => {
+      const container = document.getElementById('dynamicTextContainer');
+      const types = ['micro', 'small', 'body', 'emphasis', 'title', 'heading'];
+      const colors = ['primary', 'accent', 'secondary', 'stats', 'warning'];
+      
+      const text = window.MLGMobileUI.createGamingText({
+        text: `Dynamic Text ${container.children.length + 1}`,
+        type: types[Math.floor(Math.random() * types.length)],
+        color: colors[Math.floor(Math.random() * colors.length)],
+        element: 'div'
+      });
+      
+      text.style.marginBottom = '10px';
+      container.appendChild(text);
+    });
+
+    // Test interface controls
+    document.getElementById('openTestInterface').addEventListener('click', () => {
+      if (window.MLGTypographyTester) {
+        window.MLGTypographyTester.toggleTestUI();
+      }
+    });
+
+    document.getElementById('runQuickTest').addEventListener('click', async () => {
+      const resultsDiv = document.getElementById('testResults');
+      resultsDiv.style.display = 'block';
+      resultsDiv.innerHTML = 'Running quick tests...<br>';
+      
+      if (window.MLGTypographyTester) {
+        // Override log function to capture results
+        const originalLog = window.MLGTypographyTester.logResult;
+        window.MLGTypographyTester.logResult = (message) => {
+          resultsDiv.innerHTML += message + '<br>';
+          originalLog.call(window.MLGTypographyTester, message);
+        };
+        
+        await window.MLGTypographyTester.testTypography();
+        await window.MLGTypographyTester.testButtons();
+        
+        // Restore original log function
+        window.MLGTypographyTester.logResult = originalLog;
+        
+        resultsDiv.innerHTML += '<br>✅ Quick tests completed!';
+      }
+    });
+
+    // Initialize with default gaming mode
+    if (window.MLGMobileUI) {
+      window.MLGMobileUI.setGamingMode('default');
+    }
+
+    console.log('MLG Mobile Typography & Button Integration Examples loaded!');
+    console.log('Available commands:');
+    console.log('- window.MLGMobileUI.setGamingMode(mode)');
+    console.log('- window.MLGMobileUI.createGamingButton(options)');
+    console.log('- window.MLGMobileUI.createGamingText(options)');
+    console.log('- window.MLGTypographyTester.runAllTests()');
+    console.log('- Press Ctrl+Shift+T to open test interface');
+  </script>
+
+</body>
+</html>

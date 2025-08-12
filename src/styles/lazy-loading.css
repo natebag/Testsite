@@ -1,0 +1,518 @@
+/**
+ * MLG Lazy Loading Styles
+ * 
+ * CSS for lazy loading animations, transitions, and states
+ * Gaming-themed visual feedback for loading processes
+ */
+
+/* Image lazy loading states */
+.mlg-lazy-image {
+  transition: opacity 0.3s ease-out, filter 0.3s ease-out;
+}
+
+.mlg-loading {
+  opacity: 0.7;
+  filter: blur(5px) brightness(0.8);
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 136, 0.1) 0%,
+    rgba(139, 92, 246, 0.1) 50%,
+    rgba(0, 255, 136, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: mlg-loading-shimmer 2s ease-in-out infinite;
+}
+
+.mlg-loaded {
+  opacity: 1;
+  filter: none;
+}
+
+.mlg-error {
+  opacity: 0.5;
+  filter: grayscale(100%) brightness(0.6);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Loading animations */
+@keyframes mlg-loading-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes mlg-pulse-neon {
+  0%, 100% {
+    box-shadow: 
+      0 0 5px rgba(0, 255, 136, 0.5),
+      0 0 10px rgba(0, 255, 136, 0.3),
+      0 0 15px rgba(0, 255, 136, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 10px rgba(0, 255, 136, 0.8),
+      0 0 20px rgba(0, 255, 136, 0.5),
+      0 0 30px rgba(0, 255, 136, 0.3);
+  }
+}
+
+@keyframes mlg-glow-rotate {
+  0% {
+    transform: rotate(0deg);
+    box-shadow: 
+      0 0 5px rgba(139, 92, 246, 0.5),
+      0 0 10px rgba(139, 92, 246, 0.3);
+  }
+  50% {
+    box-shadow: 
+      0 0 10px rgba(139, 92, 246, 0.8),
+      0 0 20px rgba(139, 92, 246, 0.5),
+      0 0 30px rgba(139, 92, 246, 0.3);
+  }
+  100% {
+    transform: rotate(360deg);
+    box-shadow: 
+      0 0 5px rgba(139, 92, 246, 0.5),
+      0 0 10px rgba(139, 92, 246, 0.3);
+  }
+}
+
+@keyframes mlg-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Gaming-themed loading spinner */
+.mlg-loading-spinner {
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+
+.mlg-loading-spinner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 3px solid rgba(0, 255, 136, 0.2);
+  border-top-color: #00ff88;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.mlg-loading-spinner::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 3px solid rgba(139, 92, 246, 0.2);
+  border-bottom-color: #8b5cf6;
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite reverse;
+}
+
+/* Gaming loading bars */
+.mlg-loading-bars {
+  display: flex;
+  gap: 4px;
+  align-items: end;
+  height: 32px;
+}
+
+.mlg-loading-bar {
+  width: 4px;
+  background: linear-gradient(to top, #00ff88, #8b5cf6);
+  animation: mlg-loading-bars 1.4s ease-in-out infinite;
+}
+
+.mlg-loading-bar:nth-child(2) { animation-delay: 0.1s; }
+.mlg-loading-bar:nth-child(3) { animation-delay: 0.2s; }
+.mlg-loading-bar:nth-child(4) { animation-delay: 0.3s; }
+.mlg-loading-bar:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes mlg-loading-bars {
+  0%, 40%, 100% {
+    height: 8px;
+    opacity: 0.6;
+  }
+  20% {
+    height: 32px;
+    opacity: 1;
+  }
+}
+
+/* Skeleton loaders */
+.mlg-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(26, 26, 46, 0.8) 25%,
+    rgba(10, 10, 15, 0.6) 50%,
+    rgba(26, 26, 46, 0.8) 75%
+  );
+  background-size: 200% 100%;
+  animation: mlg-skeleton-loading 2s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+.mlg-skeleton-text {
+  height: 16px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.mlg-skeleton-text:last-child {
+  width: 75%;
+}
+
+.mlg-skeleton-title {
+  height: 24px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+}
+
+.mlg-skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.mlg-skeleton-card {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(26, 26, 46, 0.5);
+  border: 1px solid rgba(0, 255, 136, 0.1);
+}
+
+@keyframes mlg-skeleton-loading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Component loading states */
+.mlg-suspense-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: rgba(26, 26, 46, 0.3);
+  border-radius: 12px;
+  border: 1px dashed rgba(0, 255, 136, 0.3);
+}
+
+.mlg-suspense-fallback .mlg-loading-text {
+  margin-top: 16px;
+  color: #00ff88;
+  font-size: 14px;
+  opacity: 0.8;
+  animation: mlg-pulse-text 2s ease-in-out infinite;
+}
+
+@keyframes mlg-pulse-text {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Video loading states */
+.mlg-video-loading {
+  position: relative;
+  background: rgba(10, 10, 15, 0.9);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mlg-video-loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(0, 255, 136, 0.1) 0%,
+    rgba(139, 92, 246, 0.1) 100%
+  );
+  animation: mlg-video-loading-wave 3s ease-in-out infinite;
+}
+
+.mlg-video-loading::after {
+  content: '▶';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  color: #00ff88;
+  animation: mlg-float 2s ease-in-out infinite;
+}
+
+@keyframes mlg-video-loading-wave {
+  0%, 100% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+}
+
+/* Progressive loading progress bars */
+.mlg-progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(10, 10, 15, 0.8);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.mlg-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff88, #8b5cf6);
+  border-radius: 2px;
+  transition: width 0.3s ease-out;
+  position: relative;
+}
+
+.mlg-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: mlg-progress-shine 2s ease-in-out infinite;
+}
+
+@keyframes mlg-progress-shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Asset loading indicators */
+.mlg-asset-loading-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(26, 26, 46, 0.95);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  transform: translateY(100px);
+  transition: transform 0.3s ease-out;
+}
+
+.mlg-asset-loading-indicator.visible {
+  transform: translateY(0);
+}
+
+.mlg-asset-loading-indicator .icon {
+  width: 20px;
+  height: 20px;
+  color: #00ff88;
+  animation: spin 2s linear infinite;
+}
+
+.mlg-asset-loading-indicator .text {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.mlg-asset-loading-indicator .count {
+  color: #00ff88;
+  font-weight: 600;
+}
+
+/* Performance monitoring overlay (dev mode) */
+.mlg-performance-overlay {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(10, 10, 15, 0.95);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: #8b5cf6;
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  max-width: 300px;
+}
+
+.mlg-performance-overlay .metric {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.mlg-performance-overlay .metric:last-child {
+  margin-bottom: 0;
+}
+
+.mlg-performance-overlay .metric .label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.mlg-performance-overlay .metric .value {
+  color: #00ff88;
+  font-weight: bold;
+}
+
+.mlg-performance-overlay .metric .value.warning {
+  color: #fbbf24;
+}
+
+.mlg-performance-overlay .metric .value.error {
+  color: #ef4444;
+}
+
+/* Error states */
+.mlg-loading-error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  color: #ef4444;
+}
+
+.mlg-loading-error .icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.mlg-loading-error .message {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.mlg-loading-error .retry-button {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #ef4444;
+  color: #ef4444;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mlg-loading-error .retry-button:hover {
+  background: rgba(239, 68, 68, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Responsive adaptations */
+@media (max-width: 768px) {
+  .mlg-asset-loading-indicator {
+    bottom: 10px;
+    right: 10px;
+    padding: 8px 12px;
+  }
+
+  .mlg-performance-overlay {
+    top: 10px;
+    left: 10px;
+    max-width: 250px;
+    font-size: 11px;
+  }
+
+  .mlg-suspense-fallback {
+    padding: 20px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .mlg-loading {
+    filter: blur(2px) contrast(1.5);
+  }
+
+  .mlg-skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.1) 25%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.1) 75%
+    );
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .mlg-loading,
+  .mlg-skeleton,
+  .mlg-progress-fill::after,
+  .mlg-loading-spinner::before,
+  .mlg-loading-spinner::after,
+  .mlg-loading-bar,
+  .mlg-video-loading::before {
+    animation: none;
+  }
+
+  .mlg-loading {
+    opacity: 0.8;
+    filter: blur(2px);
+  }
+
+  .mlg-loaded {
+    transition: opacity 0.1s ease-out;
+  }
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  .mlg-skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.05) 25%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0.05) 75%
+    );
+  }
+}
+
+/* Print styles (hide loading indicators) */
+@media print {
+  .mlg-loading-spinner,
+  .mlg-asset-loading-indicator,
+  .mlg-performance-overlay,
+  .mlg-suspense-fallback {
+    display: none !important;
+  }
+
+  .mlg-loading {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - MLG.clan</title>
+  
+  <!-- Meta Tags -->
+  <meta name="description" content="MLG.clan - You're currently offline. Some features are still available!">
+  <meta name="theme-color" content="#00ff88">
+  
+  <!-- External Dependencies -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'gaming-bg': '#0a0a0f',
+            'gaming-surface': '#1a1a2e',
+            'gaming-accent': '#00ff88',
+            'gaming-purple': '#8b5cf6',
+            'gaming-blue': '#3b82f6',
+            'gaming-yellow': '#fbbf24',
+            'gaming-red': '#ef4444'
+          },
+          animation: {
+            'pulse-neon': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow': 'glow 2s ease-in-out infinite alternate',
+            'float': 'float 6s ease-in-out infinite'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow-x: hidden;
+    }
+    
+    .neon-glow {
+      box-shadow: 0 0 10px #00ff88, 0 0 20px #00ff88, 0 0 30px #00ff88;
+      border: 1px solid #00ff88;
+    }
+    
+    .card-glow {
+      background: rgba(26, 26, 46, 0.95);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      backdrop-filter: blur(15px);
+      transition: all 0.3s ease;
+    }
+    
+    @keyframes glow {
+      from { box-shadow: 0 0 10px #00ff88; }
+      to { box-shadow: 0 0 20px #00ff88, 0 0 30px #00ff88; }
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .connection-indicator {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    
+    .offline-mode {
+      background: linear-gradient(45deg, #ef4444, #fbbf24);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-white">
+  
+  <!-- Connection Status Indicator -->
+  <div class="connection-indicator">
+    <div class="flex items-center space-x-2 bg-gaming-red/20 border border-gaming-red/30 rounded-lg px-3 py-2">
+      <div class="w-3 h-3 bg-gaming-red rounded-full animate-pulse"></div>
+      <span class="text-sm text-gaming-red">Offline</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="bg-gaming-surface/80 backdrop-blur-lg border-b border-gaming-accent/20 sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="text-2xl">🎮</div>
+          <h1 class="text-xl font-bold text-gaming-accent">MLG.clan</h1>
+          <span class="text-sm text-gaming-red bg-gaming-red/20 px-2 py-1 rounded">OFFLINE MODE</span>
+        </div>
+        <button onclick="checkConnection()" class="bg-gaming-accent text-gaming-bg px-4 py-2 rounded-lg hover:bg-gaming-accent/80 transition-colors">
+          <i data-lucide="wifi" class="w-4 h-4 inline mr-2"></i>
+          Retry Connection
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    
+    <!-- Offline Status -->
+    <div class="text-center mb-12">
+      <div class="w-32 h-32 mx-auto mb-6 bg-gaming-surface/50 rounded-full flex items-center justify-center border border-gaming-red/30">
+        <i data-lucide="wifi-off" class="w-16 h-16 text-gaming-red"></i>
+      </div>
+      <h2 class="text-4xl font-bold mb-4">
+        <span class="offline-mode">You're Offline</span>
+      </h2>
+      <p class="text-gray-300 text-lg mb-6">
+        No internet connection detected, but you can still access some gaming features!
+      </p>
+    </div>
+
+    <!-- Available Offline Features -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      
+      <!-- Cached Gaming Data -->
+      <div class="card-glow rounded-xl p-6 hover:scale-105 transition-transform cursor-pointer" onclick="viewCachedData()">
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 bg-gaming-blue/20 rounded-lg flex items-center justify-center mr-4">
+            <i data-lucide="database" class="w-6 h-6 text-gaming-blue"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gaming-blue">Cached Data</h3>
+        </div>
+        <p class="text-gray-300 mb-4">Access your previously loaded gaming profiles, clan stats, and leaderboards.</p>
+        <div class="text-sm text-gaming-accent">Available Offline</div>
+      </div>
+
+      <!-- Offline Gaming Tools -->
+      <div class="card-glow rounded-xl p-6 hover:scale-105 transition-transform cursor-pointer" onclick="openOfflineTools()">
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 bg-gaming-purple/20 rounded-lg flex items-center justify-center mr-4">
+            <i data-lucide="gamepad-2" class="w-6 h-6 text-gaming-purple"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gaming-purple">Gaming Tools</h3>
+        </div>
+        <p class="text-gray-300 mb-4">Use offline calculators, strategy planners, and gaming utilities.</p>
+        <div class="text-sm text-gaming-accent">Works Offline</div>
+      </div>
+
+      <!-- Drafts & Notes -->
+      <div class="card-glow rounded-xl p-6 hover:scale-105 transition-transform cursor-pointer" onclick="openDrafts()">
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 bg-gaming-yellow/20 rounded-lg flex items-center justify-center mr-4">
+            <i data-lucide="edit" class="w-6 h-6 text-gaming-yellow"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gaming-yellow">Drafts & Notes</h3>
+        </div>
+        <p class="text-gray-300 mb-4">Create content drafts and gaming notes that will sync when online.</p>
+        <div class="text-sm text-gaming-accent">Sync When Online</div>
+      </div>
+
+      <!-- Settings -->
+      <div class="card-glow rounded-xl p-6 hover:scale-105 transition-transform cursor-pointer" onclick="openSettings()">
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 bg-gaming-accent/20 rounded-lg flex items-center justify-center mr-4">
+            <i data-lucide="settings" class="w-6 h-6 text-gaming-accent"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gaming-accent">Settings</h3>
+        </div>
+        <p class="text-gray-300 mb-4">Adjust app preferences, themes, and offline settings.</p>
+        <div class="text-sm text-gaming-accent">Always Available</div>
+      </div>
+
+      <!-- Help & FAQ -->
+      <div class="card-glow rounded-xl p-6 hover:scale-105 transition-transform cursor-pointer" onclick="openHelp()">
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 bg-gaming-blue/20 rounded-lg flex items-center justify-center mr-4">
+            <i data-lucide="help-circle" class="w-6 h-6 text-gaming-blue"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gaming-blue">Help & FAQ</h3>
+        </div>
+        <p class="text-gray-300 mb-4">Browse cached help articles and frequently asked questions.</p>
+        <div class="text-sm text-gaming-accent">Cached Content</div>
+      </div>
+
+      <!-- Sync Status -->
+      <div class="card-glow rounded-xl p-6">
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 bg-gaming-red/20 rounded-lg flex items-center justify-center mr-4">
+            <i data-lucide="cloud-off" class="w-6 h-6 text-gaming-red"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-gaming-red">Sync Status</h3>
+        </div>
+        <p class="text-gray-300 mb-4">Your actions are saved locally and will sync when connection is restored.</p>
+        <div id="pendingSync" class="text-sm text-gaming-yellow">
+          <span id="syncCount">0</span> items waiting to sync
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Connection Tips -->
+    <div class="card-glow rounded-xl p-6 mb-8">
+      <h3 class="text-xl font-semibold text-gaming-accent mb-4">
+        <i data-lucide="lightbulb" class="w-5 h-5 inline mr-2"></i>
+        Tips for Better Offline Experience
+      </h3>
+      <div class="grid md:grid-cols-2 gap-4 text-gray-300">
+        <div class="flex items-start space-x-3">
+          <i data-lucide="check-circle" class="w-5 h-5 text-gaming-accent mt-0.5 flex-shrink-0"></i>
+          <span>Your recent gaming data is cached and accessible offline</span>
+        </div>
+        <div class="flex items-start space-x-3">
+          <i data-lucide="check-circle" class="w-5 h-5 text-gaming-accent mt-0.5 flex-shrink-0"></i>
+          <span>Actions you take will sync automatically when online</span>
+        </div>
+        <div class="flex items-start space-x-3">
+          <i data-lucide="check-circle" class="w-5 h-5 text-gaming-accent mt-0.5 flex-shrink-0"></i>
+          <span>Enable notifications to get updates when connection returns</span>
+        </div>
+        <div class="flex items-start space-x-3">
+          <i data-lucide="check-circle" class="w-5 h-5 text-gaming-accent mt-0.5 flex-shrink-0"></i>
+          <span>Use the retry button to check for connection improvements</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center space-x-4">
+      <button onclick="goToHomepage()" class="bg-gaming-accent text-gaming-bg px-6 py-3 rounded-lg hover:bg-gaming-accent/80 transition-colors inline-flex items-center">
+        <i data-lucide="home" class="w-4 h-4 mr-2"></i>
+        Go to Homepage
+      </button>
+      <button onclick="checkConnection()" class="bg-gaming-surface border border-gaming-accent text-gaming-accent px-6 py-3 rounded-lg hover:bg-gaming-accent/10 transition-colors inline-flex items-center">
+        <i data-lucide="refresh-cw" class="w-4 h-4 mr-2"></i>
+        Check Connection
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gaming-surface/50 border-t border-gaming-accent/20 mt-16">
+    <div class="container mx-auto px-4 py-8 text-center">
+      <p class="text-gray-400">
+        MLG.clan - Gaming platform that works online and offline
+      </p>
+      <p class="text-sm text-gray-500 mt-2">
+        PWA enabled • Offline functionality • Background sync
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Connection checking functionality
+    async function checkConnection() {
+      const retryButton = document.querySelector('button[onclick="checkConnection()"]');
+      const originalText = retryButton.innerHTML;
+      
+      retryButton.innerHTML = '<i data-lucide="loader" class="w-4 h-4 mr-2 animate-spin"></i>Checking...';
+      
+      try {
+        // Try to fetch a small resource to test connectivity
+        const response = await fetch('/manifest.json', { 
+          method: 'HEAD',
+          cache: 'no-cache'
+        });
+        
+        if (response.ok) {
+          // Connection restored
+          showConnectionRestored();
+          setTimeout(() => {
+            window.location.href = '/pages/index.html';
+          }, 2000);
+        } else {
+          throw new Error('No connection');
+        }
+      } catch (error) {
+        // Still offline
+        showStillOffline();
+      } finally {
+        setTimeout(() => {
+          retryButton.innerHTML = originalText;
+          lucide.createIcons();
+        }, 2000);
+      }
+    }
+
+    function showConnectionRestored() {
+      const indicator = document.querySelector('.connection-indicator');
+      indicator.innerHTML = `
+        <div class="flex items-center space-x-2 bg-gaming-accent/20 border border-gaming-accent/30 rounded-lg px-3 py-2">
+          <div class="w-3 h-3 bg-gaming-accent rounded-full"></div>
+          <span class="text-sm text-gaming-accent">Connected! Redirecting...</span>
+        </div>
+      `;
+    }
+
+    function showStillOffline() {
+      const indicator = document.querySelector('.connection-indicator');
+      indicator.innerHTML = `
+        <div class="flex items-center space-x-2 bg-gaming-red/20 border border-gaming-red/30 rounded-lg px-3 py-2">
+          <div class="w-3 h-3 bg-gaming-red rounded-full animate-pulse"></div>
+          <span class="text-sm text-gaming-red">Still offline</span>
+        </div>
+      `;
+    }
+
+    // Feature navigation functions
+    function viewCachedData() {
+      alert('Cached data viewer would open here with offline-available gaming data');
+    }
+
+    function openOfflineTools() {
+      alert('Offline gaming tools would open here');
+    }
+
+    function openDrafts() {
+      alert('Drafts and notes editor would open here');
+    }
+
+    function openSettings() {
+      alert('Settings panel would open here');
+    }
+
+    function openHelp() {
+      alert('Help and FAQ would open here');
+    }
+
+    function goToHomepage() {
+      window.location.href = '/pages/index.html';
+    }
+
+    // Update sync counter
+    function updateSyncCounter() {
+      // This would check IndexedDB for pending sync items
+      const count = Math.floor(Math.random() * 5); // Placeholder
+      document.getElementById('syncCount').textContent = count;
+    }
+
+    // Listen for online/offline events
+    window.addEventListener('online', () => {
+      showConnectionRestored();
+      setTimeout(() => {
+        window.location.href = '/pages/index.html';
+      }, 1500);
+    });
+
+    window.addEventListener('offline', () => {
+      console.log('Still offline');
+    });
+
+    // Initialize
+    updateSyncCounter();
+
+    // Check connection periodically
+    setInterval(checkConnection, 30000);
+  </script>
+</body>
+</html>

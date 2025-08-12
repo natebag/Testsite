@@ -1,0 +1,453 @@
+{
+  "name": "MLG.clan Gaming Platform",
+  "short_name": "MLG.clan",
+  "description": "Ultimate gaming platform with Web3 integration, clan management, DAO governance, and real-time tournaments. Experience competitive gaming with blockchain rewards and mobile-native features.",
+  "start_url": "/pages/index.html?utm_source=pwa&utm_medium=app_launch",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#00ff88",
+  "background_color": "#0a0a0f",
+  "scope": "/",
+  "categories": ["games", "entertainment", "social", "sports", "utilities"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "id": "mlgclan-gaming-platform",
+  
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "handle_links": "preferred",
+  
+  "icons": [
+    {
+      "src": "/assets/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  
+  "shortcuts": [
+    {
+      "name": "Vote Vault",
+      "short_name": "Vote",
+      "description": "Cast votes and manage voting power with MLG tokens",
+      "url": "/pages/voting.html?shortcut=true",
+      "icons": [
+        {
+          "src": "/assets/icons/vote-shortcut.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Clan Roster",
+      "short_name": "Clan",
+      "description": "Manage clan members, tournaments, and activities",
+      "url": "/pages/clans.html?shortcut=true",
+      "icons": [
+        {
+          "src": "/assets/icons/clan-shortcut.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Content Hub",
+      "short_name": "Content",
+      "description": "Browse and submit gaming content for rewards",
+      "url": "/pages/content.html?shortcut=true",
+      "icons": [
+        {
+          "src": "/assets/icons/content-shortcut.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "DAO Governance",
+      "short_name": "DAO",
+      "description": "Participate in platform governance and proposals",
+      "url": "/pages/dao.html?shortcut=true",
+      "icons": [
+        {
+          "src": "/assets/icons/dao-shortcut.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Gaming Profile",
+      "short_name": "Profile",
+      "description": "View achievements, stats, and gaming progress",
+      "url": "/pages/profile.html?shortcut=true",
+      "icons": [
+        {
+          "src": "/assets/icons/profile-shortcut.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Quick Vote",
+      "short_name": "Quick Vote",
+      "description": "Instantly vote on gaming content",
+      "url": "/pages/voting.html?mode=quick&shortcut=true",
+      "icons": [
+        {
+          "src": "/assets/icons/quick-vote-shortcut.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  
+  "screenshots": [
+    {
+      "src": "/assets/screenshots/desktop-home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "MLG.clan Home Dashboard - Gaming Command Center"
+    },
+    {
+      "src": "/assets/screenshots/desktop-voting.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Vote Vault - Token-Powered Gaming Democracy"
+    },
+    {
+      "src": "/assets/screenshots/desktop-clans.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Clan Management - Organize Your Gaming Squad"
+    },
+    {
+      "src": "/assets/screenshots/mobile-home.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile Gaming Hub - Touch-Optimized Interface"
+    },
+    {
+      "src": "/assets/screenshots/mobile-voting.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile Voting Interface - Swipe to Vote"
+    },
+    {
+      "src": "/assets/screenshots/mobile-clans.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile Clan Management - Gaming on the Go"
+    },
+    {
+      "src": "/assets/screenshots/mobile-tournaments.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tournament Brackets - Competitive Gaming"
+    }
+  ],
+  
+  "share_target": {
+    "action": "/pages/content.html?share=true",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "body",
+      "url": "url",
+      "files": [
+        {
+          "name": "media",
+          "accept": [
+            "image/png",
+            "image/jpeg", 
+            "image/gif",
+            "image/webp",
+            "video/mp4",
+            "video/webm",
+            "video/quicktime"
+          ]
+        },
+        {
+          "name": "gaming_clips",
+          "accept": [
+            "video/mp4",
+            "video/webm"
+          ]
+        }
+      ]
+    }
+  },
+  
+  "file_handlers": [
+    {
+      "action": "/pages/content.html?handler=gaming_clip",
+      "accept": {
+        "video/mp4": [".mp4"],
+        "video/webm": [".webm"],
+        "video/quicktime": [".mov"]
+      },
+      "icons": [
+        {
+          "src": "/assets/icons/video-handler.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ],
+      "launch_type": "single-client"
+    },
+    {
+      "action": "/pages/profile.html?handler=gaming_stats",
+      "accept": {
+        "application/json": [".json"],
+        "text/csv": [".csv"]
+      },
+      "icons": [
+        {
+          "src": "/assets/icons/stats-handler.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ],
+      "launch_type": "single-client"
+    }
+  ],
+  
+  "protocol_handlers": [
+    {
+      "protocol": "web+mlgclan",
+      "url": "/pages/index.html?action=%s"
+    },
+    {
+      "protocol": "web+gaming",
+      "url": "/pages/content.html?gaming=%s"
+    },
+    {
+      "protocol": "web+clan",
+      "url": "/pages/clans.html?invite=%s"
+    },
+    {
+      "protocol": "web+vote",
+      "url": "/pages/voting.html?content=%s"
+    }
+  ],
+  
+  "widgets": [
+    {
+      "name": "Gaming Stats",
+      "short_name": "Stats",
+      "description": "Quick view of your gaming statistics and achievements",
+      "tag": "gaming_stats",
+      "template": "gaming_stats_template",
+      "ms_ac_template": "gaming_stats_adaptive_card.json",
+      "data": "/api/widgets/gaming-stats",
+      "type": "application/json",
+      "auth": false,
+      "update": 300,
+      "icons": [
+        {
+          "src": "/assets/icons/stats-widget.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ],
+      "screenshots": [
+        {
+          "src": "/assets/screenshots/stats-widget.png",
+          "sizes": "300x200",
+          "type": "image/png",
+          "label": "Gaming Statistics Widget"
+        }
+      ]
+    },
+    {
+      "name": "Clan Activity",
+      "short_name": "Clan",
+      "description": "Latest clan member activities and achievements",
+      "tag": "clan_activity",
+      "template": "clan_activity_template",
+      "ms_ac_template": "clan_activity_adaptive_card.json",
+      "data": "/api/widgets/clan-activity",
+      "type": "application/json",
+      "auth": true,
+      "update": 180,
+      "icons": [
+        {
+          "src": "/assets/icons/clan-widget.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ],
+      "screenshots": [
+        {
+          "src": "/assets/screenshots/clan-widget.png",
+          "sizes": "300x200",
+          "type": "image/png",
+          "label": "Clan Activity Widget"
+        }
+      ]
+    },
+    {
+      "name": "Quick Vote",
+      "short_name": "Vote",
+      "description": "Instantly vote on trending gaming content",
+      "tag": "quick_vote",
+      "template": "quick_vote_template",
+      "ms_ac_template": "quick_vote_adaptive_card.json",
+      "data": "/api/widgets/trending-content",
+      "type": "application/json",
+      "auth": true,
+      "update": 120,
+      "icons": [
+        {
+          "src": "/assets/icons/vote-widget.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ],
+      "screenshots": [
+        {
+          "src": "/assets/screenshots/vote-widget.png",
+          "sizes": "300x200",
+          "type": "image/png",
+          "label": "Quick Vote Widget"
+        }
+      ]
+    }
+  ],
+  
+  "scope_extensions": [
+    {
+      "origin": "*.mlgclan.com"
+    },
+    {
+      "origin": "*.solana.com",
+      "reason": "Solana blockchain integration for gaming tokens"
+    },
+    {
+      "origin": "*.phantom.app",
+      "reason": "Phantom wallet integration for Web3 gaming"
+    }
+  ],
+  
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.mlgclan.app",
+      "id": "com.mlgclan.app",
+      "min_version": "1.0.0"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/app/mlgclan/id123456789",
+      "id": "123456789"
+    },
+    {
+      "platform": "windows",
+      "url": "https://www.microsoft.com/store/apps/9NBLGGH5L9XT",
+      "id": "9NBLGGH5L9XT"
+    },
+    {
+      "platform": "chrome_web_store",
+      "url": "https://chrome.google.com/webstore/detail/mlgclan/abcdefghijklmnopqrstuvwxyz",
+      "id": "abcdefghijklmnopqrstuvwxyz"
+    }
+  ],
+  
+  "prefer_related_applications": false,
+  
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/icons/*",
+        "assets/sounds/*",
+        "assets/animations/*"
+      ],
+      "matches": ["*"]
+    }
+  ],
+  
+  "permissions": [
+    "camera",
+    "microphone",
+    "notifications",
+    "background-sync",
+    "clipboard-read",
+    "clipboard-write"
+  ],
+  
+  "features": [
+    "Cross-platform gaming integration",
+    "Web3 blockchain rewards",
+    "Real-time clan management",
+    "Token-powered voting system",
+    "Offline gaming statistics",
+    "Push notifications for tournaments",
+    "Native mobile sharing",
+    "Camera integration for gaming content",
+    "QR code clan invitations",
+    "Haptic feedback for gaming interactions",
+    "Battery optimization for extended sessions",
+    "Gaming-optimized performance"
+  ]
+}

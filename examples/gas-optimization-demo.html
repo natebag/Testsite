@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan Gas Optimization Demo</title>
+    
+    <!-- Gas optimization configuration -->
+    <meta name="mlg-gas-auto-init" content="true">
+    <meta name="mlg-gas-batching" content="true">
+    <meta name="mlg-gas-ui" content="true">
+    <meta name="mlg-gaming-mode" content="VOTING_SESSION">
+    <meta name="mlg-gas-monitoring" content="true">
+    
+    <!-- Existing MLG.clan styling -->
+    <link rel="stylesheet" href="../src/styles/main.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Gaming-themed dark styling */
+        :root {
+            --gaming-dark: #0f0f0f;
+            --gaming-surface: #1a1a1a;
+            --gaming-accent: #10b981;
+        }
+        
+        body {
+            background: var(--gaming-dark);
+            color: white;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        .gaming-button {
+            background: linear-gradient(45deg, var(--gaming-accent), #34d399);
+            border: none;
+            border-radius: 8px;
+            color: black;
+            font-weight: bold;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .gaming-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .gaming-card {
+            background: var(--gaming-surface);
+            border: 1px solid var(--gaming-accent);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 16px 0;
+        }
+        
+        .vote-btn {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            padding: 8px 16px;
+            margin: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .vote-btn:hover {
+            background: linear-gradient(45deg, #2563eb, #1e40af);
+        }
+        
+        .burn-btn {
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+        }
+        
+        .clan-btn {
+            background: linear-gradient(45deg, #f59e0b, #d97706);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-online { background-color: #10b981; }
+        .status-busy { background-color: #f59e0b; }
+        .status-offline { background-color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-2">⛽ MLG.clan Gas Optimization Demo</h1>
+            <p class="text-gray-300">Interactive demonstration of Solana Web3 gas efficiency optimizations</p>
+            
+            <!-- System Status -->
+            <div id="system-status" class="mt-4 p-4 bg-gray-800 rounded-lg">
+                <div class="flex items-center justify-center space-x-4">
+                    <span class="status-indicator status-offline" id="gas-optimizer-status"></span>
+                    <span>Gas Optimizer: <span id="gas-optimizer-text">Initializing...</span></span>
+                    
+                    <span class="status-indicator status-offline" id="batcher-status"></span>
+                    <span>Transaction Batcher: <span id="batcher-text">Initializing...</span></span>
+                    
+                    <span class="status-indicator status-offline" id="ui-status"></span>
+                    <span>UI System: <span id="ui-text">Initializing...</span></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Demo Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Voting Optimization Demo -->
+            <section class="gaming-card">
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                    🗳️ Voting Gas Optimization
+                    <span class="ml-2 text-sm bg-gaming-accent text-black px-2 py-1 rounded">ACTIVE</span>
+                </h2>
+                
+                <p class="text-gray-300 mb-4">
+                    Demonstrate gas optimization for MLG token burn-to-vote operations with real-time fee estimation.
+                </p>
+                
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span>Single Vote (25 MLG)</span>
+                        <button class="vote-btn burn-btn" data-action="upvote" data-cost="25" data-content-id="demo-content-1">
+                            🔥 Burn & Vote
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span>Super Vote (100 MLG)</span>
+                        <button class="vote-btn burn-btn" data-action="supervote" data-cost="100" data-content-id="demo-content-2">
+                            ⭐ Super Vote
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span>Mega Vote (500 MLG)</span>
+                        <button class="vote-btn burn-btn" data-action="megavote" data-cost="500" data-content-id="demo-content-3">
+                            💥 Mega Vote
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span>Free Vote (0 MLG)</span>
+                        <button class="vote-btn" data-action="free-vote" data-cost="0" data-content-id="demo-content-4">
+                            🆓 Free Vote
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-3 bg-gray-800 rounded">
+                    <h4 class="font-semibold mb-2">Batching Status</h4>
+                    <div id="vote-batch-status" class="text-sm text-gray-400">
+                        No votes queued for batching
+                    </div>
+                </div>
+            </section>
+
+            <!-- Clan Operations Demo -->
+            <section class="gaming-card">
+                <h2 class="text-2xl font-bold mb-4 flex items-center">
+                    🏰 Clan Operations
+                    <span class="ml-2 text-sm bg-blue-500 text-white px-2 py-1 rounded">DEMO</span>
+                </h2>
+                
+                <p class="text-gray-300 mb-4">
+                    Optimize gas fees for clan treasury operations and member management.
+                </p>
+                
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span>Join Clan (50 MLG)</span>
+                        <button class="vote-btn clan-btn" data-clan-operation="join" data-cost="50">
+                            🤝 Join Clan
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span>Treasury Transfer (200 MLG)</span>
+                        <button class="vote-btn clan-btn" data-clan-operation="treasury_transfer" data-cost="200">
+                            💰 Transfer
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span>Role Update (75 MLG)</span>
+                        <button class="vote-btn clan-btn" data-clan-operation="role_update" data-cost="75">
+                            👑 Update Role
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span>Clan Battle Entry (300 MLG)</span>
+                        <button class="vote-btn clan-btn" data-clan-operation="battle_entry" data-cost="300">
+                            ⚔️ Enter Battle
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Network Status Demo -->
+            <section class="gaming-card">
+                <h2 class="text-2xl font-bold mb-4">📊 Network & Fee Status</h2>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-gray-800 p-3 rounded">
+                        <h4 class="font-semibold mb-2">Network Congestion</h4>
+                        <div id="network-congestion" class="text-2xl font-bold text-gaming-accent">
+                            Loading...
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 p-3 rounded">
+                        <h4 class="font-semibold mb-2">Estimated Fee Range</h4>
+                        <div id="fee-range" class="text-2xl font-bold text-blue-400">
+                            Loading...
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 p-3 rounded">
+                        <h4 class="font-semibold mb-2">Batch Savings</h4>
+                        <div id="batch-savings" class="text-2xl font-bold text-green-400">
+                            Loading...
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 p-3 rounded">
+                        <h4 class="font-semibold mb-2">Gaming Mode</h4>
+                        <div id="gaming-mode" class="text-2xl font-bold text-purple-400">
+                            Loading...
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <h4 class="font-semibold mb-2">Quick Mode Switch</h4>
+                    <div class="flex space-x-2">
+                        <button class="text-sm px-3 py-1 bg-gray-700 rounded hover:bg-gray-600" onclick="switchGamingMode('CASUAL')">
+                            🎮 Casual
+                        </button>
+                        <button class="text-sm px-3 py-1 bg-gray-700 rounded hover:bg-gray-600" onclick="switchGamingMode('COMPETITIVE')">
+                            🏆 Competitive
+                        </button>
+                        <button class="text-sm px-3 py-1 bg-gray-700 rounded hover:bg-gray-600" onclick="switchGamingMode('CLAN_OPERATIONS')">
+                            ⚔️ Clan Ops
+                        </button>
+                        <button class="text-sm px-3 py-1 bg-gray-700 rounded hover:bg-gray-600" onclick="switchGamingMode('VOTING_SESSION')">
+                            🗳️ Voting
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testing Controls -->
+            <section class="gaming-card">
+                <h2 class="text-2xl font-bold mb-4">🧪 Testing Controls</h2>
+                
+                <div class="space-y-3">
+                    <button class="gaming-button w-full" onclick="simulateHighTraffic()">
+                        📈 Simulate High Network Traffic
+                    </button>
+                    
+                    <button class="gaming-button w-full" onclick="testBatchOptimization()">
+                        📦 Test Batch Optimization
+                    </button>
+                    
+                    <button class="gaming-button w-full" onclick="showFeeEstimationDemo()">
+                        💰 Show Fee Estimation Demo
+                    </button>
+                    
+                    <button class="gaming-button w-full" onclick="generatePerformanceReport()">
+                        📊 Generate Performance Report
+                    </button>
+                    
+                    <button class="gaming-button w-full" onclick="resetGasOptimization()">
+                        🔄 Reset Gas Optimization
+                    </button>
+                </div>
+                
+                <div class="mt-4 p-3 bg-gray-800 rounded">
+                    <h4 class="font-semibold mb-2">Console Output</h4>
+                    <div id="console-output" class="text-xs font-mono text-gray-300 max-h-32 overflow-y-auto">
+                        Waiting for gas optimization system...
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Performance Metrics -->
+        <section class="gaming-card mt-8">
+            <h2 class="text-2xl font-bold mb-4">📈 Performance Metrics</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-gray-800 p-4 rounded text-center">
+                    <h3 class="font-semibold mb-2">Total Optimizations</h3>
+                    <div id="total-optimizations" class="text-3xl font-bold text-gaming-accent">0</div>
+                </div>
+                
+                <div class="bg-gray-800 p-4 rounded text-center">
+                    <h3 class="font-semibold mb-2">Average Fee Savings</h3>
+                    <div id="avg-savings" class="text-3xl font-bold text-green-400">0%</div>
+                </div>
+                
+                <div class="bg-gray-800 p-4 rounded text-center">
+                    <h3 class="font-semibold mb-2">Optimization Time</h3>
+                    <div id="opt-time" class="text-3xl font-bold text-blue-400">0ms</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Load gas optimization system -->
+    <script type="module">
+        import { initializeMLGGasOptimization } from '../src/main-gas-optimization.js';
+        
+        // Global demo functions
+        window.switchGamingMode = async (mode) => {
+            if (window.MLGGasOptimization) {
+                try {
+                    await window.MLGGasOptimization.setGamingMode(mode);
+                    document.getElementById('gaming-mode').textContent = mode;
+                    logToConsole(`Gaming mode switched to: ${mode}`);
+                } catch (error) {
+                    logToConsole(`Failed to switch gaming mode: ${error.message}`);
+                }
+            }
+        };
+        
+        window.simulateHighTraffic = () => {
+            logToConsole('Simulating high network traffic...');
+            // This would normally interact with the gas optimization system
+            setTimeout(() => {
+                document.getElementById('network-congestion').textContent = 'HIGH';
+                document.getElementById('network-congestion').className = 'text-2xl font-bold text-red-400';
+                logToConsole('Network congestion set to HIGH');
+            }, 1000);
+        };
+        
+        window.testBatchOptimization = async () => {
+            logToConsole('Testing batch optimization...');
+            if (window.optimizeVote) {
+                try {
+                    const result = await window.optimizeVote('upvote', 25, { showUI: true });
+                    logToConsole(`Batch optimization test: ${JSON.stringify(result, null, 2)}`);
+                } catch (error) {
+                    logToConsole(`Batch test failed: ${error.message}`);
+                }
+            }
+        };
+        
+        window.showFeeEstimationDemo = async () => {
+            if (window.showGasOptimization) {
+                try {
+                    await window.showGasOptimization('single_vote_burn', {
+                        tokenAmount: 100,
+                        showUI: true
+                    });
+                } catch (error) {
+                    logToConsole(`Fee estimation demo failed: ${error.message}`);
+                }
+            }
+        };
+        
+        window.generatePerformanceReport = () => {
+            if (window.getGasStatus) {
+                const status = window.getGasStatus();
+                logToConsole(`Performance Report: ${JSON.stringify(status, null, 2)}`);
+            }
+        };
+        
+        window.resetGasOptimization = () => {
+            logToConsole('Resetting gas optimization system...');
+            location.reload();
+        };
+        
+        function logToConsole(message) {
+            const output = document.getElementById('console-output');
+            const time = new Date().toLocaleTimeString();
+            output.innerHTML += `<div>[${time}] ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        // Initialize system
+        async function initDemo() {
+            try {
+                logToConsole('Initializing MLG.clan Gas Optimization Demo...');
+                
+                const result = await initializeMLGGasOptimization({
+                    enableBatching: true,
+                    enableUI: true,
+                    gamingMode: 'VOTING_SESSION',
+                    enableMonitoring: true
+                });
+                
+                logToConsole(`Gas optimization initialized successfully!`);
+                logToConsole(`Gaming mode: ${result.gamingMode}`);
+                
+                // Update status indicators
+                updateStatusIndicator('gas-optimizer', true);
+                updateStatusIndicator('batcher', result.features.transactionBatching);
+                updateStatusIndicator('ui', result.features.userInterface);
+                
+                // Update dashboard
+                updateDashboard();
+                
+                // Start periodic updates
+                setInterval(updateDashboard, 5000);
+                
+            } catch (error) {
+                logToConsole(`Gas optimization initialization failed: ${error.message}`);
+            }
+        }
+        
+        function updateStatusIndicator(system, isOnline) {
+            const statusEl = document.getElementById(`${system}-status`);
+            const textEl = document.getElementById(`${system}-text`);
+            
+            if (isOnline) {
+                statusEl.className = 'status-indicator status-online';
+                textEl.textContent = 'Online';
+            } else {
+                statusEl.className = 'status-indicator status-offline';
+                textEl.textContent = 'Offline';
+            }
+        }
+        
+        function updateDashboard() {
+            // Simulate real data updates
+            document.getElementById('network-congestion').textContent = ['LOW', 'MEDIUM', 'HIGH'][Math.floor(Math.random() * 3)];
+            document.getElementById('fee-range').textContent = `${(Math.random() * 0.01).toFixed(6)} SOL`;
+            document.getElementById('batch-savings').textContent = `${(Math.random() * 25).toFixed(1)}%`;
+            document.getElementById('gaming-mode').textContent = 'VOTING_SESSION';
+            
+            // Update metrics
+            document.getElementById('total-optimizations').textContent = Math.floor(Math.random() * 100);
+            document.getElementById('avg-savings').textContent = `${(Math.random() * 20).toFixed(1)}%`;
+            document.getElementById('opt-time').textContent = `${Math.floor(Math.random() * 500)}ms`;
+            
+            if (window.getGasStatus) {
+                const status = window.getGasStatus();
+                if (status && status.metrics) {
+                    document.getElementById('total-optimizations').textContent = status.metrics.totalOptimizations || 0;
+                }
+            }
+        }
+        
+        // Start the demo when DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initDemo);
+        } else {
+            initDemo();
+        }
+    </script>
+</body>
+</html>

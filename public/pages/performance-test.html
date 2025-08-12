@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Monitoring Test Runner - MLG.clan</title>
+    <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="/src/styles/main.css">
+    
+    <style>
+        .test-runner {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+        
+        .test-output {
+            background: #000;
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            max-height: 600px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .test-status {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .test-status.running {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .test-status.passed {
+            background: #10b981;
+            color: white;
+        }
+        
+        .test-status.failed {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .test-status.warning {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00aa66);
+            transition: width 0.3s ease;
+        }
+        
+        .metric-card {
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .test-category {
+            border-left: 4px solid #00ff88;
+            padding-left: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .test-item {
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            border-radius: 4px;
+        }
+        
+        .test-item.passed {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+        }
+        
+        .test-item.failed {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+        }
+        
+        .test-item.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid #f59e0b;
+        }
+    </style>
+</head>
+<body class="bg-gaming-bg text-white min-h-screen">
+    <!-- Header -->
+    <header class="bg-gaming-surface border-b border-gaming-accent/30 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <a href="/index.html" class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-gaming-accent rounded-full flex items-center justify-center">
+                            <span class="text-black font-bold text-sm">M</span>
+                        </div>
+                        <span class="text-xl font-bold">MLG.clan</span>
+                    </a>
+                    <span class="text-gaming-accent">Performance Test Runner</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="/public/pages/performance.html" class="text-gray-300 hover:text-gaming-accent transition-colors">
+                        Performance Dashboard
+                    </a>
+                    <div id="system-status" class="test-status">Ready</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Test Control Panel -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gaming-accent mb-4">🧪 Performance Monitoring Test Suite</h1>
+            <p class="text-gray-300 text-lg mb-6">Validate the accuracy and functionality of the performance monitoring system</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="metric-card">
+                    <h3 class="text-lg font-semibold text-gaming-accent mb-2">Test Status</h3>
+                    <div id="test-progress" class="progress-bar mb-2">
+                        <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span id="progress-text">Ready to run</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <h3 class="text-lg font-semibold text-gaming-accent mb-2">Test Results</h3>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div>
+                            <div id="passed-count" class="text-2xl font-bold text-green-400">0</div>
+                            <div class="text-xs text-gray-400">Passed</div>
+                        </div>
+                        <div>
+                            <div id="failed-count" class="text-2xl font-bold text-red-400">0</div>
+                            <div class="text-xs text-gray-400">Failed</div>
+                        </div>
+                        <div>
+                            <div id="warning-count" class="text-2xl font-bold text-yellow-400">0</div>
+                            <div class="text-xs text-gray-400">Warnings</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <h3 class="text-lg font-semibold text-gaming-accent mb-2">Performance</h3>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm">Duration</span>
+                            <span id="test-duration" class="text-sm font-mono">0ms</span>
+                        </div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm">Memory</span>
+                            <span id="memory-usage" class="text-sm font-mono">--</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm">Success Rate</span>
+                            <span id="success-rate" class="text-sm font-mono">--%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex space-x-4">
+                <button id="run-tests-btn" class="px-6 py-3 bg-gaming-accent hover:bg-gaming-accent/80 text-black font-bold rounded-lg transition-colors">
+                    🚀 Run Complete Test Suite
+                </button>
+                <button id="run-quick-btn" class="px-6 py-3 bg-gaming-blue hover:bg-gaming-blue/80 text-white font-bold rounded-lg transition-colors">
+                    ⚡ Quick Test
+                </button>
+                <button id="clear-output-btn" class="px-6 py-3 bg-gray-600 hover:bg-gray-500 text-white font-bold rounded-lg transition-colors">
+                    🗑️ Clear Output
+                </button>
+                <button id="export-results-btn" class="px-6 py-3 bg-gaming-purple hover:bg-gaming-purple/80 text-white font-bold rounded-lg transition-colors" disabled>
+                    📊 Export Results
+                </button>
+            </div>
+        </div>
+
+        <!-- Test Output -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Console Output -->
+            <div class="test-runner">
+                <h2 class="text-2xl font-bold text-gaming-accent mb-4">📟 Test Console</h2>
+                <div id="test-console" class="test-output">
+                    Performance Monitoring Test Runner v1.0.0
+Ready to run tests...
+
+Available test suites:
+• Performance Analytics Core
+• Gaming Metrics Tracking  
+• Alert System
+• Data Pipeline
+• Insights Engine
+• Performance Integration
+• Voting Integration
+• End-to-End Workflow
+• System Performance
+
+Click "Run Complete Test Suite" to begin testing.
+                </div>
+            </div>
+            
+            <!-- Test Results Summary -->
+            <div>
+                <h2 class="text-2xl font-bold text-gaming-accent mb-4">📋 Test Results</h2>
+                <div id="test-results" class="bg-gaming-surface/30 border border-gaming-accent/20 rounded-lg p-6 min-h-96">
+                    <p class="text-gray-400 text-center py-8">No tests run yet. Click "Run Tests" to begin.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div id="recommendations-section" class="mt-12" style="display: none;">
+            <h2 class="text-2xl font-bold text-gaming-accent mb-4">🎯 Recommendations</h2>
+            <div id="recommendations" class="space-y-4"></div>
+        </div>
+    </main>
+
+    <!-- Performance Monitoring Scripts -->
+    <script type="module">
+        import { PerformanceMonitoringTests } from '/src/shared/performance/PerformanceMonitoringTests.js';
+        import { performanceIntegration } from '/src/shared/performance/PerformanceIntegration.js';
+        
+        let testSuite = null;
+        let testResults = null;
+        let testStartTime = 0;
+        
+        // Initialize test runner
+        async function initializeTestRunner() {
+            try {
+                // Initialize performance monitoring first
+                if (!performanceIntegration.isReady()) {
+                    await performanceIntegration.initialize();
+                }
+                
+                // Create test suite
+                testSuite = new PerformanceMonitoringTests();
+                
+                updateSystemStatus('ready', 'System Ready');
+                logToConsole('✅ Test runner initialized successfully');
+                
+            } catch (error) {
+                console.error('Failed to initialize test runner:', error);
+                updateSystemStatus('failed', 'Initialization Failed');
+                logToConsole(`❌ Initialization failed: ${error.message}`);
+            }
+        }
+        
+        // Run complete test suite
+        async function runCompleteTestSuite() {
+            if (!testSuite) {
+                logToConsole('❌ Test suite not initialized');
+                return;
+            }
+            
+            try {
+                updateSystemStatus('running', 'Running Tests');
+                logToConsole('🎯 Starting complete performance monitoring test suite...\n');
+                
+                resetTestMetrics();
+                testStartTime = Date.now();
+                
+                // Run tests with progress updates
+                testResults = await runTestsWithProgress();
+                
+                // Display results
+                displayTestResults(testResults);
+                displayRecommendations(testResults.recommendations);
+                
+                const duration = Date.now() - testStartTime;
+                updateTestMetrics(testResults.summary, duration);
+                
+                if (testResults.summary.success) {
+                    updateSystemStatus('passed', 'All Tests Passed');
+                    logToConsole('\n🎉 All tests completed successfully!');
+                } else {
+                    updateSystemStatus('failed', 'Some Tests Failed');
+                    logToConsole(`\n⚠️ ${testResults.summary.failed} test(s) failed`);
+                }
+                
+                // Enable export button
+                document.getElementById('export-results-btn').disabled = false;
+                
+            } catch (error) {
+                console.error('Test suite execution failed:', error);
+                updateSystemStatus('failed', 'Test Execution Failed');
+                logToConsole(`❌ Test execution failed: ${error.message}`);
+            }
+        }
+        
+        // Run tests with progress tracking
+        async function runTestsWithProgress() {
+            const testCategories = [
+                'Performance Analytics Core',
+                'Gaming Metrics Tracking',
+                'Alert System',
+                'Data Pipeline',
+                'Insights Engine',
+                'Performance Integration',
+                'Voting Integration',
+                'End-to-End Workflow',
+                'System Performance'
+            ];
+            
+            let completedCategories = 0;
+            const totalCategories = testCategories.length;
+            
+            // Override test suite logging to capture progress
+            const originalRunTest = testSuite.runTest.bind(testSuite);
+            testSuite.runTest = async function(testName, testFunction) {
+                const result = await originalRunTest(testName, testFunction);
+                
+                // Update UI metrics
+                updateTestCounters(testSuite.testSummary);
+                
+                return result;
+            };
+            
+            // Run the actual test suite
+            const results = await testSuite.runCompleteTestSuite();
+            
+            // Final progress update
+            updateProgress(100, 'Tests Complete');
+            
+            return results;
+        }
+        
+        // Run quick performance check
+        async function runQuickTest() {
+            if (!testSuite) {
+                logToConsole('❌ Test suite not initialized');
+                return;
+            }
+            
+            try {
+                updateSystemStatus('running', 'Running Quick Test');
+                logToConsole('⚡ Running quick performance check...\n');
+                
+                resetTestMetrics();
+                testStartTime = Date.now();
+                
+                // Run core functionality tests only
+                await testSuite.testPerformanceAnalyticsCore();
+                await testSuite.testGamingMetricsTracking();
+                await testSuite.testPerformanceIntegration();
+                
+                const duration = Date.now() - testStartTime;
+                updateTestMetrics(testSuite.testSummary, duration);
+                
+                logToConsole('\n✅ Quick test completed');
+                updateSystemStatus('passed', 'Quick Test Passed');
+                
+            } catch (error) {
+                console.error('Quick test failed:', error);
+                updateSystemStatus('failed', 'Quick Test Failed');
+                logToConsole(`❌ Quick test failed: ${error.message}`);
+            }
+        }
+        
+        // Update system status indicator
+        function updateSystemStatus(status, text) {
+            const statusElement = document.getElementById('system-status');
+            statusElement.className = `test-status ${status}`;
+            statusElement.textContent = text;
+        }
+        
+        // Log message to console output
+        function logToConsole(message) {
+            const console = document.getElementById('test-console');
+            console.textContent += message + '\n';
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        // Update progress bar
+        function updateProgress(percent, text) {
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+            const progressPercent = document.getElementById('progress-percent');
+            
+            progressFill.style.width = `${percent}%`;
+            progressText.textContent = text;
+            progressPercent.textContent = `${percent}%`;
+        }
+        
+        // Reset test metrics
+        function resetTestMetrics() {
+            document.getElementById('passed-count').textContent = '0';
+            document.getElementById('failed-count').textContent = '0';
+            document.getElementById('warning-count').textContent = '0';
+            document.getElementById('test-duration').textContent = '0ms';
+            document.getElementById('success-rate').textContent = '--%';
+            updateProgress(0, 'Starting...');
+        }
+        
+        // Update test counters
+        function updateTestCounters(summary) {
+            document.getElementById('passed-count').textContent = summary.passed.toString();
+            document.getElementById('failed-count').textContent = summary.failed.toString();
+            document.getElementById('warning-count').textContent = summary.warnings.toString();
+            
+            if (summary.total > 0) {
+                const successRate = Math.round((summary.passed / summary.total) * 100);
+                document.getElementById('success-rate').textContent = `${successRate}%`;
+                
+                const progress = Math.round((summary.passed + summary.failed) / summary.total * 100);
+                updateProgress(progress, `${summary.passed + summary.failed}/${summary.total} tests`);
+            }
+        }
+        
+        // Update test metrics display
+        function updateTestMetrics(summary, duration) {
+            document.getElementById('test-duration').textContent = `${duration}ms`;
+            
+            if (performance.memory) {
+                const memoryMB = Math.round(performance.memory.usedJSHeapSize / 1048576);
+                document.getElementById('memory-usage').textContent = `${memoryMB}MB`;
+            }
+            
+            updateTestCounters(summary);
+        }
+        
+        // Display test results
+        function displayTestResults(results) {
+            const resultsContainer = document.getElementById('test-results');
+            
+            let html = '<div class="space-y-4">';
+            
+            // Group results by test category
+            const categories = {};
+            results.results.forEach(result => {
+                const category = result.name.split(' ')[0] || 'Other';
+                if (!categories[category]) categories[category] = [];
+                categories[category].push(result);
+            });
+            
+            for (const [category, tests] of Object.entries(categories)) {
+                html += `<div class="test-category">`;
+                html += `<h3 class="text-lg font-semibold text-gaming-accent mb-2">${category}</h3>`;
+                
+                tests.forEach(test => {
+                    const statusClass = test.status.toLowerCase();
+                    html += `<div class="test-item ${statusClass}">`;
+                    html += `<div class="flex justify-between items-center">`;
+                    html += `<span>${test.name}</span>`;
+                    html += `<span class="text-sm font-mono">${test.status}</span>`;
+                    html += `</div>`;
+                    
+                    if (test.error) {
+                        html += `<div class="text-sm text-red-300 mt-1">${test.error}</div>`;
+                    }
+                    
+                    if (test.message) {
+                        html += `<div class="text-sm text-yellow-300 mt-1">${test.message}</div>`;
+                    }
+                    
+                    html += `</div>`;
+                });
+                
+                html += `</div>`;
+            }
+            
+            html += '</div>';
+            resultsContainer.innerHTML = html;
+        }
+        
+        // Display recommendations
+        function displayRecommendations(recommendations) {
+            const recommendationsSection = document.getElementById('recommendations-section');
+            const recommendationsContainer = document.getElementById('recommendations');
+            
+            if (!recommendations || recommendations.length === 0) {
+                recommendationsSection.style.display = 'none';
+                return;
+            }
+            
+            recommendationsSection.style.display = 'block';
+            
+            let html = '';
+            recommendations.forEach(rec => {
+                const priorityColor = rec.priority === 'high' ? 'border-red-500' : 
+                                   rec.priority === 'medium' ? 'border-yellow-500' : 'border-green-500';
+                
+                html += `<div class="metric-card ${priorityColor} border-l-4">`;
+                html += `<div class="flex justify-between items-start mb-2">`;
+                html += `<h4 class="text-lg font-semibold text-white">${rec.title}</h4>`;
+                html += `<span class="text-sm px-2 py-1 bg-gaming-accent/20 rounded text-gaming-accent">${rec.priority}</span>`;
+                html += `</div>`;
+                html += `<p class="text-gray-300">${rec.description}</p>`;
+                html += `</div>`;
+            });
+            
+            recommendationsContainer.innerHTML = html;
+        }
+        
+        // Export test results
+        function exportTestResults() {
+            if (!testResults) {
+                alert('No test results to export. Run tests first.');
+                return;
+            }
+            
+            try {
+                const exportData = {
+                    ...testResults,
+                    exportedAt: new Date().toISOString(),
+                    exportedBy: 'MLG.clan Performance Test Runner'
+                };
+                
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+                    type: 'application/json'
+                });
+                
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `mlg-performance-test-results-${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                logToConsole('📊 Test results exported successfully');
+                
+            } catch (error) {
+                console.error('Export failed:', error);
+                alert('Failed to export test results');
+            }
+        }
+        
+        // Clear console output
+        function clearOutput() {
+            const console = document.getElementById('test-console');
+            console.textContent = 'Performance Monitoring Test Runner v1.0.0\nConsole cleared.\n';
+            
+            const resultsContainer = document.getElementById('test-results');
+            resultsContainer.innerHTML = '<p class="text-gray-400 text-center py-8">No tests run yet. Click "Run Tests" to begin.</p>';
+            
+            document.getElementById('recommendations-section').style.display = 'none';
+            document.getElementById('export-results-btn').disabled = true;
+            
+            resetTestMetrics();
+            updateSystemStatus('ready', 'Ready');
+        }
+        
+        // Event listeners
+        document.getElementById('run-tests-btn').addEventListener('click', runCompleteTestSuite);
+        document.getElementById('run-quick-btn').addEventListener('click', runQuickTest);
+        document.getElementById('clear-output-btn').addEventListener('click', clearOutput);
+        document.getElementById('export-results-btn').addEventListener('click', exportTestResults);
+        
+        // Initialize when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeTestRunner);
+        } else {
+            initializeTestRunner();
+        }
+        
+        // Auto-run tests if URL parameter is present
+        if (window.location.search.includes('autorun=true')) {
+            setTimeout(() => {
+                runCompleteTestSuite();
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

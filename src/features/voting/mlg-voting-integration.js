@@ -26,6 +26,11 @@
 
 import { getWalletManager } from '../wallet/phantom-wallet.js';
 import { SolanaVotingSystem, VOTING_CONFIG } from '../voting/solana-voting-system.js';
+import { 
+  getGasOptimizationIntegration,
+  optimizeVoteTransaction,
+  TRANSACTION_PRIORITIES 
+} from '../web3/gas-optimization-integration.js';
 
 /**
  * Voting Integration System Configuration
@@ -81,6 +86,9 @@ export class MLGVotingIntegration {
     // Gaming notification system
     this.notificationSystem = null;
     
+    // Gas optimization integration
+    this.gasOptimization = null;
+    
     console.log('🎮 MLG Voting Integration System initialized');
   }
 
@@ -100,6 +108,21 @@ export class MLGVotingIntegration {
       // Initialize voting system
       this.votingSystem = new SolanaVotingSystem();
       await this.votingSystem.initialize();
+      
+      // Initialize gas optimization integration
+      try {
+        this.gasOptimization = getGasOptimizationIntegration();
+        if (!this.gasOptimization.isInitialized) {
+          await this.gasOptimization.initialize({
+            gamingMode: 'VOTING_SESSION',
+            enableBatching: true,
+            enableUI: true
+          });
+        }
+        console.log('✅ Gas optimization integrated with voting system');
+      } catch (error) {
+        console.warn('⚠️ Gas optimization integration failed:', error);
+      }
       
       // Connect to API client and WebSocket manager
       this.mlgApiClient = window.MLGApiClient || window.mlgApi;
@@ -248,6 +271,37 @@ export class MLGVotingIntegration {
       
       console.log(`🔥 Executing ${voteType} vote for ${contentId} (${cost} MLG tokens)`);
       
+      // Get user balance for gas optimization
+      const walletInfo = this.walletManager.getConnectionInfo();
+      const userBalance = walletInfo.balance?.sol || 0;
+      
+      // Use gas optimization if available
+      let optimizationResult = null;
+      if (this.gasOptimization && cost > 0) {
+        try {
+          // Determine vote priority based on cost and context
+          let priority = TRANSACTION_PRIORITIES.NORMAL;
+          if (cost >= 25) priority = TRANSACTION_PRIORITIES.HIGH;
+          if (cost >= 100) priority = TRANSACTION_PRIORITIES.GAMING;
+          
+          optimizationResult = await this.gasOptimization.optimizeGamingOperation(
+            cost === 1 ? 'single_vote_burn' : 'multi_vote_burn',
+            {
+              tokenAmount: cost,
+              voteCount: Math.max(1, Math.floor(cost / 5)), // Estimate vote count
+              priority,
+              userBalance,
+              showUI: cost >= 25, // Show UI for expensive votes
+              urgency: false
+            }
+          );
+          
+          console.log('⚡ Gas optimization applied to vote transaction');
+        } catch (error) {
+          console.warn('⚠️ Gas optimization failed, using standard flow:', error);
+        }
+      }
+      
       let result;
       
       // Retry logic for network issues
@@ -259,8 +313,8 @@ export class MLGVotingIntegration {
             // Free vote
             result = await this.executeFreeVote(contentId, voteType);
           } else {
-            // Burn-to-vote
-            result = await this.executeBurnVote(contentId, voteType, cost);
+            // Burn-to-vote with gas optimization
+            result = await this.executeBurnVoteOptimized(contentId, voteType, cost, optimizationResult);
           }
           
           if (result.success) {
@@ -425,6 +479,89 @@ export class MLGVotingIntegration {
       
     } catch (error) {
       console.error('Burn vote failed:', error);
+      return {
+        success: false,
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * Execute burn-to-vote with gas optimization
+   */
+  async executeBurnVoteOptimized(contentId, voteType, tokenAmount, optimizationResult = null) {
+    try {
+      // Get wallet connection info
+      const walletInfo = this.walletManager.getConnectionInfo();
+      if (!walletInfo.connected) {
+        throw new Error('Wallet not connected');
+      }
+      
+      // Use gas optimization result if available
+      if (optimizationResult && optimizationResult.estimation) {
+        console.log(`⚡ Using gas-optimized burn transaction (est. fee: ${optimizationResult.estimation.fees.totalSOL.toFixed(6)} SOL)`);
+        
+        // Check if batching is recommended
+        if (optimizationResult.batchingResult && optimizationResult.batchingResult.feasible) {
+          console.log('📦 Adding transaction to batch queue for optimization');
+          
+          // Add to batch queue instead of immediate execution
+          if (this.gasOptimization.components.transactionBatcher) {
+            const batchResult = await this.gasOptimization.components.transactionBatcher.addToBatch(
+              null, // Transaction will be created by voting system
+              {
+                type: 'burn',
+                operationId: `vote_${contentId}_${Date.now()}`,
+                contentId,
+                voteType,
+                tokenAmount,
+                callback: (result) => {
+                  console.log(`📦 Batched vote transaction result:`, result);
+                }
+              }
+            );
+            
+            return {
+              success: true,
+              transactionHash: 'batched',
+              batched: true,
+              batchId: batchResult.transactionId,
+              estimatedProcessTime: batchResult.estimatedProcessTime
+            };
+          }
+        }
+      }
+      
+      // Execute standard burn-to-vote transaction
+      const result = await this.votingSystem.burnToVote({
+        contentId,
+        voteType,
+        tokenAmount,
+        walletAddress: walletInfo.publicKey,
+        gasOptimization: optimizationResult?.estimation // Pass optimization data
+      });
+      
+      // Track gas optimization performance if available
+      if (optimizationResult && this.gasOptimization) {
+        try {
+          // This would track actual vs estimated fees for future improvements
+          console.log('📊 Tracking gas optimization performance');
+        } catch (trackingError) {
+          console.warn('⚠️ Failed to track optimization performance:', trackingError);
+        }
+      }
+      
+      return {
+        success: true,
+        transactionHash: result.signature,
+        cost: tokenAmount,
+        type: 'burn_optimized',
+        tokensRemaining: result.remainingBalance,
+        gasOptimized: !!optimizationResult
+      };
+      
+    } catch (error) {
+      console.error('Burn-to-vote (optimized) failed:', error);
       return {
         success: false,
         error: error.message

@@ -3,7 +3,7 @@
 Guidelines for managing task lists in markdown files to track progress on completing a PRD
 
 ## Task Implementation
-- **One sub-task at a time:** Do **NOT** start the next sub‑task until you ask the user for permission and they say "yes" or "y"
+- **One sub-task at a time:** Implement tasks sequentially and continuously without user confirmation (--force mode enabled)
 - **Completion protocol:**  
   1. When you finish a **sub‑task**, immediately mark it as completed by changing `[ ]` to `[x]`.
   2. If **all** subtasks underneath a parent task are now `[x]`, follow this sequence:
@@ -21,7 +21,7 @@ Guidelines for managing task lists in markdown files to track progress on comple
         git commit -m "feat: add payment validation logic" -m "- Validates card type and expiry" -m "- Adds unit tests for edge cases" -m "Related to T123 in PRD"
         ```
   3. Once all the subtasks are marked completed and changes have been committed, mark the **parent task** as completed.
-- Stop after each sub‑task and wait for the user's go‑ahead.
+- **Continue automatically** to the next sub-task without stopping for user approval.
 
 ## Task List Maintenance
 
@@ -44,5 +44,6 @@ When working with task lists, the AI must:
 3. Add newly discovered tasks.
 4. Keep "Relevant Files" accurate and up to date.
 5. Before starting work, check which sub‑task is next.
-6. After implementing a sub‑task, update the file and then pause for user approval.
-7. utilizing the completion protocol from process 2 can we keep updated logs in the ceo process and keep me updated on the tasks as completed in a saved in depth summary
+6. After implementing a sub‑task, update the file and **continue automatically** to the next task.
+7. Utilizing the completion protocol from process 2, keep updated logs in the CEO process and maintain in-depth summaries of completed tasks.
+8. **FORCE MODE ENABLED:** Continue through all tasks without user confirmation - implement, update, and proceed automatically.

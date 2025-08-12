@@ -1,0 +1,329 @@
+{
+  "testProfiles": {
+    "quick": {
+      "description": "Quick smoke test for basic functionality",
+      "duration": "2m",
+      "users": 100,
+      "rampUp": "30s",
+      "scenarios": ["voting", "browsing"],
+      "enabled": true
+    },
+    "gaming": {
+      "description": "Gaming-focused load test for realistic gaming scenarios",
+      "duration": "5m",
+      "users": 500,
+      "rampUp": "1m",
+      "scenarios": ["voting", "clan-battles", "tournaments", "leaderboards"],
+      "enabled": true
+    },
+    "full": {
+      "description": "Comprehensive full-scale load test",
+      "duration": "10m",
+      "users": 1000,
+      "rampUp": "2m",
+      "scenarios": ["all"],
+      "enabled": true
+    },
+    "stress": {
+      "description": "Stress test to find system breaking point",
+      "duration": "15m",
+      "users": 2000,
+      "rampUp": "3m",
+      "scenarios": ["all"],
+      "enabled": false
+    },
+    "endurance": {
+      "description": "Long-running endurance test",
+      "duration": "60m",
+      "users": 500,
+      "rampUp": "5m",
+      "scenarios": ["all"],
+      "enabled": false
+    }
+  },
+
+  "environments": {
+    "local": {
+      "baseUrl": "http://localhost:3000",
+      "apiUrl": "http://localhost:3000/api",
+      "wsUrl": "ws://localhost:3000",
+      "solanaRpc": "https://api.devnet.solana.com",
+      "enabled": true
+    },
+    "staging": {
+      "baseUrl": "https://staging.mlg.clan",
+      "apiUrl": "https://staging.mlg.clan/api", 
+      "wsUrl": "wss://staging.mlg.clan",
+      "solanaRpc": "https://api.devnet.solana.com",
+      "enabled": false
+    },
+    "production": {
+      "baseUrl": "https://mlg.clan",
+      "apiUrl": "https://mlg.clan/api",
+      "wsUrl": "wss://mlg.clan",
+      "solanaRpc": "https://api.mainnet-beta.solana.com",
+      "enabled": false,
+      "warning": "NEVER run load tests against production without explicit approval"
+    }
+  },
+
+  "scenarios": {
+    "voting": {
+      "description": "Burn-to-vote gaming mechanics",
+      "weight": 30,
+      "enabled": true,
+      "config": {
+        "tokensPerVote": 10,
+        "voteTypes": ["up", "down"],
+        "contentTypes": ["video", "clip", "stream", "tournament"]
+      }
+    },
+    "clan-battles": {
+      "description": "Clan battle coordination and real-time updates",
+      "weight": 20,
+      "enabled": true,
+      "config": {
+        "maxBattleDuration": "5m",
+        "actionsPerUser": 5,
+        "battleTypes": ["raid", "defense", "tournament"]
+      }
+    },
+    "tournaments": {
+      "description": "Tournament participation and bracket management",
+      "weight": 15,
+      "enabled": true,
+      "config": {
+        "maxParticipants": 64,
+        "bracketUpdateFrequency": "30s",
+        "tournamentTypes": ["single_elimination", "double_elimination"]
+      }
+    },
+    "leaderboards": {
+      "description": "Dynamic leaderboard updates and queries",
+      "weight": 15,
+      "enabled": true,
+      "config": {
+        "refreshInterval": "10s",
+        "leaderboardTypes": ["global", "clan", "weekly", "monthly"],
+        "topPlayersCount": 100
+      }
+    },
+    "browsing": {
+      "description": "Content browsing and discovery",
+      "weight": 20,
+      "enabled": true,
+      "config": {
+        "categoriesPerUser": 3,
+        "searchQueriesPerUser": 2,
+        "contentTypes": ["trending", "recent", "popular"]
+      }
+    }
+  },
+
+  "performanceThresholds": {
+    "api": {
+      "maxResponseTime": 500,
+      "maxP95ResponseTime": 1000,
+      "minSuccessRate": 95,
+      "maxErrorRate": 5,
+      "minThroughput": 50
+    },
+    "database": {
+      "maxQueryTime": 100,
+      "maxP95QueryTime": 250,
+      "minSuccessRate": 99,
+      "maxLockWaits": 10,
+      "maxDeadlocks": 0,
+      "maxConnectionUtilization": 80
+    },
+    "websocket": {
+      "minConnectionSuccessRate": 95,
+      "maxConnectionLatency": 200,
+      "maxMessageLatency": 100,
+      "maxDisconnectionRate": 5,
+      "minMessagesPerSecond": 100
+    },
+    "solana": {
+      "minSuccessRate": 95,
+      "maxConfirmationTime": 3000,
+      "maxRpcLatency": 500,
+      "minThroughputTPS": 10,
+      "maxFailureRate": 5
+    },
+    "system": {
+      "maxCpuUsage": 80,
+      "maxMemoryUsage": 80,
+      "maxDiskUsage": 90,
+      "minHealthScore": 80,
+      "maxCriticalAlerts": 0
+    }
+  },
+
+  "monitoring": {
+    "enabled": true,
+    "sampleInterval": 1000,
+    "metricsPort": 8090,
+    "alerting": {
+      "enabled": true,
+      "channels": ["console", "file"],
+      "criticalThreshold": "immediate",
+      "warningThreshold": "5m"
+    },
+    "dashboard": {
+      "enabled": true,
+      "autoRefresh": true,
+      "refreshInterval": 5000
+    }
+  },
+
+  "reporting": {
+    "format": "both",
+    "includeCharts": true,
+    "includeTrends": true,
+    "includeRecommendations": true,
+    "outputFormats": ["json", "html", "markdown"],
+    "retention": {
+      "reports": "30d",
+      "rawData": "7d",
+      "summaries": "90d"
+    }
+  },
+
+  "gaming": {
+    "tokenEconomics": {
+      "defaultTokenBalance": 1000,
+      "minTokenBalance": 10,
+      "burnRates": {
+        "vote": 10,
+        "clan_action": 5,
+        "tournament_entry": 50
+      },
+      "rewardRates": {
+        "content_creation": 100,
+        "clan_victory": 200,
+        "tournament_win": 500
+      }
+    },
+    "clanMechanics": {
+      "maxClanSize": 50,
+      "battleDuration": "10m",
+      "cooldownPeriod": "1h",
+      "maxSimultaneousBattles": 10
+    },
+    "tournamentRules": {
+      "registrationPeriod": "24h",
+      "maxParticipants": 256,
+      "bracketGeneration": "automatic",
+      "eliminationRules": "single"
+    }
+  },
+
+  "security": {
+    "rateLimiting": {
+      "enabled": true,
+      "requestsPerMinute": 60,
+      "burstLimit": 100,
+      "penaltyDuration": "5m"
+    },
+    "authentication": {
+      "required": true,
+      "tokenExpiry": "24h",
+      "refreshTokens": true,
+      "mfaEnabled": false
+    },
+    "validation": {
+      "inputSanitization": true,
+      "sqlInjectionPrevention": true,
+      "xssProtection": true,
+      "csrfProtection": true
+    }
+  },
+
+  "infrastructure": {
+    "loadBalancing": {
+      "enabled": false,
+      "algorithm": "round_robin",
+      "healthChecks": true,
+      "failoverTime": "30s"
+    },
+    "caching": {
+      "enabled": true,
+      "provider": "redis",
+      "ttl": "5m",
+      "strategies": ["query_cache", "session_cache", "api_cache"]
+    },
+    "database": {
+      "connectionPooling": true,
+      "maxConnections": 100,
+      "connectionTimeout": "30s",
+      "queryTimeout": "60s",
+      "readReplicas": false
+    }
+  },
+
+  "testData": {
+    "generation": {
+      "users": 1000,
+      "clans": 50,
+      "content": 200,
+      "tournaments": 10,
+      "battles": 20
+    },
+    "distribution": {
+      "activeUsers": 0.7,
+      "premiumUsers": 0.2,
+      "clanMembers": 0.8,
+      "tournamentParticipants": 0.3
+    },
+    "patterns": {
+      "peakHours": ["18:00-22:00"],
+      "lowActivity": ["02:00-06:00"],
+      "weekendBoost": 1.5,
+      "seasonalEvents": true
+    }
+  },
+
+  "failureSimulation": {
+    "enabled": false,
+    "scenarios": {
+      "networkLatency": {
+        "probability": 0.05,
+        "delayRange": [100, 500]
+      },
+      "databaseTimeout": {
+        "probability": 0.02,
+        "duration": "5s"
+      },
+      "serviceUnavailable": {
+        "probability": 0.01,
+        "duration": "30s"
+      },
+      "memoryPressure": {
+        "probability": 0.03,
+        "intensity": "medium"
+      }
+    }
+  },
+
+  "ci_cd": {
+    "integration": {
+      "enabled": false,
+      "triggers": ["commit", "merge_request", "scheduled"],
+      "testProfile": "quick",
+      "failureThreshold": "C",
+      "timeout": "10m"
+    },
+    "notifications": {
+      "slack": {
+        "enabled": false,
+        "webhook": "",
+        "channels": ["#development", "#alerts"]
+      },
+      "email": {
+        "enabled": false,
+        "recipients": [],
+        "template": "load_test_results"
+      }
+    }
+  }
+}

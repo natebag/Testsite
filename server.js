@@ -92,6 +92,7 @@ app.use(helmet({
       frameSrc: ["'none'"],
       childSrc: ["'none'"],
       workerSrc: ["'self'", "blob:"],
+      manifestSrc: ["'self'"],
       upgradeInsecureRequests: []
     }
   },
@@ -161,6 +162,7 @@ const staticOptions = {
 };
 
 // Serve static files with optimization
+app.use(express.static(path.join(__dirname, 'public'), staticOptions)); // PWA files
 app.use(express.static(path.join(__dirname, 'src'), staticOptions));
 app.use('/ui', express.static(path.join(__dirname, 'src/ui'), staticOptions));
 app.use('/examples', express.static(path.join(__dirname, 'src/ui/examples'), staticOptions));

@@ -16,6 +16,20 @@
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
   
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="../manifest.json">
+  <meta name="theme-color" content="#00ff88">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MLG.clan">
+  <meta name="msapplication-TileColor" content="#00ff88">
+  <meta name="msapplication-config" content="../browserconfig.xml">
+  
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/icons/icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/icons/icon-192x192.png">
+  
   <!-- External Dependencies -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -3003,5 +3017,204 @@
       }
     }
   </style>
+
+  <!-- PWA Initialization Scripts -->
+  <script type="module">
+    // Import PWA modules
+    import('../../src/utils/pwa/pwa-manager.js').then(({ PWAManager }) => {
+      console.log('[PWA] Manager loaded and initialized');
+    }).catch(error => {
+      console.error('[PWA] Failed to load PWA manager:', error);
+    });
+
+    import('../../src/utils/pwa/pwa-security.js').then(({ PWASecurityManager }) => {
+      console.log('[PWA] Security manager loaded');
+    }).catch(error => {
+      console.error('[PWA] Failed to load PWA security:', error);
+    });
+
+    import('../../src/utils/pwa/offline-data-manager.js').then(({ OfflineDataManager }) => {
+      console.log('[PWA] Offline data manager loaded');
+    }).catch(error => {
+      console.error('[PWA] Failed to load offline data manager:', error);
+    });
+
+    import('../../src/utils/pwa/pwa-performance-monitor.js').then(({ PWAPerformanceMonitor }) => {
+      console.log('[PWA] Performance monitor loaded');
+    }).catch(error => {
+      console.error('[PWA] Failed to load performance monitor:', error);
+    });
+
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', async () => {
+        try {
+          const registration = await navigator.serviceWorker.register('/sw.js', {
+            scope: '/'
+          });
+          
+          console.log('[PWA] Service Worker registered:', registration.scope);
+          
+          // Handle updates
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            console.log('[PWA] New Service Worker available');
+            
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed') {
+                if (navigator.serviceWorker.controller) {
+                  console.log('[PWA] New content is available; please refresh.');
+                } else {
+                  console.log('[PWA] Content is cached for offline use.');
+                }
+              }
+            });
+          });
+        } catch (error) {
+          console.error('[PWA] Service Worker registration failed:', error);
+        }
+      });
+    }
+
+    // PWA Install Prompt Handler
+    let deferredPrompt;
+    
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      console.log('[PWA] Install prompt ready');
+      
+      // Show install button if needed
+      showInstallButton();
+    });
+
+    window.addEventListener('appinstalled', (event) => {
+      console.log('[PWA] App was installed');
+      deferredPrompt = null;
+      hideInstallButton();
+    });
+
+    function showInstallButton() {
+      // Custom install button logic would go here
+      console.log('[PWA] Install button should be shown');
+    }
+
+    function hideInstallButton() {
+      console.log('[PWA] Install button should be hidden');
+    }
+
+    // Performance monitoring
+    window.addEventListener('load', () => {
+      // Monitor page load performance
+      if (window.pwaPerformanceMonitor) {
+        window.pwaPerformanceMonitor.generatePerformanceReport();
+      }
+    });
+
+    // Online/Offline handling
+    window.addEventListener('online', () => {
+      console.log('[PWA] Connection restored');
+      document.body.classList.remove('offline');
+      
+      // Trigger background sync if available
+      if (window.pwaManager) {
+        window.pwaManager.handleConnectionRestore();
+      }
+    });
+
+    window.addEventListener('offline', () => {
+      console.log('[PWA] Connection lost');
+      document.body.classList.add('offline');
+      
+      if (window.pwaManager) {
+        window.pwaManager.handleConnectionLost();
+      }
+    });
+
+    // PWA Debug Commands (Development)
+    if (window.location.hostname === 'localhost') {
+      window.pwaDebug = {
+        showSecurityDashboard: () => window.pwaSecurityManager?.showSecurityDashboard(),
+        showPerformanceDashboard: () => window.pwaPerformanceMonitor?.showPerformanceDashboard(),
+        getOfflineStats: () => window.offlineDataManager?.getStorageStats(),
+        clearCache: async () => {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map(name => caches.delete(name)));
+          console.log('[PWA Debug] All caches cleared');
+        },
+        forceUpdate: () => window.pwaManager?.updateApp()
+      };
+      
+      console.log('[PWA Debug] Debug commands available:', Object.keys(window.pwaDebug));
+    }
+  </script>
+
+  <!-- Offline Styles -->
+  <style>
+    .offline .connection-required {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    
+    .offline .offline-indicator {
+      display: block !important;
+    }
+    
+    .offline-indicator {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(45deg, #ef4444, #fbbf24);
+      color: white;
+      text-align: center;
+      padding: 0.5rem;
+      z-index: 1000;
+      font-size: 0.875rem;
+    }
+
+    /* PWA-specific styles */
+    @media (display-mode: standalone) {
+      .pwa-only {
+        display: block !important;
+      }
+      
+      .browser-only {
+        display: none !important;
+      }
+      
+      /* Add padding for status bar on mobile */
+      .standalone-header {
+        padding-top: env(safe-area-inset-top);
+      }
+    }
+    
+    /* Installation prompt styles */
+    .pwa-install-prompt,
+    .pwa-update-prompt,
+    .pwa-security-warning,
+    .pwa-permission-guidance {
+      animation: slideUp 0.3s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+
+  <!-- Offline Indicator -->
+  <div class="offline-indicator">
+    <i data-lucide="wifi-off" class="inline w-4 h-4 mr-2"></i>
+    You're offline - Some features may not be available
+    <a href="/pages/offline.html" class="underline ml-2">View offline features</a>
+  </div>
 </body>
 </html>
