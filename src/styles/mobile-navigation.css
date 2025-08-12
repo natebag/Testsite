@@ -1,0 +1,951 @@
+/**
+ * MLG.clan Mobile Navigation Styles
+ * 
+ * Xbox 360 dashboard-inspired mobile navigation with gaming aesthetics
+ * Optimized for touch interactions and 60fps animations
+ * 
+ * Features:
+ * - Xbox 360 gaming tile design
+ * - Smooth gesture animations
+ * - Performance-optimized transforms
+ * - Battery-conscious animations
+ * - Accessibility compliance
+ * - Responsive breakpoints
+ * 
+ * @author Claude Code - Frontend Production Engineer
+ * @version 1.0.0
+ */
+
+/* CSS Custom Properties */
+:root {
+  /* Mobile Navigation Colors */
+  --nav-bg-primary: #0a0a0f;
+  --nav-bg-secondary: #1a1a2e;
+  --nav-bg-tertiary: #2a2a3e;
+  --nav-surface: #1e1e2e;
+  --nav-border: rgba(0, 255, 136, 0.2);
+  --nav-border-active: rgba(0, 255, 136, 0.6);
+  
+  /* Gaming Colors */
+  --gaming-accent: #00ff88;
+  --gaming-accent-dark: #00cc6a;
+  --gaming-purple: #8b5cf6;
+  --gaming-blue: #3b82f6;
+  --gaming-yellow: #fbbf24;
+  --gaming-red: #ef4444;
+  --gaming-orange: #f97316;
+  
+  /* Xbox Colors */
+  --xbox-green: #107c10;
+  --xbox-green-light: #00ff88;
+  --xbox-green-dark: #0c5d0c;
+  
+  /* Mobile Navigation Dimensions */
+  --drawer-width: 320px;
+  --drawer-width-small: 280px;
+  --bottom-nav-height: 68px;
+  --tab-height: 56px;
+  --tile-size: 80px;
+  --tile-gap: 12px;
+  --fab-size: 56px;
+  
+  /* Animation Settings */
+  --animation-fast: 150ms;
+  --animation-normal: 300ms;
+  --animation-slow: 500ms;
+  --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Touch Target Sizes */
+  --touch-target-min: 48px;
+  --touch-target-preferred: 56px;
+  --touch-target-large: 64px;
+  
+  /* Shadows and Effects */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --shadow-neon: 0 0 20px rgba(0, 255, 136, 0.3);
+  --shadow-neon-strong: 0 0 30px rgba(0, 255, 136, 0.5);
+}
+
+/* Base Mobile Navigation Styles */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--animation-normal) var(--animation-easing);
+}
+
+.mobile-drawer.open {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.mobile-drawer.opening {
+  pointer-events: auto;
+}
+
+.mobile-drawer.closing {
+  pointer-events: none;
+}
+
+/* Drawer Positioning */
+.drawer-left {
+  justify-content: flex-start;
+}
+
+.drawer-right {
+  justify-content: flex-end;
+}
+
+/* Drawer Overlay */
+.drawer-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--animation-normal) var(--animation-easing);
+}
+
+.mobile-drawer.open .drawer-overlay {
+  opacity: 1;
+}
+
+/* Drawer Content */
+.drawer-content {
+  position: relative;
+  width: var(--drawer-width);
+  max-width: 90vw;
+  height: 100vh;
+  background: linear-gradient(180deg, var(--nav-bg-primary) 0%, var(--nav-bg-secondary) 100%);
+  border-right: 1px solid var(--nav-border);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateX(-100%);
+  transition: transform var(--animation-normal) var(--animation-easing);
+}
+
+.drawer-right .drawer-content {
+  border-right: none;
+  border-left: 1px solid var(--nav-border);
+  transform: translateX(100%);
+}
+
+.mobile-drawer.open .drawer-content {
+  transform: translateX(0);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-drawer {
+    transition: opacity var(--animation-fast) ease;
+  }
+  
+  .drawer-content {
+    transition: transform var(--animation-fast) ease;
+  }
+  
+  .reduced-motion .drawer-content {
+    transition: none;
+  }
+}
+
+/* Small screens adjustment */
+@media (max-width: 640px) {
+  .drawer-content {
+    width: var(--drawer-width-small);
+  }
+}
+
+/* Drawer Header */
+.drawer-header {
+  padding: 1.5rem 1rem 1rem;
+  border-bottom: 1px solid var(--nav-border);
+  background: var(--nav-bg-secondary);
+  flex-shrink: 0;
+}
+
+.gaming-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.brand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(45deg, var(--gaming-accent), var(--xbox-green-light));
+  border-radius: 12px;
+  color: black;
+  box-shadow: var(--shadow-neon);
+}
+
+.brand-text {
+  flex: 1;
+}
+
+.brand-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  background: linear-gradient(90deg, var(--gaming-accent), var(--xbox-green-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brand-subtitle {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  margin-top: 0.25rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notification-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  background: var(--nav-bg-tertiary);
+  border: 1px solid var(--nav-border);
+  border-radius: 12px;
+  color: var(--gaming-accent);
+  transition: all var(--animation-fast) var(--animation-easing);
+}
+
+.notification-btn:hover {
+  border-color: var(--nav-border-active);
+  box-shadow: var(--shadow-neon);
+}
+
+.notification-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--gaming-red);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  background: transparent;
+  border: 1px solid var(--nav-border);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all var(--animation-fast) var(--animation-easing);
+}
+
+.close-btn:hover {
+  color: var(--gaming-red);
+  border-color: var(--gaming-red);
+}
+
+/* Quick Actions Bar */
+.quick-actions-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--nav-bg-tertiary);
+  border-bottom: 1px solid var(--nav-border);
+  flex-shrink: 0;
+}
+
+.quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.75rem 0.5rem;
+  background: var(--nav-bg-primary);
+  border: 1px solid var(--nav-border);
+  border-radius: 12px;
+  color: var(--gaming-accent);
+  min-height: var(--touch-target-preferred);
+  transition: all var(--animation-fast) var(--animation-easing);
+}
+
+.quick-action:active {
+  transform: scale(0.95);
+  background: var(--nav-bg-secondary);
+}
+
+.quick-action:hover {
+  border-color: var(--nav-border-active);
+  box-shadow: var(--shadow-neon);
+}
+
+.action-label {
+  font-size: 0.625rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+/* Navigation Sections */
+.drawer-sections {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--nav-border) transparent;
+}
+
+.drawer-sections::-webkit-scrollbar {
+  width: 4px;
+}
+
+.drawer-sections::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.drawer-sections::-webkit-scrollbar-thumb {
+  background: var(--nav-border);
+  border-radius: 2px;
+}
+
+.nav-section {
+  border-bottom: 1px solid var(--nav-border);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 1rem;
+  background: transparent;
+  border: none;
+  color: white;
+  text-align: left;
+  min-height: var(--touch-target-preferred);
+  transition: all var(--animation-fast) var(--animation-easing);
+}
+
+.section-header:hover {
+  background: var(--nav-bg-tertiary);
+}
+
+.section-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--nav-bg-tertiary);
+  border: 1px solid var(--nav-border);
+  border-radius: 8px;
+  color: var(--gaming-accent);
+}
+
+.section-title {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  transition: transform var(--animation-fast) var(--animation-easing);
+}
+
+.nav-section.expanded .section-toggle .chevron {
+  transform: rotate(90deg);
+}
+
+.section-content {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height var(--animation-normal) var(--animation-easing);
+}
+
+.nav-section.expanded .section-content {
+  max-height: 1000px;
+}
+
+/* Navigation Tiles */
+.nav-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(var(--tile-size), 1fr));
+  gap: var(--tile-gap);
+  padding: 1rem;
+}
+
+.nav-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.5rem;
+  background: var(--nav-bg-primary);
+  border: 1px solid var(--nav-border);
+  border-radius: 12px;
+  color: white;
+  min-height: var(--tile-size);
+  min-width: var(--tile-size);
+  transition: all var(--animation-fast) var(--animation-easing);
+  overflow: hidden;
+}
+
+.nav-tile:hover {
+  border-color: var(--nav-border-active);
+  background: var(--nav-bg-secondary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-neon);
+}
+
+.nav-tile:active {
+  transform: translateY(0) scale(0.95);
+}
+
+.nav-tile.active {
+  background: linear-gradient(135deg, var(--gaming-accent), var(--xbox-green-light));
+  color: black;
+  border-color: var(--gaming-accent);
+  box-shadow: var(--shadow-neon-strong);
+}
+
+.nav-tile.active .tile-icon svg {
+  color: black;
+}
+
+.tile-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.tile-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--gaming-red);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 8px;
+  min-width: 16px;
+  text-align: center;
+  line-height: 1.2;
+  border: 1px solid var(--nav-bg-primary);
+}
+
+.nav-tile.active .tile-badge {
+  background: var(--gaming-red);
+  border-color: var(--gaming-accent);
+}
+
+.tile-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.active-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 3px;
+  background: black;
+  border-radius: 2px 2px 0 0;
+}
+
+/* Gaming Stats Footer */
+.drawer-footer {
+  flex-shrink: 0;
+  padding: 1rem;
+  background: var(--nav-bg-tertiary);
+  border-top: 1px solid var(--nav-border);
+}
+
+.gaming-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--nav-bg-primary);
+  border: 1px solid var(--nav-border);
+  border-radius: 8px;
+}
+
+.stat-icon {
+  font-size: 1.25rem;
+}
+
+.stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-value {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--gaming-accent);
+  line-height: 1.2;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.625rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.2;
+}
+
+.footer-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.footer-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: var(--nav-bg-primary);
+  border: 1px solid var(--nav-border);
+  border-radius: 8px;
+  color: var(--gaming-accent);
+  font-size: 0.875rem;
+  font-weight: 500;
+  min-height: var(--touch-target-min);
+  transition: all var(--animation-fast) var(--animation-easing);
+}
+
+.footer-btn:hover {
+  border-color: var(--nav-border-active);
+  box-shadow: var(--shadow-neon);
+}
+
+/* Bottom Navigation */
+.mobile-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background: var(--nav-bg-secondary);
+  border-top: 1px solid var(--nav-border);
+  backdrop-filter: blur(10px);
+  height: var(--bottom-nav-height);
+  padding: env(safe-area-inset-bottom) 0 0;
+}
+
+.bottom-nav-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: 100%;
+}
+
+.bottom-nav-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  transition: all var(--animation-fast) var(--animation-easing);
+  min-height: var(--touch-target-preferred);
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.95);
+}
+
+.bottom-nav-item.active {
+  color: var(--gaming-accent);
+}
+
+.nav-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.nav-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--gaming-red);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 600;
+  padding: 2px 4px;
+  border-radius: 6px;
+  min-width: 14px;
+  text-align: center;
+  line-height: 1;
+}
+
+.nav-label {
+  font-size: 0.625rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* Floating Action Button */
+.floating-action-container {
+  position: fixed;
+  bottom: calc(var(--bottom-nav-height) + 1rem);
+  right: 1rem;
+  z-index: 45;
+}
+
+.floating-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--fab-size);
+  height: var(--fab-size);
+  background: linear-gradient(45deg, var(--gaming-accent), var(--xbox-green-light));
+  color: black;
+  border: none;
+  border-radius: 50%;
+  box-shadow: var(--shadow-neon);
+  transition: all var(--animation-fast) var(--animation-easing);
+}
+
+.floating-action-btn:active {
+  transform: scale(0.9);
+}
+
+.floating-action-btn:hover {
+  box-shadow: var(--shadow-neon-strong);
+  transform: translateY(-2px);
+}
+
+.quick-actions-menu {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all var(--animation-normal) var(--animation-bounce);
+}
+
+.quick-actions-menu.hidden {
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+}
+
+.quick-fab-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  color: white;
+  transition: all var(--animation-fast) var(--animation-easing);
+  box-shadow: var(--shadow-md);
+}
+
+.quick-fab-action:active {
+  transform: scale(0.9);
+}
+
+.quick-fab-action.vote-up {
+  background: var(--gaming-accent);
+  color: black;
+}
+
+.quick-fab-action.super-vote {
+  background: var(--gaming-yellow);
+  color: black;
+}
+
+.quick-fab-action.clan-action {
+  background: var(--gaming-purple);
+}
+
+/* Performance Optimizations */
+.mobile-drawer,
+.drawer-content,
+.floating-action-btn {
+  will-change: transform;
+}
+
+.mobile-drawer.open .drawer-content {
+  will-change: auto;
+}
+
+/* High Performance Mode */
+.performance-mode .nav-tile {
+  transition: none;
+}
+
+.performance-mode .nav-tile:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* High Contrast Mode */
+.high-contrast .mobile-drawer {
+  --nav-border: rgba(255, 255, 255, 0.5);
+  --nav-border-active: rgba(255, 255, 255, 0.8);
+}
+
+.high-contrast .nav-tile {
+  border-width: 2px;
+}
+
+.high-contrast .nav-tile.active {
+  border-width: 3px;
+}
+
+/* Screen Reader Only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Gaming Mode Active */
+.gaming-mode-active .mobile-drawer {
+  --gaming-accent: #ff6b00;
+  --xbox-green-light: #ff6b00;
+}
+
+.gaming-mode-active .nav-tile.active {
+  background: linear-gradient(135deg, #ff6b00, #ff8533);
+  animation: pulse-gaming 2s infinite;
+}
+
+@keyframes pulse-gaming {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(255, 107, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 107, 0, 0.6);
+  }
+}
+
+/* Loading States */
+.nav-tile.loading {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.nav-tile.loading .tile-icon {
+  animation: pulse 2s infinite;
+}
+
+/* Error States */
+.nav-tile.error {
+  border-color: var(--gaming-red);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+  .nav-tiles {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .gaming-stats {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .stat-item {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-height: 600px) {
+  .drawer-header {
+    padding: 1rem 1rem 0.75rem;
+  }
+  
+  .gaming-stats {
+    margin-bottom: 0.5rem;
+  }
+  
+  .nav-tiles {
+    padding: 0.75rem;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .nav-tile:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .nav-tile:active {
+    background: var(--nav-bg-secondary);
+    transform: scale(0.95);
+  }
+  
+  .bottom-nav-item:hover {
+    color: inherit;
+  }
+}
+
+/* Dark Mode Adjustments */
+@media (prefers-color-scheme: dark) {
+  .mobile-drawer {
+    --nav-bg-primary: #0a0a0f;
+    --nav-bg-secondary: #1a1a2e;
+    --nav-bg-tertiary: #2a2a3e;
+  }
+}
+
+/* Safe Area Support */
+@supports (padding: max(0px)) {
+  .mobile-bottom-nav {
+    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
+  }
+  
+  .floating-action-container {
+    bottom: max(calc(var(--bottom-nav-height) + 1rem), calc(env(safe-area-inset-bottom) + var(--bottom-nav-height) + 1rem));
+  }
+}
+
+/* Focus Styles */
+.nav-tile:focus-visible,
+.bottom-nav-item:focus-visible,
+.quick-action:focus-visible,
+.section-header:focus-visible {
+  outline: 2px solid var(--gaming-accent);
+  outline-offset: 2px;
+}
+
+/* Animation Classes */
+.animate-slide-in {
+  animation: slideIn var(--animation-normal) var(--animation-easing);
+}
+
+.animate-slide-out {
+  animation: slideOut var(--animation-normal) var(--animation-easing);
+}
+
+.animate-bounce-in {
+  animation: bounceIn var(--animation-normal) var(--animation-bounce);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .mobile-drawer,
+  .mobile-bottom-nav,
+  .floating-action-container {
+    display: none;
+  }
+}
