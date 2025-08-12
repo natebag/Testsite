@@ -16,7 +16,7 @@ class MLGAPIValidator {
         this.errors = [];
         this.components = [
             'mlg-error-handler.js',
-            'mlg-api-client.js', 
+            'mlg-api-client-consolidated.js', 
             'mlg-auth-manager.js',
             'mlg-websocket-manager.js',
             'mlg-cache-manager.js'
@@ -153,7 +153,7 @@ class MLGAPIValidator {
             case 'mlg-error-handler.js':
                 this.validateErrorHandler(content);
                 break;
-            case 'mlg-api-client.js':
+            case 'mlg-api-client-consolidated.js':
                 this.validateApiClient(content);
                 break;
             case 'mlg-auth-manager.js':
@@ -209,7 +209,7 @@ class MLGAPIValidator {
     }
 
     validateApiClient(content) {
-        const component = 'mlg-api-client.js';
+        const component = 'mlg-api-client-consolidated.js';
         
         // Check for endpoint configuration
         const hasEndpoints = content.includes('endpoints');
@@ -432,7 +432,7 @@ class MLGAPIValidator {
     getExpectedClassName(filename) {
         const classNames = {
             'mlg-error-handler.js': 'MLGErrorHandler',
-            'mlg-api-client.js': 'MLGApiClient',
+            'mlg-api-client-consolidated.js': 'MLGApiClient',
             'mlg-auth-manager.js': 'MLGAuthManager',
             'mlg-websocket-manager.js': 'MLGWebSocketManager',
             'mlg-cache-manager.js': 'MLGCacheManager'

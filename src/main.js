@@ -29,6 +29,18 @@ import './ui/components/vote-burn-loading.js'
 import './ui/components/gaming-upload-progress.js'
 import './ui/components/mlg-loading-system.js'
 
+// Import core production components for Task 16.1
+import './ui/components/burn-vote-confirmation-ui.js'
+import './ui/components/content-submission-form.js'
+import './ui/components/clan-management-ui.js'
+import './ui/components/clan-leaderboard-ui.js'
+
+// Import core systems
+import './voting/solana-voting-system.js'
+import './wallet/phantom-wallet.js'
+import './clans/clan-voting.js'
+import './content/content-validator.js'
+
 // Initialize application
 class MLGApplication {
   constructor() {

@@ -344,7 +344,7 @@ When all sub-tasks in a parent task are complete:
   - [x] 15.11 Verify CLAUDE.md compliance and workflow adherence **[Agent: claude-md-compliance-checker]**
 
 - [ ] 16.0 Consolidate and Optimize Codebase **[Agent: general-purpose]**
-  - [ ] 16.1 Merge duplicate JavaScript functionality from demos into main site **[Agent: general-purpose]**
+  - [x] 16.1 Merge duplicate JavaScript functionality from demos into main site **[Agent: general-purpose]**
   - [ ] 16.2 Create a proper build system (webpack/vite) for bundling **[Agent: general-purpose]**
   - [ ] 16.3 Minimize and optimize JavaScript and CSS files **[Agent: general-purpose]**
   - [ ] 16.4 Implement proper module system (ES6 modules or CommonJS) **[Agent: general-purpose]**
