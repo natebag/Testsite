@@ -14,6 +14,9 @@
     "test:integration": "node run-integration-tests.js",
     "test:headless": "HEADLESS=true node run-integration-tests.js",
     "test:ci": "npm install && npm run test && npm run test:headless",
+    "test:cors": "node test-cors-configuration.js",
+    "start:frontend": "node temp-server.js",
+    "start:demo": "cd demo && node server.js",
     "serve": "python -m http.server 8080",
     "db:migrate": "node src/database/migrations/migration-runner.js",
     "db:seed": "node src/database/seeds/development-seed.sql"
@@ -27,6 +30,7 @@
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "helmet": "^7.1.0",
+    "http-proxy-middleware": "^2.0.6",
     "isomorphic-dompurify": "^2.26.0",
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",

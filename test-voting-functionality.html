@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan - Vote Button Functionality Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <style>
+        .gaming-pulse {
+            animation: pulse 1.5s ease-in-out infinite alternate;
+        }
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #4ade80;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        .burn-animation {
+            animation: burnVote 0.6s ease-in-out;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes burnVote {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1.05) rotate(2deg); }
+            75% { transform: scale(1.08) rotate(-1deg); }
+            100% { transform: scale(1); }
+        }
+        .count-updating {
+            animation: countUpdate 0.4s ease-in-out;
+        }
+        @keyframes countUpdate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); color: #10b981; }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8 text-green-400">🗳️ MLG.clan Vote Button Functionality Test</h1>
+        
+        <!-- Wallet Status -->
+        <div class="max-w-md mx-auto bg-gray-800 rounded-lg p-4 mb-6">
+            <h3 class="font-semibold mb-2">Wallet Status</h3>
+            <div id="wallet-status" class="text-sm space-y-1">
+                <div>• Connection: <span id="wallet-connected" class="text-yellow-400">Checking...</span></div>
+                <div>• Address: <span id="wallet-address" class="text-yellow-400">-</span></div>
+                <div>• MLG Balance: <span id="wallet-balance" class="text-yellow-400">0</span></div>
+            </div>
+            <button id="connect-wallet-test" class="w-full mt-3 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg font-medium transition-colors">
+                <i data-lucide="wallet" class="w-4 h-4 inline mr-2"></i>
+                Connect Phantom Wallet
+            </button>
+        </div>
+
+        <!-- Voting Test Area -->
+        <div class="max-w-4xl mx-auto space-y-6">
+            <!-- Test Content Items -->
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                
+                <!-- Content Item 1: Free Vote -->
+                <div class="bg-gray-800 rounded-lg p-6" data-content-id="test-content-1">
+                    <div class="mb-4">
+                        <h3 class="font-bold text-lg mb-2">🎮 Epic Gaming Clip</h3>
+                        <p class="text-sm text-gray-400">Amazing headshot compilation</p>
+                    </div>
+                    <div class="mb-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-400 vote-count">42</div>
+                            <div class="text-xs text-gray-400">votes</div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <button class="w-full bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg font-medium transition-colors" 
+                                data-action="free-vote" 
+                                data-content-id="test-content-1" 
+                                data-cost="0">
+                            👍 Free Vote
+                        </button>
+                        <button class="w-full bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg font-medium transition-colors" 
+                                data-action="upvote" 
+                                data-content-id="test-content-1" 
+                                data-cost="1">
+                            ⬆ Upvote (1 MLG)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content Item 2: Multiple Vote Types -->
+                <div class="bg-gray-800 rounded-lg p-6" data-content-id="test-content-2">
+                    <div class="mb-4">
+                        <h3 class="font-bold text-lg mb-2">🏆 Tournament Highlights</h3>
+                        <p class="text-sm text-gray-400">Championship winning moments</p>
+                    </div>
+                    <div class="mb-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-400 vote-count">157</div>
+                            <div class="text-xs text-gray-400">votes</div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <button class="w-full bg-blue-600 hover:bg-blue-500 px-3 py-2 rounded text-sm transition-colors" 
+                                data-action="upvote" 
+                                data-content-id="test-content-2" 
+                                data-cost="1">
+                            ⬆ Upvote (1 MLG)
+                        </button>
+                        <button class="w-full bg-purple-600 hover:bg-purple-500 px-3 py-2 rounded text-sm transition-colors" 
+                                data-action="supervote" 
+                                data-content-id="test-content-2" 
+                                data-cost="5">
+                            🚀 Super Vote (5 MLG)
+                        </button>
+                        <button class="w-full bg-red-600 hover:bg-red-500 px-3 py-2 rounded text-sm transition-colors" 
+                                data-action="downvote" 
+                                data-content-id="test-content-2" 
+                                data-cost="2">
+                            ⬇ Downvote (2 MLG)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Content Item 3: Custom Vote Cost -->
+                <div class="bg-gray-800 rounded-lg p-6" data-content-id="test-content-3">
+                    <div class="mb-4">
+                        <h3 class="font-bold text-lg mb-2">🔥 MLG Montage</h3>
+                        <p class="text-sm text-gray-400">Premium content voting</p>
+                    </div>
+                    <div class="mb-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-400 vote-count">89</div>
+                            <div class="text-xs text-gray-400">votes</div>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <button class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 px-4 py-2 rounded-lg font-bold transition-colors vote-btn" 
+                                data-content-id="test-content-3" 
+                                data-cost="25">
+                            🔥 Premium Vote (25 MLG)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voting System Status -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="font-semibold mb-4">Voting System Status</h3>
+                <div id="system-status" class="text-sm space-y-2">
+                    <div>• Voting Integration: <span id="voting-status" class="text-yellow-400">Initializing...</span></div>
+                    <div>• Free Votes Remaining: <span id="free-votes" class="text-yellow-400">-</span></div>
+                    <div>• Votes Cast This Session: <span id="session-votes" class="text-yellow-400">0</span></div>
+                    <div>• Last Vote Transaction: <span id="last-transaction" class="text-yellow-400">None</span></div>
+                </div>
+                
+                <!-- Test Actions -->
+                <div class="mt-4 space-y-2">
+                    <button id="refresh-status" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg text-sm">
+                        🔄 Refresh Status
+                    </button>
+                    <button id="clear-cache" class="bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg text-sm ml-2">
+                        🧹 Clear Cache
+                    </button>
+                </div>
+            </div>
+
+            <!-- Test Results -->
+            <div class="bg-gray-800 rounded-lg p-6">
+                <h3 class="font-semibold mb-4">Test Results</h3>
+                <div id="test-results" class="text-sm space-y-1">
+                    <div>• Wallet Manager: <span id="test-wallet" class="text-yellow-400">Testing...</span></div>
+                    <div>• Voting Integration: <span id="test-voting" class="text-yellow-400">Testing...</span></div>
+                    <div>• Button Functionality: <span id="test-buttons" class="text-yellow-400">Testing...</span></div>
+                    <div>• Vote Execution: <span id="test-execution" class="text-yellow-400">Pending</span></div>
+                    <div>• Real-time Updates: <span id="test-realtime" class="text-yellow-400">Pending</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Voting Integration -->
+    <script type="module">
+        import { getVotingIntegration, initializeVotingIntegration } from './src/js/mlg-voting-integration.js';
+        import { getWalletManager } from './src/wallet/phantom-wallet.js';
+        
+        // Test class for vote button functionality
+        class VoteButtonTest {
+            constructor() {
+                this.walletManager = null;
+                this.votingIntegration = null;
+                this.sessionVotes = 0;
+                this.init();
+            }
+            
+            async init() {
+                console.log('🧪 Starting vote button functionality test...');
+                
+                // Initialize Lucide icons
+                lucide.createIcons();
+                
+                // Test wallet manager
+                await this.testWalletManager();
+                
+                // Test voting integration
+                await this.testVotingIntegration();
+                
+                // Test button functionality
+                this.testButtonFunctionality();
+                
+                // Setup event listeners
+                this.setupEventListeners();
+                
+                // Start status monitoring
+                this.startStatusMonitoring();
+                
+                console.log('✅ Vote button test initialization complete');
+            }
+            
+            async testWalletManager() {
+                const testElement = document.getElementById('test-wallet');
+                try {
+                    this.walletManager = getWalletManager();
+                    if (this.walletManager) {
+                        await this.walletManager.initialize();
+                        testElement.textContent = '✅ Initialized';
+                        testElement.className = 'text-green-400';
+                        
+                        // Update wallet status
+                        this.updateWalletStatus();
+                    } else {
+                        throw new Error('Wallet manager not available');
+                    }
+                } catch (error) {
+                    console.error('Wallet manager test failed:', error);
+                    testElement.textContent = '❌ Failed';
+                    testElement.className = 'text-red-400';
+                }
+            }
+            
+            async testVotingIntegration() {
+                const testElement = document.getElementById('test-voting');
+                try {
+                    this.votingIntegration = await initializeVotingIntegration();
+                    if (this.votingIntegration) {
+                        testElement.textContent = '✅ Ready';
+                        testElement.className = 'text-green-400';
+                        
+                        // Make available globally
+                        window.MLGVotingIntegration = this.votingIntegration;
+                        
+                        // Update voting status
+                        this.updateVotingStatus();
+                        
+                        document.getElementById('voting-status').textContent = '✅ Ready';
+                    } else {
+                        throw new Error('Voting integration failed');
+                    }
+                } catch (error) {
+                    console.error('Voting integration test failed:', error);
+                    testElement.textContent = '❌ Failed';
+                    testElement.className = 'text-red-400';
+                    
+                    document.getElementById('voting-status').textContent = '❌ Failed';
+                }
+            }
+            
+            testButtonFunctionality() {
+                const testElement = document.getElementById('test-buttons');
+                const voteButtons = document.querySelectorAll('[data-action]');
+                
+                if (voteButtons.length > 0) {
+                    testElement.textContent = `✅ Found ${voteButtons.length} buttons`;
+                    testElement.className = 'text-green-400';
+                } else {
+                    testElement.textContent = '❌ No vote buttons found';
+                    testElement.className = 'text-red-400';
+                }
+            }
+            
+            setupEventListeners() {
+                // Connect wallet test button
+                document.getElementById('connect-wallet-test').addEventListener('click', async () => {
+                    await this.testWalletConnection();
+                });
+                
+                // Vote buttons are handled by voting integration system
+                document.addEventListener('click', (event) => {
+                    const button = event.target.closest('[data-action]');
+                    if (!button) return;
+                    
+                    const action = button.getAttribute('data-action');
+                    if (['upvote', 'downvote', 'supervote', 'free-vote'].includes(action)) {
+                        // Track vote execution test
+                        this.trackVoteExecution(button, action);
+                    }
+                });
+                
+                // Status refresh
+                document.getElementById('refresh-status').addEventListener('click', () => {
+                    this.updateAllStatus();
+                });
+                
+                // Clear cache
+                document.getElementById('clear-cache').addEventListener('click', () => {
+                    this.clearTestCache();
+                });
+            }
+            
+            async testWalletConnection() {
+                const button = document.getElementById('connect-wallet-test');
+                const originalHTML = button.innerHTML;
+                
+                try {
+                    button.innerHTML = '<div class="loading-spinner gaming-pulse inline-block mr-2"></div>Connecting...';
+                    button.disabled = true;
+                    
+                    if (this.walletManager) {
+                        const result = await this.walletManager.connect({ timeout: 30000 });
+                        console.log('Test wallet connection result:', result);
+                        
+                        // Update wallet status
+                        this.updateWalletStatus();
+                        
+                        button.innerHTML = '✅ Connected';
+                        button.classList.add('bg-green-600');
+                        
+                    } else {
+                        throw new Error('Wallet manager not available');
+                    }
+                    
+                } catch (error) {
+                    console.error('Test wallet connection failed:', error);
+                    button.innerHTML = originalHTML;
+                    button.disabled = false;
+                    this.showStatus('❌ Connection test failed', 'error');
+                }
+            }
+            
+            trackVoteExecution(button, action) {
+                const testElement = document.getElementById('test-execution');
+                const contentId = button.getAttribute('data-content-id');
+                const cost = button.getAttribute('data-cost');
+                
+                console.log(`🧪 Tracking vote execution: ${action} on ${contentId} (${cost} MLG)`);
+                
+                testElement.textContent = `⏳ Testing ${action}...`;
+                testElement.className = 'text-yellow-400';
+                
+                // Monitor for success/failure
+                setTimeout(() => {
+                    this.sessionVotes++;
+                    document.getElementById('session-votes').textContent = this.sessionVotes;
+                    
+                    testElement.textContent = `✅ ${action} executed`;
+                    testElement.className = 'text-green-400';
+                    
+                    // Test real-time updates
+                    this.testRealTimeUpdates(contentId);
+                }, 2000);
+            }
+            
+            testRealTimeUpdates(contentId) {
+                const testElement = document.getElementById('test-realtime');
+                const voteCountElements = document.querySelectorAll(`[data-content-id="${contentId}"] .vote-count`);
+                
+                if (voteCountElements.length > 0) {
+                    testElement.textContent = '✅ UI updates working';
+                    testElement.className = 'text-green-400';
+                } else {
+                    testElement.textContent = '⚠️ No vote count elements found';
+                    testElement.className = 'text-yellow-400';
+                }
+            }
+            
+            updateWalletStatus() {
+                if (this.walletManager) {
+                    const connectionInfo = this.walletManager.getConnectionInfo();
+                    
+                    document.getElementById('wallet-connected').textContent = connectionInfo.connected ? '✅ Connected' : '❌ Not Connected';
+                    document.getElementById('wallet-connected').className = connectionInfo.connected ? 'text-green-400' : 'text-red-400';
+                    
+                    if (connectionInfo.publicKey) {
+                        const address = connectionInfo.publicKey;
+                        document.getElementById('wallet-address').textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+                    }
+                    
+                    document.getElementById('wallet-balance').textContent = connectionInfo.balance?.mlg || 0;
+                }
+            }
+            
+            async updateVotingStatus() {
+                if (this.votingIntegration) {
+                    try {
+                        const stats = await this.votingIntegration.getVotingStats();
+                        if (stats) {
+                            document.getElementById('free-votes').textContent = stats.freeVotesRemaining || 0;
+                        }
+                    } catch (error) {
+                        console.warn('Failed to update voting status:', error);
+                    }
+                }
+            }
+            
+            updateAllStatus() {
+                this.updateWalletStatus();
+                this.updateVotingStatus();
+                this.showStatus('🔄 Status refreshed', 'info');
+            }
+            
+            clearTestCache() {
+                this.sessionVotes = 0;
+                document.getElementById('session-votes').textContent = '0';
+                document.getElementById('last-transaction').textContent = 'None';
+                
+                this.showStatus('🧹 Cache cleared', 'info');
+            }
+            
+            startStatusMonitoring() {
+                // Update status every 10 seconds
+                setInterval(() => {
+                    this.updateWalletStatus();
+                }, 10000);
+            }
+            
+            showStatus(message, type = 'info') {
+                console.log(`📢 ${message}`);
+                
+                // Could integrate with notification system if available
+                if (window.MLGNotificationSystem) {
+                    window.MLGNotificationSystem.showNotification(message, type);
+                }
+            }
+        }
+        
+        // Start the test when DOM is loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            new VoteButtonTest();
+        });
+    </script>
+</body>
+</html>

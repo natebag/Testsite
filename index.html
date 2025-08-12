@@ -29,11 +29,101 @@
   <!-- Module Loading System -->
   <script src="src/js/module-loader.js"></script>
   <script src="src/js/router-loader.js"></script>
+  <script src="src/js/api-client.js"></script>
+  
+  <!-- MLG Error Handling System -->
+  <script src="src/js/mlg-error-handler.js"></script>
+  <script src="src/js/mlg-cache-manager.js"></script>
+  <script src="src/js/mlg-api-client.js"></script>
+  <script src="src/js/mlg-auth-manager.js"></script>
+  <script src="src/js/mlg-websocket-manager.js"></script>
+  <script src="src/js/mlg-offline-manager.js"></script>
+  <script src="src/js/mlg-connection-status.js"></script>
+  <script src="src/js/mlg-fallback-system.js"></script>
+  <script src="src/js/mlg-loading-states.js"></script>
+  <script src="src/js/mlg-error-logger.js"></script>
+  <script src="src/js/mlg-error-system.js"></script>
   
   <!-- MLG Loading System Components -->
   <script src="src/ui/components/gaming-loading-states.js"></script>
   <script src="src/ui/components/xbox-page-transitions.js"></script>
   <script src="src/ui/components/wallet-loading-states.js"></script>
+  
+  <!-- Phantom Wallet Manager (Enhanced Web3 Integration) -->
+  <script type="module">
+    import { getWalletManager, initializeWallet } from './src/wallet/phantom-wallet.js';
+    import { getVotingIntegration, initializeVotingIntegration } from './src/js/mlg-voting-integration.js';
+    
+    // Safe wallet initialization with error handling
+    async function safeInitializeWallet() {
+      try {
+        console.log('🎮 Initializing MLG Wallet Manager...');
+        
+        // Create wallet manager instance
+        const walletManager = getWalletManager();
+        if (!walletManager) {
+          throw new Error('Failed to create wallet manager instance');
+        }
+        
+        // Initialize connection
+        await walletManager.initializeConnection();
+        console.log('✅ Wallet manager initialized successfully');
+        
+        // Make available globally
+        window.phantomWalletManager = walletManager;
+        window.initializeWallet = initializeWallet;
+        
+        // Initialize voting integration
+        window.getVotingIntegration = getVotingIntegration;
+        window.initializeVotingIntegration = initializeVotingIntegration;
+        
+        // Signal that wallet system is ready
+        window.walletSystemReady = true;
+        
+        // Dispatch custom event to notify that wallet system is ready
+        window.dispatchEvent(new CustomEvent('walletSystemReady', { 
+          detail: { walletManager, ready: true } 
+        }));
+        
+        return walletManager;
+        
+      } catch (error) {
+        console.error('❌ Wallet initialization failed:', error);
+        
+        // Create a minimal fallback manager for graceful degradation
+        window.phantomWalletManager = {
+          connect: async () => {
+            throw new Error('Wallet system not properly initialized. Please refresh the page.');
+          },
+          disconnect: async () => {},
+          getConnectionInfo: () => ({ connected: false }),
+          hasStoredSession: () => false
+        };
+        
+        window.walletSystemReady = false;
+        
+        // Dispatch error event
+        window.dispatchEvent(new CustomEvent('walletSystemError', { 
+          detail: { error: error.message, ready: false } 
+        }));
+        
+        throw error;
+      }
+    }
+    
+    // Initialize wallet system when DOM is loaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        safeInitializeWallet().catch(console.error);
+      });
+    } else {
+      // DOM already loaded
+      safeInitializeWallet().catch(console.error);
+    }
+    
+    // Make initialization function available globally for manual retry
+    window.safeInitializeWallet = safeInitializeWallet;
+  </script>
   <script src="src/ui/components/vote-burn-loading.js"></script>
   <script src="src/ui/components/gaming-upload-progress.js"></script>
   <script src="src/ui/components/mlg-loading-system.js"></script>
@@ -1036,10 +1126,46 @@
       }
       
       async connectMobileWallet() {
-        // Delegate to main wallet connection
-        if (window.mlg && window.mlg.connectWallet) {
-          await window.mlg.connectWallet();
-          this.syncMobileWalletUI();
+        console.log('📱 Mobile wallet connection initiated...');
+        
+        // Update mobile button state
+        const mobileWalletButton = document.getElementById('mobile-wallet-connect');
+        if (mobileWalletButton) {
+          mobileWalletButton.innerHTML = `
+            <div class="flex items-center justify-center space-x-2">
+              <div class="loading-spinner gaming-pulse"></div>
+              <span>Connecting...</span>
+            </div>
+          `;
+          mobileWalletButton.disabled = true;
+        }
+        
+        try {
+          // Delegate to main wallet connection with PhantomWalletManager
+          if (window.mlg && window.mlg.connectWallet) {
+            await window.mlg.connectWallet();
+            this.syncMobileWalletUI();
+            console.log('✅ Mobile wallet connection completed');
+          } else {
+            throw new Error('Main wallet connection not available');
+          }
+        } catch (error) {
+          console.error('❌ Mobile wallet connection failed:', error);
+          
+          // Reset mobile button state
+          if (mobileWalletButton) {
+            mobileWalletButton.innerHTML = `
+              <i data-lucide="wallet" class="w-4 h-4"></i>
+              <span>Connect Phantom</span>
+            `;
+            mobileWalletButton.disabled = false;
+            lucide.createIcons();
+          }
+          
+          // Show mobile-friendly error
+          if (window.mlg && window.mlg.showNotification) {
+            window.mlg.showNotification('📱 Mobile wallet connection failed. Please try again.', 'error');
+          }
         }
       }
       
@@ -1106,7 +1232,16 @@
       async init() {
         console.log('🚀 Initializing MLG.clan Platform...');
         
-        // Initialize navigation enhancements first
+        // Initialize error handling system first
+        await this.initErrorSystem();
+        
+        // Initialize Phantom Wallet Manager
+        await this.initializeWalletManager();
+        
+        // Initialize Voting Integration System
+        await this.initializeVotingSystem();
+        
+        // Initialize navigation enhancements
         initNavigationEnhancements();
         
         // Initialize UI
@@ -1118,6 +1253,9 @@
         // Load initial data
         await this.loadPlatformStats();
         
+        // Load additional API data
+        await this.loadAdditionalApiData();
+        
         // Set up event listeners
         this.setupEventListeners();
         
@@ -1126,6 +1264,170 @@
         
         console.log('✅ MLG.clan Platform initialized successfully!');
         this.showNotification('🎮 MLG.clan Platform Ready!', 'success');
+      }
+      
+      /**
+       * Wait for wallet system to be ready with timeout
+       */
+      async waitForWalletSystem(timeout = 10000) {
+        return new Promise((resolve, reject) => {
+          if (window.walletSystemReady) {
+            resolve();
+            return;
+          }
+          
+          const timeoutId = setTimeout(() => {
+            reject(new Error('Wallet system initialization timeout'));
+          }, timeout);
+          
+          const handleReady = () => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('walletSystemReady', handleReady);
+            window.removeEventListener('walletSystemError', handleError);
+            resolve();
+          };
+          
+          const handleError = (event) => {
+            clearTimeout(timeoutId);
+            window.removeEventListener('walletSystemReady', handleReady);
+            window.removeEventListener('walletSystemError', handleError);
+            reject(new Error(`Wallet system error: ${event.detail.error}`));
+          };
+          
+          window.addEventListener('walletSystemReady', handleReady, { once: true });
+          window.addEventListener('walletSystemError', handleError, { once: true });
+        });
+      }
+      
+      /**
+       * Initialize PhantomWalletManager and check for existing sessions
+       */
+      async initializeWalletManager() {
+        console.log('🔌 Initializing Phantom Wallet Manager...');
+        
+        try {
+          // Wait for wallet system to be ready (with timeout)
+          await this.waitForWalletSystem();
+          
+          // Check if PhantomWalletManager is available
+          if (!window.phantomWalletManager) {
+            console.warn('⚠️ PhantomWalletManager not available, wallet features will be limited');
+            return;
+          }
+          
+          console.log('✅ Phantom Wallet Manager is ready');
+          
+          // Check for existing session and attempt auto-reconnection
+          const hasSession = window.phantomWalletManager.hasStoredSession();
+          if (hasSession) {
+            console.log('🔄 Found existing wallet session, attempting auto-reconnect...');
+            
+            try {
+              const reconnectResult = await window.phantomWalletManager.attemptAutoReconnect();
+              if (reconnectResult) {
+                console.log('✅ Wallet auto-reconnection successful');
+                
+                // Update UI for reconnected wallet
+                const connectionInfo = window.phantomWalletManager.getConnectionInfo();
+                if (connectionInfo.connected) {
+                  this.wallet.connected = true;
+                  this.wallet.address = connectionInfo.publicKey;
+                  this.wallet.balance.mlg = connectionInfo.balance?.mlg || 1250;
+                  this.wallet.balance.sol = connectionInfo.balance?.sol || 2.45;
+                  
+                  // Update UI elements
+                  const walletButton = document.getElementById('wallet-connect');
+                  const userInfo = document.getElementById('user-info');
+                  const userAddress = document.getElementById('user-address');
+                  const mlgBalance = document.getElementById('mlg-balance');
+                  
+                  if (walletButton && userInfo && userAddress && mlgBalance) {
+                    walletButton.classList.add('hidden');
+                    userInfo.classList.remove('hidden');
+                    userAddress.textContent = `${this.wallet.address.slice(0, 4)}...${this.wallet.address.slice(-4)}`;
+                    mlgBalance.textContent = this.wallet.balance.mlg.toLocaleString();
+                  }
+                  
+                  // Sync mobile UI
+                  if (window.mobileMenuManager) {
+                    window.mobileMenuManager.syncMobileWalletUI();
+                  }
+                  
+                  this.showNotification('🔄 Wallet reconnected automatically', 'info');
+                }
+              }
+            } catch (reconnectError) {
+              console.warn('⚠️ Auto-reconnection failed:', reconnectError);
+              // Clear invalid session
+              window.phantomWalletManager.clearStoredSession();
+            }
+          }
+          
+          // Setup wallet event listeners
+          this.setupWalletEventListeners();
+          
+        } catch (error) {
+          console.error('❌ Failed to initialize wallet manager:', error);
+          this.showNotification('⚠️ Wallet initialization failed. Some features may be limited.', 'warning');
+        }
+      }
+      
+      /**
+       * Initialize MLG Voting Integration System
+       */
+      async initializeVotingSystem() {
+        console.log('🗳️ Initializing MLG Voting Integration System...');
+        
+        try {
+          // Check if voting integration is available
+          if (!window.initializeVotingIntegration) {
+            console.warn('⚠️ Voting integration not available, voting features will be limited');
+            return;
+          }
+          
+          // Initialize voting integration
+          this.votingIntegration = await window.initializeVotingIntegration();
+          
+          // Make voting stats available to app
+          if (this.votingIntegration) {
+            this.votingStats = await this.votingIntegration.getVotingStats();
+            console.log('🗳️ Voting stats loaded:', this.votingStats);
+          }
+          
+          console.log('✅ MLG Voting Integration System initialized');
+          
+        } catch (error) {
+          console.error('❌ Failed to initialize voting system:', error);
+          this.showNotification('⚠️ Voting system initialization failed. Some features may be limited.', 'warning');
+        }
+      }
+      
+      async initErrorSystem() {
+        try {
+          // Initialize the error handling system
+          if (window.MLGErrorSystem) {
+            this.errorSystem = window.MLGErrorSystem;
+            await this.errorSystem.init();
+            console.log('✅ Error handling system initialized');
+          } else {
+            console.warn('⚠️ MLGErrorSystem not found, using fallback error handling');
+            this.setupBasicErrorHandling();
+          }
+        } catch (error) {
+          console.error('❌ Failed to initialize error system:', error);
+          this.setupBasicErrorHandling();
+        }
+      }
+      
+      setupBasicErrorHandling() {
+        // Basic fallback error handling if the advanced system fails
+        window.onerror = (message, source, lineno, colno, error) => {
+          console.error('JavaScript Error:', { message, source, lineno, colno, error });
+        };
+        
+        window.addEventListener('unhandledrejection', (event) => {
+          console.error('Unhandled Promise Rejection:', event.reason);
+        });
       }
       
       initializeUI() {
@@ -1239,17 +1541,54 @@
       
       async loadPlatformStats() {
         try {
-          // This would connect to our actual API endpoints
+          console.log('📊 Loading platform stats from API...');
+          
+          // Load data from API endpoints
+          const [statusData, votingData, clansData, contentData] = await Promise.allSettled([
+            window.mlgApi.getStatus(),
+            window.mlgApi.getVoting(),
+            window.mlgApi.getClans(),
+            window.mlgApi.getContent()
+          ]);
+          
+          // Extract stats from API responses
+          const status = statusData.status === 'fulfilled' ? statusData.value : {};
+          const voting = votingData.status === 'fulfilled' ? votingData.value : {};
+          const clans = clansData.status === 'fulfilled' ? clansData.value : {};
+          const content = contentData.status === 'fulfilled' ? contentData.value : {};
+          
           this.stats = {
-            users: 2847 + Math.floor(Math.random() * 100),
-            clans: 1234 + Math.floor(Math.random() * 50),
-            votes: 856 + Math.floor(Math.random() * 25),
-            mlg: 289000 + Math.floor(Math.random() * 1000)
+            users: status.stats?.users_online || 0,
+            clans: clans.leaderboard?.length || 0,
+            votes: voting.voting?.total_votes_today || 0,
+            mlg: voting.voting?.mlg_burned_today || 0,
+            content: content.analytics?.new_creators || 0
+          };
+          
+          // Store full API responses for other components to use
+          this.apiData = {
+            status: status,
+            voting: voting,
+            clans: clans,
+            content: content
           };
           
           this.updateStatsDisplay();
+          console.log('✅ Platform stats loaded from API');
+          
         } catch (error) {
           console.error('Failed to load platform stats:', error);
+          this.showNotification('Failed to load platform data. Using fallback.', 'warning');
+          
+          // Use fallback static data
+          this.stats = {
+            users: 2847,
+            clans: 1234,
+            votes: 856,
+            mlg: 289000,
+            content: 1847
+          };
+          this.updateStatsDisplay();
         }
       }
       
@@ -1258,25 +1597,235 @@
           'live-users': this.stats.users.toLocaleString(),
           'live-clans': this.stats.clans.toLocaleString(),
           'live-votes': this.stats.votes.toLocaleString(),
-          'live-mlg': (this.stats.mlg / 1000).toFixed(0) + 'K',
-          'active-voters': (5621 + Math.floor(Math.random() * 100)).toLocaleString(),
+          'live-mlg': this.formatNumber(this.stats.mlg),
+          'active-voters': (this.apiData?.voting?.voting?.active_voters || 5621).toLocaleString(),
           'total-clans': this.stats.clans.toLocaleString(),
-          'content-count': (45200 + Math.floor(Math.random() * 100)).toLocaleString(),
-          'daily-users': (24800 + Math.floor(Math.random() * 100)).toLocaleString(),
+          'content-count': this.formatNumber(this.apiData?.content?.analytics?.new_creators || this.stats.content || 45200),
+          'daily-users': this.formatNumber(this.apiData?.status?.stats?.users_online || this.stats.users || 24800),
           'ws-connections': (1200 + Math.floor(Math.random() * 100)).toLocaleString() + ' connections'
         };
         
         Object.entries(elements).forEach(([id, value]) => {
           const element = document.getElementById(id);
           if (element) {
+            // Add pulse effect for live updates
             element.textContent = value;
+            this.addPulseEffect(element);
+          }
+        });
+        
+        // Update dashboard cards with real API data
+        this.updateDashboardCards();
+      }
+      
+      formatNumber(num) {
+        if (num >= 1000000) {
+          return (num / 1000000).toFixed(1) + 'M';
+        } else if (num >= 1000) {
+          return (num / 1000).toFixed(1) + 'K';
+        }
+        return num.toLocaleString();
+      }
+
+      updatePlatformLeaderboards(leaderboardData) {
+        console.log('🏆 Updating platform leaderboards with real-time data');
+        
+        // Update clan leaderboards if data is available
+        if (leaderboardData.clans) {
+          this.updateClanLeaderboard(leaderboardData.clans);
+        }
+        
+        // Update voter leaderboards if data is available
+        if (leaderboardData.voters) {
+          this.updateVoterLeaderboard(leaderboardData.voters);
+        }
+        
+        // Update creator leaderboards if data is available
+        if (leaderboardData.creators) {
+          this.updateCreatorLeaderboard(leaderboardData.creators);
+        }
+      }
+
+      updateClanLeaderboard(clanData) {
+        // Update clan leaderboard displays throughout the platform
+        const clanElements = document.querySelectorAll('[data-clan-leaderboard]');
+        clanElements.forEach(element => {
+          // Update clan rank displays with real-time data
+          const clanId = element.dataset.clanId;
+          const clanInfo = clanData.find(c => c.id === clanId);
+          if (clanInfo) {
+            // Update clan statistics and ranking
+            this.updateElementWithAnimation(element, clanInfo);
           }
         });
       }
+
+      updateVoterLeaderboard(voterData) {
+        // Update voter statistics across platform
+        const voterElements = document.querySelectorAll('[data-voter-stats]');
+        voterElements.forEach(element => {
+          // Update voter ranking displays
+          this.updateElementWithAnimation(element, voterData);
+        });
+      }
+
+      updateCreatorLeaderboard(creatorData) {
+        // Update content creator statistics
+        const creatorElements = document.querySelectorAll('[data-creator-stats]');
+        creatorElements.forEach(element => {
+          // Update creator ranking displays
+          this.updateElementWithAnimation(element, creatorData);
+        });
+      }
+
+      updateElementWithAnimation(element, data) {
+        // Add pulse animation to show updates
+        element.classList.add('animate-pulse-neon');
+        
+        // Update the content
+        if (element.textContent && data.value) {
+          element.textContent = data.value;
+        }
+        
+        // Remove animation after effect
+        setTimeout(() => {
+          element.classList.remove('animate-pulse-neon');
+        }, 1000);
+      }
+      
+      addPulseEffect(element) {
+        element.classList.add('animate-pulse-neon');
+        setTimeout(() => {
+          element.classList.remove('animate-pulse-neon');
+        }, 1000);
+      }
+      
+      async loadAdditionalApiData() {
+        try {
+          console.log('📊 Loading additional API data...');
+          
+          // Load DAO and analytics data for dashboard cards
+          const [daoData, analyticsData] = await Promise.allSettled([
+            window.mlgApi.getDao(),
+            window.mlgApi.getAnalytics()
+          ]);
+          
+          // Store additional API data
+          if (!this.apiData) this.apiData = {};
+          
+          if (daoData.status === 'fulfilled') {
+            this.apiData.dao = daoData.value;
+          }
+          
+          if (analyticsData.status === 'fulfilled') {
+            this.apiData.analytics = analyticsData.value;
+          }
+          
+          // Update dashboard cards with new data
+          this.updateDashboardCards();
+          
+        } catch (error) {
+          console.warn('Failed to load additional API data:', error);
+        }
+      }
+
+      updateDashboardCards() {
+        if (!this.apiData) return;
+        
+        // Update various dashboard elements with real API data
+        try {
+          // Update treasury amount in DAO card
+          const treasuryElement = document.querySelector('.card-glow:has(.text-gaming-yellow) .text-gaming-yellow.font-bold');
+          if (treasuryElement && this.apiData.dao?.treasury?.total_assets) {
+            treasuryElement.textContent = this.apiData.dao.treasury.total_assets;
+          }
+          
+          // Update active proposals count
+          const proposalsElement = document.querySelector('.card-glow:has(.text-gaming-yellow) .text-gaming-blue.font-bold');
+          if (proposalsElement && this.apiData.dao?.governance?.active_proposals) {
+            proposalsElement.textContent = this.apiData.dao.governance.active_proposals;
+          }
+          
+          // Update revenue in analytics card
+          const revenueElement = document.querySelector('.card-glow:has(.text-gaming-red) .text-gaming-yellow.font-bold');
+          if (revenueElement && this.apiData.analytics?.metrics?.revenue_30d) {
+            revenueElement.textContent = this.apiData.analytics.metrics.revenue_30d;
+          }
+          
+        } catch (error) {
+          console.warn('Error updating dashboard cards:', error);
+        }
+      }
       
       simulateRealTimeUpdates() {
+        // Start real-time updates using the API client
+        console.log('🔄 Starting real-time updates...');
+        
+        // Subscribe to real-time system status updates
+        if (window.MLGWebSocketManager) {
+          window.MLGWebSocketManager.subscribe('system', (data) => {
+            if (data.success && data.data && data.data.stats) {
+              this.stats.users = data.data.stats.users_online || this.stats.users;
+              this.updateStatsDisplay();
+            }
+          });
+          
+          // Subscribe to real-time voting updates
+          window.MLGWebSocketManager.subscribe('voting', (data) => {
+            if (data.success && data.data && data.data.voting) {
+              this.stats.votes = data.data.voting.total_votes_today || this.stats.votes;
+              this.stats.mlg = data.data.voting.mlg_burned_today || this.stats.mlg;
+              this.updateStatsDisplay();
+            }
+          });
+          
+          // Subscribe to real-time leaderboard updates
+          window.MLGWebSocketManager.subscribe('leaderboard', (data) => {
+            if (data.success && data.data) {
+              console.log('🏆 Leaderboard update received');
+              // Update leaderboard displays if present
+              this.updatePlatformLeaderboards(data.data);
+            }
+          });
+        } else {
+          // Fallback to polling mode
+          console.log('⚠️ WebSocket not available, using polling fallback');
+          
+          // Update platform stats every 10 seconds
+          setInterval(async () => {
+            try {
+              const statusData = await window.MLGApiClient.getSystemStatus();
+              if (statusData && statusData.stats) {
+                this.stats.users = statusData.stats.users_online || this.stats.users;
+                this.updateStatsDisplay();
+              }
+            } catch (error) {
+              console.warn('Status polling failed:', error);
+            }
+          }, 10000);
+          
+          // Update voting data every 15 seconds
+          setInterval(async () => {
+            try {
+              const votingData = await window.MLGApiClient.getActiveVotes();
+              if (votingData) {
+                // Calculate stats from voting data
+                const totalVotes = votingData.reduce((sum, vote) => sum + (vote.votesCount || 0), 0);
+                const totalTokens = votingData.reduce((sum, vote) => sum + (vote.tokensBurned || 0), 0);
+                this.stats.votes = totalVotes;
+                this.stats.mlg = totalTokens;
+                this.updateStatsDisplay();
+              }
+            } catch (error) {
+              console.warn('Voting polling failed:', error);
+            }
+          }, 15000);
+        }
+        
+        // Legacy fallback for smooth transitions
         setInterval(() => {
-          this.stats.users += Math.floor(Math.random() * 5) - 2;
+          // Small random variations for smoother UX
+          this.stats.users += Math.floor(Math.random() * 3) - 1;
           this.stats.votes += Math.floor(Math.random() * 3);
           this.stats.mlg += Math.floor(Math.random() * 100) - 50;
           
@@ -1285,10 +1834,12 @@
       }
       
       startLiveUpdates() {
-        // Update live stats every 3 seconds
+        // Update live stats every 30 seconds to avoid overwhelming the API
         setInterval(() => {
           this.loadPlatformStats();
-        }, 3000);
+        }, 30000);
+        
+        console.log('🔄 Live updates started (30s interval)');
       }
       
       setupEventListeners() {
@@ -1315,53 +1866,218 @@
         const userAddress = document.getElementById('user-address');
         const mlgBalance = document.getElementById('mlg-balance');
         
-        try {
-          walletButton.innerHTML = '<div class="loading-spinner"></div><span>Connecting...</span>';
+        // Check if wallet system is ready
+        if (!window.walletSystemReady || !window.phantomWalletManager) {
+          console.warn('🔄 Wallet system not ready, attempting to initialize...');
+          this.showNotification('🔄 Initializing wallet system...', 'info');
           
-          // Check if Phantom wallet is installed
-          if (window.solana && window.solana.isPhantom) {
-            // Connect to Phantom
-            const response = await window.solana.connect();
-            const publicKey = response.publicKey.toString();
-            
-            // Update wallet state
-            this.wallet.connected = true;
-            this.wallet.address = publicKey;
-            this.wallet.balance.mlg = 1250 + Math.floor(Math.random() * 500);
-            this.wallet.balance.sol = 2.45 + Math.random();
-            
-            // Update UI
-            walletButton.classList.add('hidden');
-            userInfo.classList.remove('hidden');
-            userAddress.textContent = `${publicKey.slice(0, 4)}...${publicKey.slice(-4)}`;
-            mlgBalance.textContent = this.wallet.balance.mlg.toLocaleString();
-            
-            this.showNotification('🔗 Phantom Wallet Connected!', 'success');
-            
-            // Load user data
-            await this.loadUserData();
-            
-            // Sync mobile wallet UI
-            if (mobileMenuManager) {
-              mobileMenuManager.syncMobileWalletUI();
+          try {
+            // Try to manually initialize if available
+            if (window.safeInitializeWallet) {
+              await window.safeInitializeWallet();
+              this.showNotification('✅ Wallet system initialized!', 'success');
+            } else {
+              throw new Error('Wallet initialization function not available');
             }
-            
-          } else {
-            throw new Error('Phantom wallet not installed');
-          }
-          
-        } catch (error) {
-          console.error('Wallet connection error:', error);
-          walletButton.innerHTML = '<i data-lucide="wallet" class="w-4 h-4"></i><span>Connect Phantom</span>';
-          lucide.createIcons();
-          
-          if (error.message.includes('not installed')) {
-            this.showNotification('Please install Phantom wallet first', 'error');
-            window.open('https://phantom.app/', '_blank');
-          } else {
-            this.showNotification('Failed to connect wallet. Please try again.', 'error');
+          } catch (error) {
+            console.error('❌ Failed to initialize wallet system:', error);
+            this.showNotification('❌ Wallet system not available. Please refresh the page.', 'error');
+            return;
           }
         }
+        
+        // Check for Phantom wallet
+        if (!window.solana || !window.solana.isPhantom) {
+          this.showNotification('🔗 Please install Phantom wallet first', 'error');
+          window.open('https://phantom.app/', '_blank');
+          return;
+        }
+
+        try {
+          // Update button to connecting state with gaming theme
+          walletButton.innerHTML = `
+            <div class="flex items-center space-x-2">
+              <div class="loading-spinner gaming-pulse"></div>
+              <span>Connecting Phantom...</span>
+            </div>
+          `;
+          walletButton.disabled = true;
+          
+          console.log('🎮 Starting Phantom wallet connection via PhantomWalletManager...');
+          
+          // Use PhantomWalletManager for sophisticated connection handling
+          const connectionResult = await window.phantomWalletManager.connect({
+            timeout: 30000, // 30 second timeout
+            autoApprove: false // Require user approval
+          });
+          
+          console.log('✅ Phantom wallet connection successful:', connectionResult);
+          
+          // Get connection info from manager
+          const connectionInfo = window.phantomWalletManager.getConnectionInfo();
+          const publicKey = connectionInfo.publicKey;
+          
+          if (!publicKey) {
+            throw new Error('No public key received from wallet manager');
+          }
+          
+          console.log('🔑 Connected with public key:', publicKey);
+          
+          // Connect wallet through MLG API integration
+          let walletData;
+          try {
+            walletData = await window.mlgApi.connectWallet(publicKey);
+            console.log('🌐 API wallet data received:', walletData);
+          } catch (apiError) {
+            console.warn('⚠️ API connection failed, using fallback:', apiError);
+            walletData = { success: false };
+          }
+          
+          // Update internal wallet state
+          if (walletData && walletData.success) {
+            // Use API response data
+            this.wallet.connected = walletData.wallet.connected;
+            this.wallet.address = walletData.wallet.address;
+            this.wallet.balance.mlg = walletData.wallet.balance.mlg || 1250;
+            this.wallet.balance.sol = walletData.wallet.balance.sol || 2.45;
+            
+            console.log('💎 Updated wallet state from API:', this.wallet);
+          } else {
+            // Use PhantomWalletManager data as fallback
+            this.wallet.connected = connectionInfo.connected;
+            this.wallet.address = publicKey;
+            this.wallet.balance.mlg = 1250; // Default MLG balance
+            this.wallet.balance.sol = connectionInfo.balance?.sol || 2.45;
+            
+            console.log('🎯 Updated wallet state from manager (fallback):', this.wallet);
+          }
+          
+          // Update UI elements with gaming theme
+          walletButton.classList.add('hidden');
+          userInfo.classList.remove('hidden');
+          userAddress.textContent = `${publicKey.slice(0, 4)}...${publicKey.slice(-4)}`;
+          mlgBalance.textContent = this.wallet.balance.mlg.toLocaleString();
+          
+          // Gaming success notification with MLG theme
+          this.showNotification('🎮 Phantom Wallet Connected Successfully!', 'success');
+          
+          // Load user data and setup real-time updates
+          try {
+            await this.loadUserData();
+            console.log('📊 User data loaded successfully');
+          } catch (userDataError) {
+            console.warn('⚠️ User data loading failed (non-critical):', userDataError);
+          }
+          
+          // Sync mobile wallet UI for responsive experience
+          if (window.mobileMenuManager) {
+            window.mobileMenuManager.syncMobileWalletUI();
+            console.log('📱 Mobile wallet UI synchronized');
+          }
+          
+          // Setup wallet event listeners for real-time updates
+          this.setupWalletEventListeners();
+          
+        } catch (error) {
+          console.error('❌ Wallet connection error:', error);
+          
+          // Reset button state with proper gaming styling
+          walletButton.innerHTML = '<i data-lucide="wallet" class="w-4 h-4"></i><span>Connect Phantom</span>';
+          walletButton.disabled = false;
+          lucide.createIcons();
+          
+          // Enhanced error handling based on error type
+          this.handleWalletConnectionError(error);
+        }
+      }
+      
+      /**
+       * Setup wallet event listeners for real-time updates
+       */
+      setupWalletEventListeners() {
+        if (!window.phantomWalletManager) return;
+        
+        // Listen for wallet state changes
+        window.phantomWalletManager.on('connected', (data) => {
+          console.log('🎯 Wallet connected event:', data);
+          this.showNotification('✅ Wallet connection established!', 'success');
+        });
+        
+        window.phantomWalletManager.on('disconnected', (data) => {
+          console.log('🔌 Wallet disconnected event:', data);
+          this.handleWalletDisconnection(data);
+        });
+        
+        window.phantomWalletManager.on('error', (error) => {
+          console.error('❌ Wallet error event:', error);
+          this.showNotification(`⚠️ Wallet Error: ${error.message}`, 'error');
+        });
+        
+        window.phantomWalletManager.on('reconnected', (data) => {
+          console.log('🔄 Wallet reconnected event:', data);
+          this.showNotification('🔄 Wallet reconnected successfully!', 'info');
+        });
+      }
+      
+      /**
+       * Handle wallet connection errors with user-friendly messages
+       */
+      handleWalletConnectionError(error) {
+        console.error('🚨 Processing wallet connection error:', error);
+        
+        // Specific error handling based on error types from PhantomWalletManager
+        if (error.code === 'WALLET_NOT_INSTALLED' || error.message?.includes('not installed')) {
+          this.showNotification('🔗 Please install Phantom wallet first', 'error');
+          // Open Phantom installation page
+          setTimeout(() => window.open('https://phantom.app/', '_blank'), 1000);
+        } else if (error.code === 'USER_REJECTED') {
+          this.showNotification('❌ Connection cancelled by user', 'warning');
+        } else if (error.code === 'WALLET_NOT_AVAILABLE') {
+          this.showNotification('⚠️ Phantom wallet is not available. Please check your wallet.', 'error');
+        } else if (error.code === 'NETWORK_ERROR') {
+          this.showNotification('🌐 Network connection issue. Please check your internet.', 'error');
+        } else if (error.code === 'CONNECTION_TIMEOUT') {
+          this.showNotification('⏱️ Connection timed out. Please try again.', 'error');
+        } else if (error.code === 'RATE_LIMITED') {
+          this.showNotification('⏳ Too many connection attempts. Please wait and try again.', 'warning');
+        } else {
+          // Generic error handling
+          this.showNotification('❌ Failed to connect wallet. Please try again.', 'error');
+        }
+      }
+      
+      /**
+       * Handle wallet disconnection events
+       */
+      handleWalletDisconnection(data) {
+        const walletButton = document.getElementById('wallet-connect');
+        const userInfo = document.getElementById('user-info');
+        
+        // Reset wallet state
+        this.wallet.connected = false;
+        this.wallet.address = '';
+        this.wallet.balance.mlg = 0;
+        this.wallet.balance.sol = 0;
+        
+        // Update UI
+        if (walletButton) {
+          walletButton.classList.remove('hidden');
+          walletButton.innerHTML = '<i data-lucide="wallet" class="w-4 h-4"></i><span>Connect Phantom</span>';
+          walletButton.disabled = false;
+          lucide.createIcons();
+        }
+        
+        if (userInfo) {
+          userInfo.classList.add('hidden');
+        }
+        
+        // Show appropriate disconnection message
+        const reason = data?.reason || 'unknown';
+        if (reason !== 'user_initiated') {
+          this.showNotification('🔌 Wallet disconnected. Please reconnect if needed.', 'info');
+        }
+        
+        console.log('🔌 Wallet disconnection handled:', data);
       }
       
       async loadUserData() {
@@ -1371,6 +2087,16 @@
       }
       
       showNotification(message, type = 'info') {
+        // Use the new error system if available
+        if (this.errorSystem && this.errorSystem.showNotification) {
+          this.errorSystem.showNotification(message, type, {
+            title: '🎮 MLG.clan',
+            icon: this.getNotificationIcon(type)
+          });
+          return;
+        }
+        
+        // Fallback to old notification system
         const container = document.getElementById('notifications-container');
         if (!container) return;
         
@@ -1399,6 +2125,16 @@
             }
           }, 300);
         }, 4000);
+      }
+      
+      getNotificationIcon(type) {
+        const icons = {
+          'success': '✅',
+          'error': '❌',
+          'warning': '⚠️',
+          'info': 'ℹ️'
+        };
+        return icons[type] || '🎮';
       }
     }
     

@@ -25,6 +25,39 @@
   
   <!-- Solana Web3.js -->
   <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+  
+  <!-- API Client -->
+  <script src="src/js/api-client.js"></script>
+  <script src="src/js/mlg-websocket-manager.js"></script>
+  
+  <!-- Voting Integration System -->
+  <script type="module">
+    import { getVotingIntegration, initializeVotingIntegration } from './src/js/mlg-voting-integration.js';
+    import { getWalletManager } from './src/wallet/phantom-wallet.js';
+    
+    // Make voting system available globally for this page
+    window.getVotingIntegration = getVotingIntegration;
+    window.getWalletManager = getWalletManager;
+    
+    // Initialize voting when page loads
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        console.log('🏛️ Initializing voting system for DAO page...');
+        
+        // Initialize wallet manager if not already available
+        if (!window.phantomWalletManager) {
+          window.phantomWalletManager = getWalletManager();
+        }
+        
+        // Initialize voting integration
+        window.MLGVotingIntegration = await initializeVotingIntegration();
+        console.log('✅ DAO voting system ready');
+        
+      } catch (error) {
+        console.error('❌ Failed to initialize DAO voting system:', error);
+      }
+    });
+  </script>
 
   <!-- Tailwind Configuration -->
   <script>
@@ -390,7 +423,7 @@
                     <div class="bg-gaming-accent h-3 rounded-full" style="width: 78%"></div>
                   </div>
                   <div class="flex justify-between text-sm">
-                    <span class="text-gray-400">8,924 total votes</span>
+                    <span class="text-gray-400 vote-count" data-content-id="proposal-1-total">8,924 total votes</span>
                     <span class="text-gray-400">Quorum: 85% reached</span>
                   </div>
                 </div>
@@ -398,14 +431,14 @@
 
               <div class="flex flex-col justify-center space-y-4">
                 <div class="text-center mb-4">
-                  <div class="text-3xl font-bold text-gaming-accent mb-1">78%</div>
+                  <div class="text-3xl font-bold text-gaming-accent mb-1 vote-count" data-content-id="proposal-1-support">78%</div>
                   <div class="text-sm text-gray-400">Support</div>
                 </div>
                 <div class="space-y-2">
-                  <button class="w-full bg-gaming-accent hover:bg-green-400 text-black px-6 py-3 rounded-lg font-bold transition-colors vote-btn" data-vote="for" data-proposal="1">
+                  <button class="w-full bg-gaming-accent hover:bg-green-400 text-black px-6 py-3 rounded-lg font-bold transition-colors vote-btn" data-content-id="proposal-1-for" data-cost="10" data-vote="for" data-proposal="1">
                     Vote For (Cost: 10 MLG)
                   </button>
-                  <button class="w-full bg-gaming-red hover:bg-red-600 px-6 py-3 rounded-lg font-bold transition-colors vote-btn" data-vote="against" data-proposal="1">
+                  <button class="w-full bg-gaming-red hover:bg-red-600 px-6 py-3 rounded-lg font-bold transition-colors vote-btn" data-content-id="proposal-1-against" data-cost="10" data-vote="against" data-proposal="1">
                     Vote Against (Cost: 10 MLG)
                   </button>
                 </div>
@@ -442,7 +475,7 @@
                     <div class="bg-gaming-blue h-3 rounded-full" style="width: 65%"></div>
                   </div>
                   <div class="flex justify-between text-sm">
-                    <span class="text-gray-400">6,342 total votes</span>
+                    <span class="text-gray-400 vote-count" data-content-id="proposal-2-total">6,342 total votes</span>
                     <span class="text-gray-400">Quorum: 62% reached</span>
                   </div>
                 </div>
@@ -450,14 +483,14 @@
 
               <div class="flex flex-col justify-center space-y-4">
                 <div class="text-center mb-4">
-                  <div class="text-3xl font-bold text-gaming-blue mb-1">65%</div>
+                  <div class="text-3xl font-bold text-gaming-blue mb-1 vote-count" data-content-id="proposal-2-support">65%</div>
                   <div class="text-sm text-gray-400">Support</div>
                 </div>
                 <div class="space-y-2">
-                  <button class="w-full bg-gaming-accent hover:bg-green-400 text-black px-6 py-3 rounded-lg font-bold transition-colors vote-btn" data-vote="for" data-proposal="2">
+                  <button class="w-full bg-gaming-accent hover:bg-green-400 text-black px-6 py-3 rounded-lg font-bold transition-colors vote-btn" data-content-id="proposal-2-for" data-cost="10" data-vote="for" data-proposal="2">
                     Vote For (Cost: 10 MLG)
                   </button>
-                  <button class="w-full bg-gaming-red hover:bg-red-600 px-6 py-3 rounded-lg font-bold transition-colors vote-btn" data-vote="against" data-proposal="2">
+                  <button class="w-full bg-gaming-red hover:bg-red-600 px-6 py-3 rounded-lg font-bold transition-colors vote-btn" data-content-id="proposal-2-against" data-cost="10" data-vote="against" data-proposal="2">
                     Vote Against (Cost: 10 MLG)
                   </button>
                 </div>
@@ -494,7 +527,7 @@
                     <div class="bg-gaming-purple h-3 rounded-full" style="width: 52%"></div>
                   </div>
                   <div class="flex justify-between text-sm">
-                    <span class="text-gray-400">4,182 total votes</span>
+                    <span class="text-gray-400 vote-count" data-content-id="proposal-3-total">4,182 total votes</span>
                     <span class="text-gray-400">Quorum: 41% reached</span>
                   </div>
                 </div>
@@ -502,14 +535,14 @@
 
               <div class="flex flex-col justify-center space-y-4">
                 <div class="text-center mb-4">
-                  <div class="text-3xl font-bold text-gaming-purple mb-1">52%</div>
+                  <div class="text-3xl font-bold text-gaming-purple mb-1 vote-count" data-content-id="proposal-3-support">52%</div>
                   <div class="text-sm text-gray-400">Support</div>
                 </div>
                 <div class="space-y-2">
-                  <button class="w-full bg-gaming-accent hover:bg-green-400 text-black px-6 py-3 rounded-lg font-bold transition-colors vote-btn" data-vote="for" data-proposal="3">
+                  <button class="w-full bg-gaming-accent hover:bg-green-400 text-black px-6 py-3 rounded-lg font-bold transition-colors vote-btn" data-content-id="proposal-3-for" data-cost="10" data-vote="for" data-proposal="3">
                     Vote For (Cost: 10 MLG)
                   </button>
-                  <button class="w-full bg-gaming-red hover:bg-red-600 px-6 py-3 rounded-lg font-bold transition-colors vote-btn" data-vote="against" data-proposal="3">
+                  <button class="w-full bg-gaming-red hover:bg-red-600 px-6 py-3 rounded-lg font-bold transition-colors vote-btn" data-content-id="proposal-3-against" data-cost="10" data-vote="against" data-proposal="3">
                     Vote Against (Cost: 10 MLG)
                   </button>
                 </div>
@@ -595,13 +628,21 @@
           mlgBalance: 1250,
           votesThisMonth: 3
         };
+        this.daoData = null;
         this.init();
       }
       
-      init() {
+      async init() {
+        console.log('🏛️ Initializing DAO Platform...');
+        
         this.initializeUI();
-        this.loadLiveStats();
         this.setupEventListeners();
+        
+        // Load data from API
+        await this.loadDAOData();
+        
+        this.startRealTimeUpdates();
+        console.log('✅ DAO Platform initialized successfully!');
       }
       
       initializeUI() {
@@ -653,31 +694,130 @@
         console.log(`Updated proposal ${proposalId} with ${voteType} vote`);
       }
       
-      loadLiveStats() {
-        // Update stats with some variance
-        this.stats.participation += Math.floor(Math.random() * 3) - 1;
-        this.stats.totalVoters += Math.floor(Math.random() * 20);
-        
-        // Keep participation between reasonable bounds
-        this.stats.participation = Math.max(50, Math.min(85, this.stats.participation));
-        
-        // Update DOM
+      async loadDAOData() {
+        try {
+          console.log('📊 Loading DAO data from API...');
+          
+          // Show loading state
+          window.mlgApi?.showLoading('main', {
+            message: 'Loading DAO data...',
+            type: 'dashboard'
+          });
+          
+          // Load DAO data from API
+          const response = await window.mlgApi.getDao();
+          
+          if (response.success) {
+            this.daoData = response;
+            
+            // Update stats from API data
+            if (response.treasury) {
+              this.stats.treasury = parseFloat(response.treasury.total_assets.replace(/[^\d.]/g, '')) * 1000000 || this.stats.treasury;
+            }
+            
+            if (response.governance) {
+              this.stats.activeProposals = response.governance.active_proposals || this.stats.activeProposals;
+              this.stats.participation = response.governance.participation_rate || this.stats.participation;
+              this.stats.totalVoters = response.governance.total_voters || this.stats.totalVoters;
+            }
+            
+            if (response.user_voting) {
+              this.userVotes.mlgBalance = response.user_voting.mlg_holdings || this.userVotes.mlgBalance;
+              this.userVotes.votesThisMonth = response.user_voting.proposals_voted || this.userVotes.votesThisMonth;
+            }
+            
+            // Update display
+            this.updateStatsDisplay();
+            
+            // Update proposals
+            this.updateProposalsList(response.proposals || []);
+            
+            console.log('✅ DAO data loaded from API');
+          } else {
+            throw new Error('API response not successful');
+          }
+          
+        } catch (error) {
+          console.error('Failed to load DAO data:', error);
+          
+          // Show error notification
+          this.showNotification('Failed to load DAO data. Using fallback.', 'warning');
+          
+          // Use fallback data
+          this.updateStatsDisplay();
+        } finally {
+          // Hide loading state
+          window.mlgApi?.hideLoading('main');
+        }
+      }
+      
+      updateStatsDisplay() {
+        // Update DOM with current stats
         const elements = {
-          'treasury-value': '$' + (this.stats.treasury / 1000000).toFixed(1) + 'M',
+          'treasury-value': this.daoData?.treasury?.total_assets || ('$' + (this.stats.treasury / 1000000).toFixed(1) + 'M'),
           'active-proposals': this.stats.activeProposals,
           'participation': this.stats.participation + '%',
-          'total-voters': this.stats.totalVoters.toLocaleString()
+          'total-voters': this.stats.totalVoters.toLocaleString(),
+          'user-mlg-holdings': this.userVotes.mlgBalance.toLocaleString(),
+          'user-votes-month': this.userVotes.votesThisMonth
         };
         
         Object.entries(elements).forEach(([id, value]) => {
           const element = document.getElementById(id);
           if (element) {
             element.textContent = value;
+            // Add pulse effect for updates
+            element.classList.add('animate-pulse-neon');
+            setTimeout(() => {
+              element.classList.remove('animate-pulse-neon');
+            }, 1000);
           }
         });
+      }
+      
+      updateProposalsList(proposals) {
+        if (!proposals || proposals.length === 0) return;
         
-        // Update every 45 seconds
-        setTimeout(() => this.loadLiveStats(), 45000);
+        console.log('🗳️ Updating proposals list:', proposals);
+        
+        // Update proposal cards if they exist
+        proposals.forEach((proposal, index) => {
+          const proposalElement = document.querySelector(`[data-proposal-id="${proposal.id}"]`);
+          const proposalTitleElement = document.querySelector(`[data-proposal="${index}"] .proposal-title`);
+          const proposalSupportElement = document.querySelector(`[data-proposal="${index}"] .proposal-support`);
+          const proposalStatusElement = document.querySelector(`[data-proposal="${index}"] .proposal-status`);
+          
+          if (proposalTitleElement) proposalTitleElement.textContent = proposal.title;
+          if (proposalSupportElement) proposalSupportElement.textContent = `${proposal.support_percentage}% Support`;
+          if (proposalStatusElement) proposalStatusElement.textContent = `${proposal.ends_in_days} days left`;
+        });
+      }
+      
+      startRealTimeUpdates() {
+        // Start real-time updates using the API client
+        console.log('🔄 Starting real-time DAO updates...');
+        
+        // Update DAO data every 30 seconds
+        window.mlgApi?.startRealTimeUpdates('/dao', (data) => {
+          if (data.success) {
+            this.daoData = data;
+            
+            // Update stats from real-time data
+            if (data.governance) {
+              this.stats.activeProposals = data.governance.active_proposals;
+              this.stats.participation = data.governance.participation_rate;
+              this.stats.totalVoters = data.governance.total_voters;
+            }
+            
+            if (data.user_voting) {
+              this.userVotes.mlgBalance = data.user_voting.mlg_holdings;
+              this.userVotes.votesThisMonth = data.user_voting.proposals_voted;
+            }
+            
+            this.updateStatsDisplay();
+            this.updateProposalsList(data.proposals || []);
+          }
+        }, 30000);
       }
       
       showNotification(message, type = 'info') {

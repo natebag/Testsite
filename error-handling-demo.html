@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan Error Handling Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- MLG Error Handling System -->
+    <script src="src/js/mlg-error-handler.js"></script>
+    <script src="src/js/mlg-api-client.js"></script>
+    <script src="src/js/mlg-offline-manager.js"></script>
+    <script src="src/js/mlg-connection-status.js"></script>
+    <script src="src/js/mlg-fallback-system.js"></script>
+    <script src="src/js/mlg-loading-states.js"></script>
+    <script src="src/js/mlg-error-logger.js"></script>
+    <script src="src/js/mlg-error-system.js"></script>
+</head>
+<body class="bg-gray-900 text-white">
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-green-400 mb-4">🎮 MLG.clan Error Handling Demo</h1>
+            <p class="text-lg text-gray-300">Xbox 360-inspired error handling with gaming-themed notifications</p>
+        </div>
+
+        <!-- Error Code Examples -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gray-800 p-6 rounded-lg border border-green-400">
+                <h3 class="text-xl font-bold text-green-400 mb-4">🌐 Network Errors</h3>
+                <div class="space-y-3">
+                    <button class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded" onclick="demoError('E74')">
+                        E74 - Network Timeout
+                    </button>
+                    <button class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded" onclick="demoError('E68')">
+                        E68 - Connection Failed
+                    </button>
+                    <button class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded" onclick="demoError('E64')">
+                        E64 - RPC Server Down
+                    </button>
+                    <button class="w-full bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded" onclick="demoError('E65')">
+                        E65 - Rate Limited
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-lg border border-blue-400">
+                <h3 class="text-xl font-bold text-blue-400 mb-4">🎮 Wallet Errors</h3>
+                <div class="space-y-3">
+                    <button class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded" onclick="demoError('0102')">
+                        0102 - Wallet Disconnected
+                    </button>
+                    <button class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded" onclick="demoError('0101')">
+                        0101 - Wallet Not Installed
+                    </button>
+                    <button class="w-full bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded" onclick="demoError('0103')">
+                        0103 - Transaction Rejected
+                    </button>
+                    <button class="w-full bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded" onclick="demoError('0104')">
+                        0104 - Insufficient Funds
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 p-6 rounded-lg border border-purple-400">
+                <h3 class="text-xl font-bold text-purple-400 mb-4">💾 Data Errors</h3>
+                <div class="space-y-3">
+                    <button class="w-full bg-red-600 hover:bg-red-700 px-4 py-2 rounded" onclick="demoError('D01')">
+                        D01 - Data Not Found
+                    </button>
+                    <button class="w-full bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded" onclick="demoError('D02')">
+                        D02 - Invalid Data Format
+                    </button>
+                    <button class="w-full bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded" onclick="demoError('D03')">
+                        D03 - Cache Miss
+                    </button>
+                    <button class="w-full bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded" onclick="demoError('D04')">
+                        D04 - Sync Failed
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State Demos -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-green-400 mb-8">
+            <h3 class="text-xl font-bold text-green-400 mb-4">⏳ Xbox 360-Style Loading States</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded" onclick="demoLoading('connection_recovery')">
+                    🌐 Connection Recovery
+                </button>
+                <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded" onclick="demoLoading('wallet_connect')">
+                    🎮 Wallet Connection
+                </button>
+                <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded" onclick="demoLoading('transaction')">
+                    💰 Transaction Processing
+                </button>
+                <button class="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded" onclick="demoLoading('data_sync')">
+                    ☁️ Data Sync
+                </button>
+                <button class="bg-pink-600 hover:bg-pink-700 px-4 py-2 rounded" onclick="demoLoading('vote_processing')">
+                    🗳️ Vote Processing
+                </button>
+                <button class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded" onclick="demoLoading('system_recovery')">
+                    🛠️ System Recovery
+                </button>
+            </div>
+        </div>
+
+        <!-- Achievement-Style Recovery -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-yellow-400 mb-8">
+            <h3 class="text-xl font-bold text-yellow-400 mb-4">🏆 Achievement-Style Recovery</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded" onclick="demoRecovery()">
+                    🏆 Network Connection Restored
+                </button>
+                <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded" onclick="demoWalletRecovery()">
+                    🎮 Wallet Reconnected
+                </button>
+                <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded" onclick="demoDataRecovery()">
+                    💾 Data Recovery Complete
+                </button>
+                <button class="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded" onclick="demoSystemRecovery()">
+                    ⚡ System Recovery Complete
+                </button>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="bg-gray-800 p-6 rounded-lg border border-blue-400">
+            <h3 class="text-xl font-bold text-blue-400 mb-4">📊 System Status</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded" onclick="showSystemStatus()">
+                    📈 View System Status
+                </button>
+                <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded" onclick="runHealthCheck()">
+                    🏥 Run Health Check
+                </button>
+                <button class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded" onclick="exportLogs()">
+                    📥 Export Error Logs
+                </button>
+                <button class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded" onclick="clearCache()">
+                    🧹 Clear Cache
+                </button>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="mt-8 bg-gray-800 p-6 rounded-lg border border-gray-600">
+            <h3 class="text-xl font-bold text-gray-300 mb-4">📋 Instructions</h3>
+            <ul class="list-disc list-inside text-gray-300 space-y-2">
+                <li>Click any error button to see Xbox 360-style error messages</li>
+                <li>Try the loading state demos to see gaming-inspired progress indicators</li>
+                <li>Achievement-style recovery shows success notifications</li>
+                <li>System status provides insight into error handling components</li>
+                <li>Open browser console to see detailed error logging</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the error system
+        let errorSystem;
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                if (window.MLGErrorSystem) {
+                    errorSystem = window.MLGErrorSystem;
+                    await errorSystem.init();
+                    console.log('🎮 Error system initialized for demo');
+                    
+                    // Show welcome message
+                    errorSystem.showNotification(
+                        'Error handling demo ready! Try the buttons above.', 
+                        'success',
+                        { 
+                            title: '🎮 MLG.clan Demo', 
+                            icon: '🚀',
+                            duration: 6000 
+                        }
+                    );
+                } else {
+                    console.warn('MLGErrorSystem not available');
+                }
+            } catch (error) {
+                console.error('Failed to initialize error system:', error);
+            }
+        });
+
+        // Demo functions
+        function demoError(errorCode) {
+            if (!errorSystem || !errorSystem.components.errorHandler) {
+                alert(`Demo Error ${errorCode}: Error system not initialized`);
+                return;
+            }
+
+            const errorMessages = {
+                'E74': { message: 'Network timeout occurred', context: { operation: 'api_call' } },
+                'E68': { message: 'Connection to servers failed', context: { operation: 'connection' } },
+                'E64': { message: 'RPC server is unavailable', context: { operation: 'rpc_call' } },
+                'E65': { message: 'Rate limit exceeded', context: { operation: 'api_rate_limit' } },
+                '0102': { message: 'Wallet has been disconnected', context: { operation: 'wallet_check' } },
+                '0101': { message: 'Phantom wallet not found', context: { operation: 'wallet_detect' } },
+                '0103': { message: 'User rejected the transaction', context: { operation: 'transaction' } },
+                '0104': { message: 'Insufficient SOL for transaction', context: { operation: 'balance_check' } },
+                'D01': { message: 'Requested data not found', context: { operation: 'data_fetch' } },
+                'D02': { message: 'Data format validation failed', context: { operation: 'data_parse' } },
+                'D03': { message: 'Cache expired, reload needed', context: { operation: 'cache_access' } },
+                'D04': { message: 'Cloud sync operation failed', context: { operation: 'data_sync' } }
+            };
+
+            const errorInfo = errorMessages[errorCode];
+            if (errorInfo) {
+                const error = new Error(errorInfo.message);
+                errorSystem.components.errorHandler.handleError(error, errorInfo.context);
+            }
+        }
+
+        function demoLoading(type) {
+            if (!errorSystem || !errorSystem.components.loadingStates) {
+                alert(`Loading demo: ${type} - Loading system not initialized`);
+                return;
+            }
+
+            const loaderId = errorSystem.components.loadingStates.showLoader(type);
+            
+            // Auto-hide after demonstration
+            setTimeout(() => {
+                errorSystem.components.loadingStates.hideLoader(loaderId);
+            }, 5000);
+        }
+
+        function demoRecovery() {
+            if (!errorSystem) return;
+            
+            errorSystem.showNotification(
+                'Achievement Unlocked!',
+                'success',
+                {
+                    title: '🏆 Network Connection Restored',
+                    icon: '🌐',
+                    duration: 5000
+                }
+            );
+        }
+
+        function demoWalletRecovery() {
+            if (!errorSystem) return;
+            
+            errorSystem.showNotification(
+                'Ready Player One!',
+                'success',
+                {
+                    title: '🎮 Wallet Reconnected',
+                    icon: '🔌',
+                    duration: 5000
+                }
+            );
+        }
+
+        function demoDataRecovery() {
+            if (!errorSystem) return;
+            
+            errorSystem.showNotification(
+                'Save Game Complete!',
+                'success',
+                {
+                    title: '💾 Data Recovered',
+                    icon: '💽',
+                    duration: 5000
+                }
+            );
+        }
+
+        function demoSystemRecovery() {
+            if (!errorSystem) return;
+            
+            errorSystem.showNotification(
+                'Level Up!',
+                'success',
+                {
+                    title: '⚡ System Recovery Complete',
+                    icon: '🔧',
+                    duration: 5000
+                }
+            );
+        }
+
+        function showSystemStatus() {
+            if (!errorSystem) return;
+            
+            const status = errorSystem.getSystemStatus();
+            console.log('📊 System Status:', status);
+            
+            errorSystem.showNotification(
+                'System status logged to console',
+                'info',
+                {
+                    title: '📊 System Status',
+                    icon: '📈',
+                    duration: 4000
+                }
+            );
+        }
+
+        function runHealthCheck() {
+            if (!errorSystem) return;
+            
+            const health = errorSystem.runHealthCheck();
+            console.log('🏥 Health Check:', health);
+            
+            const message = health.status === 'healthy' 
+                ? 'All systems operational!' 
+                : `System status: ${health.status}`;
+            
+            errorSystem.showNotification(
+                message,
+                health.status === 'healthy' ? 'success' : 'warning',
+                {
+                    title: '🏥 Health Check',
+                    icon: '🔍',
+                    duration: 4000
+                }
+            );
+        }
+
+        function exportLogs() {
+            if (!errorSystem) return;
+            
+            errorSystem.exportLogs();
+            errorSystem.showNotification(
+                'Error logs exported to file',
+                'info',
+                {
+                    title: '📥 Export Complete',
+                    icon: '📋',
+                    duration: 4000
+                }
+            );
+        }
+
+        function clearCache() {
+            if (!errorSystem) return;
+            
+            errorSystem.clearCache();
+            errorSystem.showNotification(
+                'Cache cleared successfully',
+                'success',
+                {
+                    title: '🧹 Cache Cleared',
+                    icon: '♻️',
+                    duration: 4000
+                }
+            );
+        }
+    </script>
+</body>
+</html>

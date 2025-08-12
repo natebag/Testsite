@@ -174,7 +174,7 @@ export function createMLGTokenConnection(network = CURRENT_NETWORK, options = {}
   }
 }
 
-export function validateMLGTokenMint(mintAddress) {
+export async function validateMLGTokenMint(mintAddress) {
   try {
     if (mintAddress === 'MLGtokenMintAddressToBeDeployedLater') {
       return { isValid: false, error: 'Placeholder mint address' };
@@ -186,7 +186,7 @@ export function validateMLGTokenMint(mintAddress) {
     }
     
     // Basic PublicKey validation
-    const { PublicKey } = require('@solana/web3.js');
+    const { PublicKey } = await import('@solana/web3.js');
     new PublicKey(mintAddress); // Will throw if invalid
     return { isValid: true, mintAddress };
   } catch (error) {

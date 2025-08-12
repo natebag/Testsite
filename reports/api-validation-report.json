@@ -1,0 +1,363 @@
+{
+  "timestamp": "2025-08-11T22:04:57.108Z",
+  "stats": {
+    "total": 58,
+    "pass": 53,
+    "fail": 2,
+    "warn": 3,
+    "error": 0
+  },
+  "results": [
+    {
+      "component": "mlg-error-handler.js",
+      "test": "File Existence",
+      "status": "PASS",
+      "details": "File exists (28225 bytes)"
+    },
+    {
+      "component": "mlg-api-client.js",
+      "test": "File Existence",
+      "status": "PASS",
+      "details": "File exists (19870 bytes)"
+    },
+    {
+      "component": "mlg-auth-manager.js",
+      "test": "File Existence",
+      "status": "PASS",
+      "details": "File exists (19235 bytes)"
+    },
+    {
+      "component": "mlg-websocket-manager.js",
+      "test": "File Existence",
+      "status": "PASS",
+      "details": "File exists (17082 bytes)"
+    },
+    {
+      "component": "mlg-cache-manager.js",
+      "test": "File Existence",
+      "status": "PASS",
+      "details": "File exists (16429 bytes)"
+    },
+    {
+      "component": "mlg-error-handler.js",
+      "test": "Class Definition",
+      "status": "PASS",
+      "details": "MLGErrorHandler class found"
+    },
+    {
+      "component": "mlg-error-handler.js",
+      "test": "Constructor",
+      "status": "PASS",
+      "details": "Constructor found"
+    },
+    {
+      "component": "mlg-error-handler.js",
+      "test": "Initialization Method",
+      "status": "PASS",
+      "details": "Init method found"
+    },
+    {
+      "component": "mlg-error-handler.js",
+      "test": "Global Instance",
+      "status": "PASS",
+      "details": "Global instance created"
+    },
+    {
+      "component": "mlg-error-handler.js",
+      "test": "ES6 Exports",
+      "status": "PASS",
+      "details": "ES6 exports found"
+    },
+    {
+      "component": "mlg-error-handler.js",
+      "test": "Xbox 360 Error Codes",
+      "status": "PASS",
+      "details": "Xbox-themed error codes found"
+    },
+    {
+      "component": "mlg-error-handler.js",
+      "test": "Gaming-Themed Messages",
+      "status": "PASS",
+      "details": "Gaming-themed messages found"
+    },
+    {
+      "component": "mlg-error-handler.js",
+      "test": "Recovery Strategies",
+      "status": "PASS",
+      "details": "Recovery strategies defined"
+    },
+    {
+      "component": "mlg-error-handler.js",
+      "test": "Circuit Breakers",
+      "status": "PASS",
+      "details": "Circuit breaker system found"
+    },
+    {
+      "component": "mlg-api-client.js",
+      "test": "Class Definition",
+      "status": "PASS",
+      "details": "MLGApiClient class found"
+    },
+    {
+      "component": "mlg-api-client.js",
+      "test": "Constructor",
+      "status": "PASS",
+      "details": "Constructor found"
+    },
+    {
+      "component": "mlg-api-client.js",
+      "test": "Initialization Method",
+      "status": "PASS",
+      "details": "Init method found"
+    },
+    {
+      "component": "mlg-api-client.js",
+      "test": "Global Instance",
+      "status": "PASS",
+      "details": "Global instance created"
+    },
+    {
+      "component": "mlg-api-client.js",
+      "test": "ES6 Exports",
+      "status": "PASS",
+      "details": "ES6 exports found"
+    },
+    {
+      "component": "mlg-api-client.js",
+      "test": "Endpoint Configuration",
+      "status": "PASS",
+      "details": "Endpoint configuration found"
+    },
+    {
+      "component": "mlg-api-client.js",
+      "test": "HTTP Methods",
+      "status": "PASS",
+      "details": "All HTTP methods implemented"
+    },
+    {
+      "component": "mlg-api-client.js",
+      "test": "Request/Response Interceptors",
+      "status": "PASS",
+      "details": "Interceptors implemented"
+    },
+    {
+      "component": "mlg-api-client.js",
+      "test": "Gaming API Methods",
+      "status": "PASS",
+      "details": "Gaming-specific methods found"
+    },
+    {
+      "component": "mlg-auth-manager.js",
+      "test": "Class Definition",
+      "status": "PASS",
+      "details": "MLGAuthManager class found"
+    },
+    {
+      "component": "mlg-auth-manager.js",
+      "test": "Constructor",
+      "status": "PASS",
+      "details": "Constructor found"
+    },
+    {
+      "component": "mlg-auth-manager.js",
+      "test": "Initialization Method",
+      "status": "PASS",
+      "details": "Init method found"
+    },
+    {
+      "component": "mlg-auth-manager.js",
+      "test": "Global Instance",
+      "status": "PASS",
+      "details": "Global instance created"
+    },
+    {
+      "component": "mlg-auth-manager.js",
+      "test": "ES6 Exports",
+      "status": "PASS",
+      "details": "ES6 exports found"
+    },
+    {
+      "component": "mlg-auth-manager.js",
+      "test": "Token Encryption",
+      "status": "PASS",
+      "details": "Token encryption implemented"
+    },
+    {
+      "component": "mlg-auth-manager.js",
+      "test": "Device Fingerprinting",
+      "status": "PASS",
+      "details": "Device fingerprinting found"
+    },
+    {
+      "component": "mlg-auth-manager.js",
+      "test": "Session Management",
+      "status": "PASS",
+      "details": "Session management implemented"
+    },
+    {
+      "component": "mlg-auth-manager.js",
+      "test": "Token Refresh",
+      "status": "PASS",
+      "details": "Token refresh implemented"
+    },
+    {
+      "component": "mlg-websocket-manager.js",
+      "test": "Class Definition",
+      "status": "PASS",
+      "details": "MLGWebSocketManager class found"
+    },
+    {
+      "component": "mlg-websocket-manager.js",
+      "test": "Constructor",
+      "status": "PASS",
+      "details": "Constructor found"
+    },
+    {
+      "component": "mlg-websocket-manager.js",
+      "test": "Initialization Method",
+      "status": "PASS",
+      "details": "Init method found"
+    },
+    {
+      "component": "mlg-websocket-manager.js",
+      "test": "Global Instance",
+      "status": "PASS",
+      "details": "Global instance created"
+    },
+    {
+      "component": "mlg-websocket-manager.js",
+      "test": "ES6 Exports",
+      "status": "PASS",
+      "details": "ES6 exports found"
+    },
+    {
+      "component": "mlg-websocket-manager.js",
+      "test": "Subscription System",
+      "status": "PASS",
+      "details": "Subscription system found"
+    },
+    {
+      "component": "mlg-websocket-manager.js",
+      "test": "Reconnection Logic",
+      "status": "PASS",
+      "details": "Reconnection logic implemented"
+    },
+    {
+      "component": "mlg-websocket-manager.js",
+      "test": "Polling Fallback",
+      "status": "PASS",
+      "details": "Polling fallback implemented"
+    },
+    {
+      "component": "mlg-websocket-manager.js",
+      "test": "Gaming Events",
+      "status": "PASS",
+      "details": "Gaming-specific events found"
+    },
+    {
+      "component": "mlg-cache-manager.js",
+      "test": "Class Definition",
+      "status": "PASS",
+      "details": "MLGCacheManager class found"
+    },
+    {
+      "component": "mlg-cache-manager.js",
+      "test": "Constructor",
+      "status": "PASS",
+      "details": "Constructor found"
+    },
+    {
+      "component": "mlg-cache-manager.js",
+      "test": "Initialization Method",
+      "status": "PASS",
+      "details": "Init method found"
+    },
+    {
+      "component": "mlg-cache-manager.js",
+      "test": "Global Instance",
+      "status": "PASS",
+      "details": "Global instance created"
+    },
+    {
+      "component": "mlg-cache-manager.js",
+      "test": "ES6 Exports",
+      "status": "PASS",
+      "details": "ES6 exports found"
+    },
+    {
+      "component": "mlg-cache-manager.js",
+      "test": "Multi-Level Caching",
+      "status": "PASS",
+      "details": "Multi-level caching implemented"
+    },
+    {
+      "component": "mlg-cache-manager.js",
+      "test": "Data Compression",
+      "status": "PASS",
+      "details": "Data compression implemented"
+    },
+    {
+      "component": "mlg-cache-manager.js",
+      "test": "TTL Strategies",
+      "status": "PASS",
+      "details": "TTL strategies implemented"
+    },
+    {
+      "component": "mlg-cache-manager.js",
+      "test": "Performance Monitoring",
+      "status": "PASS",
+      "details": "Performance monitoring found"
+    },
+    {
+      "component": "index.html",
+      "test": "Component Loading",
+      "status": "PASS",
+      "details": "5/5 components loaded"
+    },
+    {
+      "component": "index.html",
+      "test": "Script Load Order",
+      "status": "PASS",
+      "details": "Error handler loads first"
+    },
+    {
+      "component": "voting.html",
+      "test": "Component Loading",
+      "status": "PASS",
+      "details": "1/5 components loaded"
+    },
+    {
+      "component": "voting.html",
+      "test": "Script Load Order",
+      "status": "WARN",
+      "details": "Error handler should load first"
+    },
+    {
+      "component": "content.html",
+      "test": "Component Loading",
+      "status": "FAIL",
+      "details": "0/5 components loaded"
+    },
+    {
+      "component": "content.html",
+      "test": "Script Load Order",
+      "status": "WARN",
+      "details": "Error handler should load first"
+    },
+    {
+      "component": "clans.html",
+      "test": "Component Loading",
+      "status": "FAIL",
+      "details": "0/5 components loaded"
+    },
+    {
+      "component": "clans.html",
+      "test": "Script Load Order",
+      "status": "WARN",
+      "details": "Error handler should load first"
+    }
+  ],
+  "errors": [],
+  "passRate": 91.37931034482759,
+  "decision": "GO"
+}

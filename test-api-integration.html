@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan API Integration Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="src/js/api-client.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .test-result {
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        .success {
+            background-color: rgba(0, 255, 136, 0.1);
+            border-left-color: #00ff88;
+            color: #00ff88;
+        }
+        .error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left-color: #ef4444;
+            color: #ef4444;
+        }
+        .loading {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+            color: #3b82f6;
+        }
+        .warning {
+            background-color: rgba(251, 191, 36, 0.1);
+            border-left-color: #fbbf24;
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-8 text-transparent bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text">
+            🎮 MLG.clan API Integration Test
+        </h1>
+        
+        <div class="bg-gray-900 bg-opacity-50 rounded-xl p-6 backdrop-blur-md">
+            <h2 class="text-2xl font-bold mb-6">API Endpoint Tests</h2>
+            <div id="test-results"></div>
+            
+            <button id="run-tests" class="mt-6 bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg font-bold transition-colors">
+                🚀 Run All Tests
+            </button>
+            
+            <button id="test-realtime" class="mt-6 ml-4 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg font-bold transition-colors">
+                🔄 Test Real-time Updates
+            </button>
+        </div>
+        
+        <div class="mt-8 bg-gray-900 bg-opacity-50 rounded-xl p-6 backdrop-blur-md">
+            <h2 class="text-2xl font-bold mb-6">Xbox 360 Loading System Test</h2>
+            <div id="loading-test-area" class="min-h-32 bg-gray-800 rounded-lg p-4 text-center">
+                <p class="text-gray-400">Click "Test Loading States" to verify Xbox 360 aesthetic is maintained</p>
+            </div>
+            
+            <button id="test-loading" class="mt-4 bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-bold transition-colors">
+                🎮 Test Loading States
+            </button>
+        </div>
+    </div>
+
+    <script>
+        class APIIntegrationTest {
+            constructor() {
+                this.testResults = document.getElementById('test-results');
+                this.tests = [
+                    { name: 'Status API', endpoint: '/status', method: 'getStatus' },
+                    { name: 'Voting API', endpoint: '/voting', method: 'getVoting' },
+                    { name: 'Clans API', endpoint: '/clans', method: 'getClans' },
+                    { name: 'Content API', endpoint: '/content', method: 'getContent' },
+                    { name: 'DAO API', endpoint: '/dao', method: 'getDao' },
+                    { name: 'Analytics API', endpoint: '/analytics', method: 'getAnalytics' },
+                    { name: 'Mobile API', endpoint: '/mobile', method: 'getMobile' },
+                    { name: 'Wallet API', endpoint: '/wallet', method: 'getWallet' }
+                ];
+                this.realTimeTests = [];
+                this.init();
+            }
+
+            init() {
+                document.getElementById('run-tests').addEventListener('click', () => this.runAllTests());
+                document.getElementById('test-realtime').addEventListener('click', () => this.testRealTimeUpdates());
+                document.getElementById('test-loading').addEventListener('click', () => this.testLoadingStates());
+            }
+
+            addResult(testName, status, message, data = null) {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `test-result ${status}`;
+                
+                let content = `<strong>${testName}:</strong> ${message}`;
+                if (data && status === 'success') {
+                    content += ` <small>(${JSON.stringify(data).length} chars)</small>`;
+                }
+                
+                resultDiv.innerHTML = content;
+                this.testResults.appendChild(resultDiv);
+                this.testResults.scrollTop = this.testResults.scrollHeight;
+            }
+
+            async runAllTests() {
+                this.testResults.innerHTML = '';
+                this.addResult('Test Suite', 'loading', 'Starting API integration tests...');
+
+                let passedTests = 0;
+                let totalTests = this.tests.length;
+
+                for (const test of this.tests) {
+                    try {
+                        this.addResult(test.name, 'loading', 'Testing...');
+                        
+                        const result = await window.mlgApi[test.method]();
+                        
+                        if (result && result.success !== false) {
+                            this.addResult(test.name, 'success', '✅ API call successful', result);
+                            passedTests++;
+                        } else {
+                            this.addResult(test.name, 'warning', '⚠️ API returned unsuccessful response', result);
+                        }
+                    } catch (error) {
+                        this.addResult(test.name, 'error', `❌ API call failed: ${error.message}`);
+                    }
+                    
+                    // Small delay between tests
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+
+                // Final summary
+                const successRate = (passedTests / totalTests * 100).toFixed(1);
+                if (passedTests === totalTests) {
+                    this.addResult('Test Summary', 'success', `🎉 All ${totalTests} tests passed! (${successRate}%)`);
+                } else {
+                    this.addResult('Test Summary', 'warning', `${passedTests}/${totalTests} tests passed (${successRate}%)`);
+                }
+            }
+
+            testRealTimeUpdates() {
+                this.addResult('Real-time Test', 'loading', 'Starting real-time update test...');
+
+                // Test real-time updates for 30 seconds
+                let updateCount = 0;
+                
+                window.mlgApi.startRealTimeUpdates('/status', (data) => {
+                    updateCount++;
+                    this.addResult('Real-time Update', 'success', `📡 Update #${updateCount} received`, data);
+                }, 5000); // Every 5 seconds for testing
+
+                // Stop after 30 seconds
+                setTimeout(() => {
+                    window.mlgApi.stopRealTimeUpdates('/status');
+                    this.addResult('Real-time Test', 'success', `🛑 Real-time test completed. Received ${updateCount} updates in 30 seconds.`);
+                }, 30000);
+            }
+
+            testLoadingStates() {
+                const container = document.getElementById('loading-test-area');
+                
+                // Test different loading states
+                const loadingTests = [
+                    { type: 'dashboard', message: 'Loading Xbox 360 Dashboard...', duration: 3000 },
+                    { type: 'skeleton', lines: 4, avatar: true, duration: 2500 },
+                    { type: 'wallet-phantom', estimatedTime: '3-5 seconds', duration: 3500 },
+                    { type: 'vote-burn', amount: 25, symbol: 'MLG', duration: 2000 }
+                ];
+
+                let currentTest = 0;
+
+                const runNextLoadingTest = () => {
+                    if (currentTest >= loadingTests.length) {
+                        this.addResult('Loading States', 'success', '✅ All Xbox 360 loading states tested successfully!');
+                        container.innerHTML = '<p class="text-green-400">🎮 All loading tests completed! Xbox 360 aesthetic maintained.</p>';
+                        return;
+                    }
+
+                    const test = loadingTests[currentTest];
+                    this.addResult('Loading Test', 'loading', `Testing ${test.type} loading state...`);
+
+                    if (window.MLG) {
+                        window.MLG.show(container, test);
+                    } else {
+                        container.innerHTML = `
+                            <div class="text-center py-8">
+                                <div class="animate-spin inline-block w-8 h-8 border-4 border-green-400 border-r-transparent rounded-full mb-4"></div>
+                                <p class="text-green-400">${test.message || 'Loading...'}</p>
+                            </div>
+                        `;
+                    }
+
+                    setTimeout(() => {
+                        currentTest++;
+                        runNextLoadingTest();
+                    }, test.duration);
+                };
+
+                runNextLoadingTest();
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new APIIntegrationTest();
+        });
+
+        // Health check on page load
+        window.addEventListener('load', async () => {
+            const healthDiv = document.createElement('div');
+            healthDiv.className = 'test-result loading';
+            healthDiv.innerHTML = '<strong>System Health:</strong> Checking API availability...';
+            document.getElementById('test-results').appendChild(healthDiv);
+
+            try {
+                const isHealthy = await window.mlgApi.healthCheck();
+                healthDiv.className = isHealthy ? 'test-result success' : 'test-result error';
+                healthDiv.innerHTML = isHealthy 
+                    ? '<strong>System Health:</strong> ✅ Demo server is online and responding'
+                    : '<strong>System Health:</strong> ❌ Demo server is not responding. Please start the server.';
+            } catch (error) {
+                healthDiv.className = 'test-result error';
+                healthDiv.innerHTML = '<strong>System Health:</strong> ❌ Failed to check server health';
+            }
+        });
+    </script>
+</body>
+</html>

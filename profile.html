@@ -18,6 +18,7 @@
   
   <!-- Standardized Module Loading System -->
   <script src="src/js/page-loader.js"></script>
+  <script src="src/js/api-client.js"></script>
 
   <!-- Page Configuration -->
   <script>
@@ -686,13 +687,22 @@
           stakedAmount: 500,
           nftCount: 7
         };
+        this.walletData = null;
+        this.profileData = null;
         this.init();
       }
       
-      init() {
+      async init() {
+        console.log('👤 Initializing Profile Platform...');
+        
         this.initializeUI();
         this.setupEventListeners();
-        this.loadProfileData();
+        
+        // Load data from API
+        await this.loadProfileData();
+        
+        this.startRealTimeUpdates();
+        console.log('✅ Profile Platform initialized successfully!');
       }
       
       initializeUI() {
@@ -720,17 +730,29 @@
       }
       
       updateProfileDisplay() {
-        // Update profile stats
-        document.getElementById('profile-level').textContent = this.userProfile.level;
-        document.getElementById('profile-wins').textContent = this.userProfile.wins.toLocaleString();
-        document.getElementById('profile-tournaments').textContent = this.userProfile.tournaments;
-        document.getElementById('profile-earnings').textContent = '$' + (this.userProfile.earnings / 1000).toFixed(1) + 'K';
+        // Update profile stats with pulse effects
+        const elements = {
+          'profile-level': this.userProfile.level,
+          'profile-wins': this.userProfile.wins.toLocaleString(),
+          'profile-tournaments': this.userProfile.tournaments,
+          'profile-earnings': '$' + (this.userProfile.earnings / 1000).toFixed(1) + 'K',
+          'wallet-mlg': this.userProfile.mlgBalance.toLocaleString(),
+          'wallet-sol': this.userProfile.solBalance.toFixed(2),
+          'staked-amount': this.userProfile.stakedAmount.toLocaleString(),
+          'nft-count': this.userProfile.nftCount
+        };
         
-        // Update wallet info
-        document.getElementById('wallet-mlg').textContent = this.userProfile.mlgBalance.toLocaleString();
-        document.getElementById('wallet-sol').textContent = this.userProfile.solBalance.toFixed(2);
-        document.getElementById('staked-amount').textContent = this.userProfile.stakedAmount.toLocaleString();
-        document.getElementById('nft-count').textContent = this.userProfile.nftCount;
+        Object.entries(elements).forEach(([id, value]) => {
+          const element = document.getElementById(id);
+          if (element) {
+            element.textContent = value;
+            // Add pulse effect for updates
+            element.classList.add('animate-pulse-neon');
+            setTimeout(() => {
+              element.classList.remove('animate-pulse-neon');
+            }, 1000);
+          }
+        });
       }
       
       openEditModal() {
@@ -765,9 +787,75 @@
         });
       }
       
-      loadProfileData() {
-        // In a real implementation, this would fetch data from the backend
-        this.showNotification('👤 Profile loaded successfully!', 'success');
+      async loadProfileData() {
+        try {
+          console.log('📊 Loading profile data from API...');
+          
+          // Show loading state
+          window.mlgApi?.showLoading('main', {
+            message: 'Loading profile data...',
+            type: 'dashboard'
+          });
+          
+          // Load wallet and user data from APIs
+          const [walletResponse, statusResponse] = await Promise.allSettled([
+            window.mlgApi.getWallet(),
+            window.mlgApi.getStatus()
+          ]);
+          
+          // Process wallet data
+          if (walletResponse.status === 'fulfilled' && walletResponse.value.success) {
+            this.walletData = walletResponse.value;
+            
+            // Update user profile with wallet data
+            if (walletResponse.value.wallet) {
+              this.userProfile.mlgBalance = walletResponse.value.wallet.balance?.mlg || this.userProfile.mlgBalance;
+              this.userProfile.solBalance = walletResponse.value.wallet.balance?.sol || this.userProfile.solBalance;
+            }
+          }
+          
+          // Process platform status for additional stats
+          if (statusResponse.status === 'fulfilled' && statusResponse.value.success) {
+            this.profileData = statusResponse.value;
+            // Could update user stats based on platform data if available
+          }
+          
+          // Update display with API data
+          this.updateProfileDisplay();
+          
+          console.log('✅ Profile data loaded from API');
+          this.showNotification('👤 Profile loaded successfully!', 'success');
+          
+        } catch (error) {
+          console.error('Failed to load profile data:', error);
+          
+          // Show error notification
+          this.showNotification('Failed to load profile data. Using fallback.', 'warning');
+          
+          // Use fallback data
+          this.updateProfileDisplay();
+        } finally {
+          // Hide loading state
+          window.mlgApi?.hideLoading('main');
+        }
+      }
+      
+      startRealTimeUpdates() {
+        // Start real-time updates for wallet balance
+        console.log('🔄 Starting real-time profile updates...');
+        
+        // Update wallet data every 20 seconds
+        window.mlgApi?.startRealTimeUpdates('/wallet', (data) => {
+          if (data.success && data.wallet) {
+            this.walletData = data;
+            
+            // Update profile with new wallet data
+            this.userProfile.mlgBalance = data.wallet.balance?.mlg || this.userProfile.mlgBalance;
+            this.userProfile.solBalance = data.wallet.balance?.sol || this.userProfile.solBalance;
+            
+            this.updateProfileDisplay();
+          }
+        }, 20000);
       }
       
       showNotification(message, type = 'info') {

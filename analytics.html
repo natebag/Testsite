@@ -25,6 +25,9 @@
   
   <!-- Solana Web3.js -->
   <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+  
+  <!-- API Client -->
+  <script src="src/js/api-client.js"></script>
 
   <!-- Tailwind Configuration -->
   <script>
@@ -583,13 +586,20 @@
     // Analytics Platform
     class AnalyticsPlatform {
       constructor() {
+        this.analyticsData = null;
         this.init();
       }
       
-      init() {
+      async init() {
+        console.log('📊 Initializing Analytics Platform...');
+        
         this.initializeUI();
+        
+        // Load data from API
+        await this.loadAnalyticsData();
+        
         this.setupRealTimeUpdates();
-        this.loadAnalyticsData();
+        console.log('✅ Analytics Platform initialized successfully!');
       }
       
       initializeUI() {
@@ -599,10 +609,16 @@
       }
       
       setupRealTimeUpdates() {
-        // Update analytics every 30 seconds
-        setInterval(() => {
-          this.updateRealTimeMetrics();
-        }, 30000);
+        // Start real-time updates using the API client
+        console.log('🔄 Starting real-time analytics updates...');
+        
+        // Update analytics data every 15 seconds
+        window.mlgApi?.startRealTimeUpdates('/analytics', (data) => {
+          if (data.success) {
+            this.analyticsData = data;
+            this.updateMetricsDisplay();
+          }
+        }, 15000);
         
         // Update charts every 5 minutes
         setInterval(() => {
@@ -610,29 +626,58 @@
         }, 300000);
       }
       
-      updateRealTimeMetrics() {
+      updateMetricsDisplay() {
+        if (!this.analyticsData) return;
+        
+        const data = this.analyticsData;
+        
+        // Main metrics from API
         const metrics = {
-          'active-users': () => 24800 + Math.floor(Math.random() * 200),
-          'transactions': () => 156000 + Math.floor(Math.random() * 1000),
-          'revenue': () => '$' + (847 + Math.floor(Math.random() * 50)) + 'K',
-          'growth': () => '+' + (24 + Math.floor(Math.random() * 5)) + '%',
-          'connections': () => 1247 + Math.floor(Math.random() * 50),
-          'response-time': () => (140 + Math.floor(Math.random() * 20)) + 'ms',
-          'cache-rate': () => (85 + Math.floor(Math.random() * 5)).toFixed(1) + '%',
-          'error-rate': () => '0.0' + Math.floor(Math.random() * 5) + '%',
-          'session-duration': () => (28 + Math.floor(Math.random() * 3)).toFixed(1) + ' min',
-          'bounce-rate': () => (23 + Math.floor(Math.random() * 3)).toFixed(1) + '%'
+          'active-users': data.metrics?.daily_active_users || (24800 + Math.floor(Math.random() * 200)),
+          'transactions': data.metrics?.transactions || '156K',
+          'revenue': data.metrics?.revenue_30d || '$847K',
+          'growth': '+24%', // Could be calculated from API data
+          
+          // Gaming activity metrics
+          'votes-cast': data.gaming_activity?.votes_cast_today || (12800 + Math.floor(Math.random() * 100)),
+          'content-submissions': data.gaming_activity?.content_submissions || (1234 + Math.floor(Math.random() * 50)),
+          'clan-battles': data.gaming_activity?.clan_battles || (456 + Math.floor(Math.random() * 20)),
+          'tournaments': data.gaming_activity?.tournaments_active || (23 + Math.floor(Math.random() * 3)),
+          
+          // Token metrics
+          'mlg-burned': data.token_metrics?.mlg_burned_today || (289000 + Math.floor(Math.random() * 1000)),
+          'mlg-earned': data.token_metrics?.mlg_earned_today || (157000 + Math.floor(Math.random() * 500)),
+          'vote-cost': data.token_metrics?.average_vote_cost || 25,
+          'token-velocity': data.token_metrics?.token_velocity || 2.4,
+          
+          // Growth metrics
+          'retention': data.growth?.user_retention_7d + '%' || '89%',
+          'revenue-per-user': data.growth?.revenue_per_user || '$34.50',
+          'satisfaction': data.growth?.user_satisfaction || 4.8,
+          
+          // Performance metrics (simulated)
+          'connections': 1247 + Math.floor(Math.random() * 50),
+          'response-time': (140 + Math.floor(Math.random() * 20)) + 'ms',
+          'cache-rate': (85 + Math.floor(Math.random() * 5)).toFixed(1) + '%',
+          'error-rate': '0.0' + Math.floor(Math.random() * 5) + '%',
+          'session-duration': (28 + Math.floor(Math.random() * 3)).toFixed(1) + ' min',
+          'bounce-rate': (23 + Math.floor(Math.random() * 3)).toFixed(1) + '%'
         };
         
-        Object.entries(metrics).forEach(([id, valueFn]) => {
+        Object.entries(metrics).forEach(([id, value]) => {
           const element = document.getElementById(id);
-          if (element && typeof valueFn === 'function') {
-            const newValue = valueFn();
-            if (typeof newValue === 'number') {
-              element.textContent = newValue.toLocaleString();
+          if (element) {
+            if (typeof value === 'number') {
+              element.textContent = value.toLocaleString();
             } else {
-              element.textContent = newValue;
+              element.textContent = value;
             }
+            
+            // Add pulse effect for updates
+            element.classList.add('animate-pulse-neon');
+            setTimeout(() => {
+              element.classList.remove('animate-pulse-neon');
+            }, 1000);
           }
         });
       }
@@ -646,12 +691,43 @@
         });
       }
       
-      loadAnalyticsData() {
-        // Initial data load
-        this.updateRealTimeMetrics();
-        
-        // Show loading notification
-        this.showNotification('📊 Real-time analytics loaded!', 'success');
+      async loadAnalyticsData() {
+        try {
+          console.log('📊 Loading analytics data from API...');
+          
+          // Show loading state
+          window.mlgApi?.showLoading('main', {
+            message: 'Loading analytics data...',
+            type: 'dashboard'
+          });
+          
+          // Load analytics data from API
+          const response = await window.mlgApi.getAnalytics();
+          
+          if (response.success) {
+            this.analyticsData = response;
+            
+            // Update display with API data
+            this.updateMetricsDisplay();
+            
+            console.log('✅ Analytics data loaded from API');
+            this.showNotification('📊 Real-time analytics loaded!', 'success');
+          } else {
+            throw new Error('API response not successful');
+          }
+          
+        } catch (error) {
+          console.error('Failed to load analytics data:', error);
+          
+          // Show error notification
+          this.showNotification('Failed to load analytics data. Using fallback.', 'warning');
+          
+          // Use fallback data
+          this.updateMetricsDisplay();
+        } finally {
+          // Hide loading state
+          window.mlgApi?.hideLoading('main');
+        }
       }
       
       showNotification(message, type = 'info') {

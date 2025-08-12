@@ -1,0 +1,338 @@
+{
+  "timestamp": "2025-08-11T22:06:59.531Z",
+  "summary": {
+    "total": 18,
+    "passed": 18,
+    "failed": 0,
+    "passRate": 100,
+    "avgDuration": 9.055555555555555
+  },
+  "categories": {
+    "Error Handler Runtime": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "category": "Error Handler Runtime",
+          "testName": "Error Classification",
+          "status": "PASS",
+          "result": "All errors classified correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.365Z"
+        },
+        {
+          "category": "Error Handler Runtime",
+          "testName": "Recovery Strategy Execution",
+          "status": "PASS",
+          "result": "Recovery delays calculated correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.366Z"
+        },
+        {
+          "category": "Error Handler Runtime",
+          "testName": "Circuit Breaker Logic",
+          "status": "PASS",
+          "result": "Circuit breaker logic working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.366Z"
+        }
+      ]
+    },
+    "API Client Runtime": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "category": "API Client Runtime",
+          "testName": "HTTP Method Simulation",
+          "status": "PASS",
+          "result": "HTTP methods processing correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.366Z"
+        },
+        {
+          "category": "API Client Runtime",
+          "testName": "Request Interceptor Chain",
+          "status": "PASS",
+          "result": "Request interceptor chain working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.366Z"
+        },
+        {
+          "category": "API Client Runtime",
+          "testName": "Cache Integration",
+          "status": "PASS",
+          "result": "Cache integration working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.366Z"
+        }
+      ]
+    },
+    "Auth Manager Runtime": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "category": "Auth Manager Runtime",
+          "testName": "Token Encryption",
+          "status": "PASS",
+          "result": "Token encryption/decryption working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.367Z"
+        },
+        {
+          "category": "Auth Manager Runtime",
+          "testName": "Session Timeout Logic",
+          "status": "PASS",
+          "result": "Session timeout logic working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.367Z"
+        },
+        {
+          "category": "Auth Manager Runtime",
+          "testName": "Device Fingerprinting",
+          "status": "PASS",
+          "result": "Device fingerprinting working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.367Z"
+        }
+      ]
+    },
+    "WebSocket Manager Runtime": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "category": "WebSocket Manager Runtime",
+          "testName": "Subscription Management",
+          "status": "PASS",
+          "result": "Subscription management working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.367Z"
+        },
+        {
+          "category": "WebSocket Manager Runtime",
+          "testName": "Reconnection Logic",
+          "status": "PASS",
+          "result": "Reconnection logic working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.367Z"
+        },
+        {
+          "category": "WebSocket Manager Runtime",
+          "testName": "Fallback Polling",
+          "status": "PASS",
+          "result": "Fallback polling working correctly",
+          "duration": 1,
+          "timestamp": "2025-08-11T22:06:59.368Z"
+        }
+      ]
+    },
+    "Cache Manager Runtime": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "category": "Cache Manager Runtime",
+          "testName": "Multi-Level Caching",
+          "status": "PASS",
+          "result": "Multi-level caching working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.368Z"
+        },
+        {
+          "category": "Cache Manager Runtime",
+          "testName": "TTL Expiration",
+          "status": "PASS",
+          "result": "TTL expiration working correctly",
+          "duration": 161,
+          "timestamp": "2025-08-11T22:06:59.529Z"
+        },
+        {
+          "category": "Cache Manager Runtime",
+          "testName": "Data Compression",
+          "status": "PASS",
+          "result": "Data compression working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.529Z"
+        }
+      ]
+    },
+    "Integration Scenarios": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "category": "Integration Scenarios",
+          "testName": "Vote Submission Flow",
+          "status": "PASS",
+          "result": "Vote submission flow working correctly",
+          "duration": 1,
+          "timestamp": "2025-08-11T22:06:59.530Z"
+        },
+        {
+          "category": "Integration Scenarios",
+          "testName": "Content Upload Flow",
+          "status": "PASS",
+          "result": "Content upload flow working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.530Z"
+        },
+        {
+          "category": "Integration Scenarios",
+          "testName": "Real-time Notification Flow",
+          "status": "PASS",
+          "result": "Real-time notification flow working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:06:59.530Z"
+        }
+      ]
+    }
+  },
+  "detailedResults": [
+    {
+      "category": "Error Handler Runtime",
+      "testName": "Error Classification",
+      "status": "PASS",
+      "result": "All errors classified correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.365Z"
+    },
+    {
+      "category": "Error Handler Runtime",
+      "testName": "Recovery Strategy Execution",
+      "status": "PASS",
+      "result": "Recovery delays calculated correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.366Z"
+    },
+    {
+      "category": "Error Handler Runtime",
+      "testName": "Circuit Breaker Logic",
+      "status": "PASS",
+      "result": "Circuit breaker logic working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.366Z"
+    },
+    {
+      "category": "API Client Runtime",
+      "testName": "HTTP Method Simulation",
+      "status": "PASS",
+      "result": "HTTP methods processing correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.366Z"
+    },
+    {
+      "category": "API Client Runtime",
+      "testName": "Request Interceptor Chain",
+      "status": "PASS",
+      "result": "Request interceptor chain working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.366Z"
+    },
+    {
+      "category": "API Client Runtime",
+      "testName": "Cache Integration",
+      "status": "PASS",
+      "result": "Cache integration working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.366Z"
+    },
+    {
+      "category": "Auth Manager Runtime",
+      "testName": "Token Encryption",
+      "status": "PASS",
+      "result": "Token encryption/decryption working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.367Z"
+    },
+    {
+      "category": "Auth Manager Runtime",
+      "testName": "Session Timeout Logic",
+      "status": "PASS",
+      "result": "Session timeout logic working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.367Z"
+    },
+    {
+      "category": "Auth Manager Runtime",
+      "testName": "Device Fingerprinting",
+      "status": "PASS",
+      "result": "Device fingerprinting working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.367Z"
+    },
+    {
+      "category": "WebSocket Manager Runtime",
+      "testName": "Subscription Management",
+      "status": "PASS",
+      "result": "Subscription management working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.367Z"
+    },
+    {
+      "category": "WebSocket Manager Runtime",
+      "testName": "Reconnection Logic",
+      "status": "PASS",
+      "result": "Reconnection logic working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.367Z"
+    },
+    {
+      "category": "WebSocket Manager Runtime",
+      "testName": "Fallback Polling",
+      "status": "PASS",
+      "result": "Fallback polling working correctly",
+      "duration": 1,
+      "timestamp": "2025-08-11T22:06:59.368Z"
+    },
+    {
+      "category": "Cache Manager Runtime",
+      "testName": "Multi-Level Caching",
+      "status": "PASS",
+      "result": "Multi-level caching working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.368Z"
+    },
+    {
+      "category": "Cache Manager Runtime",
+      "testName": "TTL Expiration",
+      "status": "PASS",
+      "result": "TTL expiration working correctly",
+      "duration": 161,
+      "timestamp": "2025-08-11T22:06:59.529Z"
+    },
+    {
+      "category": "Cache Manager Runtime",
+      "testName": "Data Compression",
+      "status": "PASS",
+      "result": "Data compression working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.529Z"
+    },
+    {
+      "category": "Integration Scenarios",
+      "testName": "Vote Submission Flow",
+      "status": "PASS",
+      "result": "Vote submission flow working correctly",
+      "duration": 1,
+      "timestamp": "2025-08-11T22:06:59.530Z"
+    },
+    {
+      "category": "Integration Scenarios",
+      "testName": "Content Upload Flow",
+      "status": "PASS",
+      "result": "Content upload flow working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.530Z"
+    },
+    {
+      "category": "Integration Scenarios",
+      "testName": "Real-time Notification Flow",
+      "status": "PASS",
+      "result": "Real-time notification flow working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:06:59.530Z"
+    }
+  ]
+}

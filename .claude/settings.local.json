@@ -31,7 +31,13 @@
       "Bash(done)",
       "Bash(for:*)",
       "Bash(then echo \"✅ File exists\")",
-      "Bash(else echo \"❌ File missing\")"
+      "Bash(else echo \"❌ File missing\")",
+      "Bash(curl:*)",
+      "Bash(start chrome test-wallet-connection.html)",
+      "Bash(start chrome wallet-debug-test.html)",
+      "Bash(start chrome http://localhost:8080/wallet-debug-test.html)",
+      "Bash(start chrome:*)",
+      "Bash(npm run test-voting:*)"
     ],
     "deny": []
   }

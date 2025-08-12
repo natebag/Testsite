@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan - Wallet Connection Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <style>
+        .gaming-pulse {
+            animation: pulse 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #4ade80;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center mb-8 text-green-400">🎮 MLG.clan Wallet Connection Test</h1>
+        
+        <div class="max-w-md mx-auto bg-gray-800 rounded-lg p-6 space-y-4">
+            <h2 class="text-xl font-semibold mb-4">Phantom Wallet Integration Test</h2>
+            
+            <!-- Connect Wallet Button -->
+            <button id="wallet-connect" class="w-full bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2">
+                <i data-lucide="wallet" class="w-4 h-4"></i>
+                <span>Connect Phantom Wallet</span>
+            </button>
+            
+            <!-- Wallet Info (Hidden by default) -->
+            <div id="wallet-info" class="hidden bg-gray-700 rounded-lg p-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full"></div>
+                    <div class="flex-1">
+                        <div class="text-sm font-mono text-gray-300" id="wallet-address"></div>
+                        <div class="text-xs text-gray-400">MLG Balance: <span id="mlg-balance">0</span></div>
+                    </div>
+                    <button id="disconnect-wallet" class="text-red-400 hover:text-red-300 text-sm">
+                        Disconnect
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Status Messages -->
+            <div id="status-messages" class="space-y-2"></div>
+            
+            <!-- Test Results -->
+            <div class="bg-gray-700 rounded-lg p-4 mt-6">
+                <h3 class="font-semibold mb-2">Test Results:</h3>
+                <div id="test-results" class="text-sm space-y-1">
+                    <div>• Phantom Detection: <span id="test-phantom" class="text-yellow-400">Testing...</span></div>
+                    <div>• Wallet Manager: <span id="test-manager" class="text-yellow-400">Testing...</span></div>
+                    <div>• Connection Status: <span id="test-connection" class="text-yellow-400">Not Connected</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import PhantomWalletManager -->
+    <script type="module">
+        import { getWalletManager, initializeWallet } from './src/wallet/phantom-wallet.js';
+        
+        // Initialize wallet manager
+        window.phantomWalletManager = getWalletManager();
+        window.initializeWallet = initializeWallet;
+        
+        // Test wallet functionality
+        class WalletTest {
+            constructor() {
+                this.walletManager = null;
+                this.init();
+            }
+            
+            async init() {
+                console.log('🧪 Starting wallet connection test...');
+                
+                // Initialize Lucide icons
+                lucide.createIcons();
+                
+                // Test Phantom detection
+                this.testPhantomDetection();
+                
+                // Test wallet manager initialization
+                await this.testWalletManager();
+                
+                // Setup event listeners
+                this.setupEventListeners();
+                
+                console.log('✅ Wallet test initialization complete');
+            }
+            
+            testPhantomDetection() {
+                const testElement = document.getElementById('test-phantom');
+                if (window.solana && window.solana.isPhantom) {
+                    testElement.textContent = '✅ Detected';
+                    testElement.className = 'text-green-400';
+                } else {
+                    testElement.textContent = '❌ Not Found';
+                    testElement.className = 'text-red-400';
+                }
+            }
+            
+            async testWalletManager() {
+                const testElement = document.getElementById('test-manager');
+                try {
+                    if (window.phantomWalletManager) {
+                        await window.phantomWalletManager.initializeConnection();
+                        testElement.textContent = '✅ Initialized';
+                        testElement.className = 'text-green-400';
+                        this.walletManager = window.phantomWalletManager;
+                    } else {
+                        throw new Error('WalletManager not available');
+                    }
+                } catch (error) {
+                    console.error('Wallet manager test failed:', error);
+                    testElement.textContent = '❌ Failed';
+                    testElement.className = 'text-red-400';
+                }
+            }
+            
+            setupEventListeners() {
+                const connectButton = document.getElementById('wallet-connect');
+                const disconnectButton = document.getElementById('disconnect-wallet');
+                
+                connectButton.addEventListener('click', () => this.connectWallet());
+                disconnectButton.addEventListener('click', () => this.disconnectWallet());
+                
+                // Wallet event listeners
+                if (this.walletManager) {
+                    this.walletManager.on('connected', (data) => {
+                        this.showStatus('✅ Wallet connected successfully!', 'success');
+                        this.updateConnectionStatus(true);
+                    });
+                    
+                    this.walletManager.on('disconnected', (data) => {
+                        this.showStatus('🔌 Wallet disconnected', 'info');
+                        this.updateConnectionStatus(false);
+                    });
+                    
+                    this.walletManager.on('error', (error) => {
+                        this.showStatus(`❌ Wallet error: ${error.message}`, 'error');
+                    });
+                }
+            }
+            
+            async connectWallet() {
+                const connectButton = document.getElementById('wallet-connect');
+                
+                if (!this.walletManager) {
+                    this.showStatus('❌ Wallet manager not available', 'error');
+                    return;
+                }
+                
+                try {
+                    // Update button state
+                    connectButton.innerHTML = `
+                        <div class="loading-spinner gaming-pulse"></div>
+                        <span>Connecting...</span>
+                    `;
+                    connectButton.disabled = true;
+                    
+                    // Connect using wallet manager
+                    const result = await this.walletManager.connect({
+                        timeout: 30000,
+                        autoApprove: false
+                    });
+                    
+                    // Get connection info
+                    const connectionInfo = this.walletManager.getConnectionInfo();
+                    
+                    // Update UI
+                    this.updateWalletUI(connectionInfo);
+                    this.showStatus('🎮 Phantom wallet connected!', 'success');
+                    
+                } catch (error) {
+                    console.error('Connection failed:', error);
+                    
+                    // Reset button
+                    connectButton.innerHTML = `
+                        <i data-lucide="wallet" class="w-4 h-4"></i>
+                        <span>Connect Phantom Wallet</span>
+                    `;
+                    connectButton.disabled = false;
+                    lucide.createIcons();
+                    
+                    // Show error message
+                    let errorMessage = '❌ Connection failed';
+                    if (error.code === 'WALLET_NOT_INSTALLED') {
+                        errorMessage = '🔗 Please install Phantom wallet first';
+                    } else if (error.code === 'USER_REJECTED') {
+                        errorMessage = '❌ Connection cancelled by user';
+                    }
+                    
+                    this.showStatus(errorMessage, 'error');
+                }
+            }
+            
+            async disconnectWallet() {
+                if (!this.walletManager) return;
+                
+                try {
+                    await this.walletManager.disconnect();
+                    this.resetWalletUI();
+                    this.showStatus('🔌 Wallet disconnected', 'info');
+                } catch (error) {
+                    console.error('Disconnect failed:', error);
+                    this.showStatus('❌ Disconnect failed', 'error');
+                }
+            }
+            
+            updateWalletUI(connectionInfo) {
+                const connectButton = document.getElementById('wallet-connect');
+                const walletInfo = document.getElementById('wallet-info');
+                const walletAddress = document.getElementById('wallet-address');
+                const mlgBalance = document.getElementById('mlg-balance');
+                
+                connectButton.classList.add('hidden');
+                walletInfo.classList.remove('hidden');
+                
+                if (connectionInfo.publicKey) {
+                    const address = connectionInfo.publicKey;
+                    walletAddress.textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+                }
+                
+                mlgBalance.textContent = '1,250';
+            }
+            
+            resetWalletUI() {
+                const connectButton = document.getElementById('wallet-connect');
+                const walletInfo = document.getElementById('wallet-info');
+                
+                connectButton.classList.remove('hidden');
+                connectButton.innerHTML = `
+                    <i data-lucide="wallet" class="w-4 h-4"></i>
+                    <span>Connect Phantom Wallet</span>
+                `;
+                connectButton.disabled = false;
+                
+                walletInfo.classList.add('hidden');
+                lucide.createIcons();
+            }
+            
+            updateConnectionStatus(connected) {
+                const testElement = document.getElementById('test-connection');
+                if (connected) {
+                    testElement.textContent = '✅ Connected';
+                    testElement.className = 'text-green-400';
+                } else {
+                    testElement.textContent = '❌ Not Connected';
+                    testElement.className = 'text-red-400';
+                }
+            }
+            
+            showStatus(message, type = 'info') {
+                const statusContainer = document.getElementById('status-messages');
+                const statusDiv = document.createElement('div');
+                
+                const typeClasses = {
+                    success: 'bg-green-900 text-green-200 border-green-600',
+                    error: 'bg-red-900 text-red-200 border-red-600',
+                    warning: 'bg-yellow-900 text-yellow-200 border-yellow-600',
+                    info: 'bg-blue-900 text-blue-200 border-blue-600'
+                };
+                
+                statusDiv.className = `p-3 rounded border ${typeClasses[type]} text-sm`;
+                statusDiv.textContent = message;
+                
+                statusContainer.appendChild(statusDiv);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    statusDiv.remove();
+                }, 5000);
+            }
+        }
+        
+        // Start the test when DOM is loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            new WalletTest();
+        });
+    </script>
+</body>
+</html>

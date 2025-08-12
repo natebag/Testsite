@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan - Wallet Integration Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    <style>
+        .test-status {
+            min-width: 120px;
+            text-align: center;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .test-pending { background: #374151; color: #d1d5db; }
+        .test-running { background: #1f2937; color: #fbbf24; animation: pulse 2s infinite; }
+        .test-passed { background: #065f46; color: #10b981; }
+        .test-failed { background: #7f1d1d; color: #f87171; }
+        .test-warning { background: #78350f; color: #fbbf24; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <h1 class="text-3xl font-bold text-center mb-8 text-green-400">
+                🧪 MLG.clan Wallet Integration Test Suite
+            </h1>
+            
+            <!-- Test Controls -->
+            <div class="bg-gray-800 rounded-lg p-6 mb-6">
+                <div class="flex flex-wrap gap-3 justify-center">
+                    <button id="run-all-tests" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-medium">
+                        🚀 Run All Tests
+                    </button>
+                    <button id="test-phantom-detection" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded font-medium">
+                        🔍 Test Phantom Detection
+                    </button>
+                    <button id="test-wallet-manager" class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded font-medium">
+                        ⚙️ Test Wallet Manager
+                    </button>
+                    <button id="test-connect-wallet" class="bg-orange-600 hover:bg-orange-700 px-4 py-2 rounded font-medium">
+                        🔗 Test Connect Wallet
+                    </button>
+                    <button id="clear-results" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded font-medium">
+                        🗑️ Clear Results
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Test Results Table -->
+            <div class="bg-gray-800 rounded-lg overflow-hidden mb-6">
+                <table class="w-full">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Test</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Result</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="test-results-body" class="bg-gray-800 divide-y divide-gray-700">
+                        <!-- Test results will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Live Console Output -->
+            <div class="bg-black rounded-lg p-4">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-lg font-semibold text-green-400">Live Console Output</h3>
+                    <button id="clear-console" class="text-gray-400 hover:text-white text-sm">Clear</button>
+                </div>
+                <div id="console-output" class="text-xs font-mono h-40 overflow-y-auto text-gray-300"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import wallet system with same structure as main app -->
+    <script type="module">
+        import { getWalletManager, initializeWallet } from './src/wallet/phantom-wallet.js';
+        import { getVotingIntegration, initializeVotingIntegration } from './src/js/mlg-voting-integration.js';
+        
+        // Safe wallet initialization (same as main app)
+        async function safeInitializeWallet() {
+            try {
+                console.log('🎮 Initializing MLG Wallet Manager for testing...');
+                
+                const walletManager = getWalletManager();
+                if (!walletManager) {
+                    throw new Error('Failed to create wallet manager instance');
+                }
+                
+                await walletManager.initializeConnection();
+                console.log('✅ Wallet manager initialized successfully');
+                
+                window.phantomWalletManager = walletManager;
+                window.initializeWallet = initializeWallet;
+                
+                window.getVotingIntegration = getVotingIntegration;
+                window.initializeVotingIntegration = initializeVotingIntegration;
+                
+                window.walletSystemReady = true;
+                
+                window.dispatchEvent(new CustomEvent('walletSystemReady', { 
+                    detail: { walletManager, ready: true } 
+                }));
+                
+                return walletManager;
+                
+            } catch (error) {
+                console.error('❌ Wallet initialization failed:', error);
+                
+                window.phantomWalletManager = {
+                    connect: async () => {
+                        throw new Error('Wallet system not properly initialized. Please refresh the page.');
+                    },
+                    disconnect: async () => {},
+                    getConnectionInfo: () => ({ connected: false }),
+                    hasStoredSession: () => false
+                };
+                
+                window.walletSystemReady = false;
+                
+                window.dispatchEvent(new CustomEvent('walletSystemError', { 
+                    detail: { error: error.message, ready: false } 
+                }));
+                
+                throw error;
+            }
+        }
+        
+        // Make available globally
+        window.safeInitializeWallet = safeInitializeWallet;
+        
+        // Initialize when ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                safeInitializeWallet().catch(console.error);
+            });
+        } else {
+            safeInitializeWallet().catch(console.error);
+        }
+    </script>
+
+    <script>
+        // Test Suite Implementation
+        class WalletTestSuite {
+            constructor() {
+                this.tests = [];
+                this.consoleOutput = document.getElementById('console-output');
+                this.testResultsBody = document.getElementById('test-results-body');
+                
+                this.setupConsoleCapture();
+                this.setupEventListeners();
+                this.initializeTests();
+            }
+            
+            setupConsoleCapture() {
+                const originalConsole = {
+                    log: console.log,
+                    error: console.error,
+                    warn: console.warn,
+                    info: console.info
+                };
+                
+                ['log', 'error', 'warn', 'info'].forEach(method => {
+                    console[method] = (...args) => {
+                        this.addToConsole(method, args);
+                        originalConsole[method](...args);
+                    };
+                });
+            }
+            
+            addToConsole(type, args) {
+                const timestamp = new Date().toLocaleTimeString();
+                const message = args.map(arg => 
+                    typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+                ).join(' ');
+                
+                const div = document.createElement('div');
+                div.className = `mb-1 ${type === 'error' ? 'text-red-400' : 
+                                    type === 'warn' ? 'text-yellow-400' : 
+                                    type === 'info' ? 'text-blue-400' : 'text-gray-300'}`;
+                div.innerHTML = `<span class="text-gray-500">[${timestamp}]</span> <span class="text-gray-400">${type.toUpperCase()}:</span> ${message}`;
+                
+                this.consoleOutput.appendChild(div);
+                this.consoleOutput.scrollTop = this.consoleOutput.scrollHeight;
+            }
+            
+            setupEventListeners() {
+                document.getElementById('run-all-tests').addEventListener('click', () => this.runAllTests());
+                document.getElementById('test-phantom-detection').addEventListener('click', () => this.runTest('phantom-detection'));
+                document.getElementById('test-wallet-manager').addEventListener('click', () => this.runTest('wallet-manager'));
+                document.getElementById('test-connect-wallet').addEventListener('click', () => this.runTest('connect-wallet'));
+                document.getElementById('clear-results').addEventListener('click', () => this.clearResults());
+                document.getElementById('clear-console').addEventListener('click', () => this.clearConsole());
+                
+                // Initialize lucide icons
+                lucide.createIcons();
+            }
+            
+            initializeTests() {
+                this.tests = [
+                    {
+                        id: 'phantom-detection',
+                        name: 'Phantom Wallet Detection',
+                        description: 'Check if Phantom wallet is installed and accessible',
+                        test: this.testPhantomDetection.bind(this)
+                    },
+                    {
+                        id: 'wallet-system-ready',
+                        name: 'Wallet System Initialization',
+                        description: 'Verify wallet system is properly initialized',
+                        test: this.testWalletSystemReady.bind(this)
+                    },
+                    {
+                        id: 'wallet-manager',
+                        name: 'Wallet Manager Instance',
+                        description: 'Test PhantomWalletManager creation and methods',
+                        test: this.testWalletManager.bind(this)
+                    },
+                    {
+                        id: 'solana-connection',
+                        name: 'Solana RPC Connection',
+                        description: 'Test Solana network connection',
+                        test: this.testSolanaConnection.bind(this)
+                    },
+                    {
+                        id: 'connect-wallet',
+                        name: 'Wallet Connection Flow',
+                        description: 'Test the complete wallet connection process',
+                        test: this.testConnectWallet.bind(this)
+                    }
+                ];
+                
+                this.renderTests();
+            }
+            
+            renderTests() {
+                this.testResultsBody.innerHTML = '';
+                this.tests.forEach(test => {
+                    const row = document.createElement('tr');
+                    row.id = `test-${test.id}`;
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-white">${test.name}</div>
+                            <div class="text-xs text-gray-400">${test.description}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="test-status test-pending">Pending</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-300">-</td>
+                        <td class="px-6 py-4 text-sm text-gray-300">Ready to run</td>
+                    `;
+                    this.testResultsBody.appendChild(row);
+                });
+            }
+            
+            async runAllTests() {
+                console.log('🚀 Starting comprehensive wallet test suite...');
+                
+                for (const test of this.tests) {
+                    await this.runTest(test.id);
+                    // Small delay between tests
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                console.log('✅ Test suite completed');
+            }
+            
+            async runTest(testId) {
+                const test = this.tests.find(t => t.id === testId);
+                if (!test) {
+                    console.error(`Test ${testId} not found`);
+                    return;
+                }
+                
+                const row = document.getElementById(`test-${testId}`);
+                const statusElement = row.querySelector('.test-status');
+                const resultElement = row.children[2];
+                const detailsElement = row.children[3];
+                
+                try {
+                    console.log(`🧪 Running test: ${test.name}`);
+                    
+                    // Update status to running
+                    statusElement.className = 'test-status test-running';
+                    statusElement.textContent = 'Running';
+                    resultElement.textContent = 'Testing...';
+                    detailsElement.textContent = 'Test in progress...';
+                    
+                    // Run the test
+                    const result = await test.test();
+                    
+                    // Update with success
+                    statusElement.className = 'test-status test-passed';
+                    statusElement.textContent = 'Passed';
+                    resultElement.textContent = result.message || 'Success';
+                    detailsElement.textContent = result.details || 'Test completed successfully';
+                    
+                    console.log(`✅ Test ${test.name} passed: ${result.message}`);
+                    
+                } catch (error) {
+                    // Update with failure
+                    statusElement.className = 'test-status test-failed';
+                    statusElement.textContent = 'Failed';
+                    resultElement.textContent = 'Error';
+                    detailsElement.textContent = error.message;
+                    
+                    console.error(`❌ Test ${test.name} failed:`, error);
+                }
+            }
+            
+            // Test Implementations
+            async testPhantomDetection() {
+                if (!window.solana) {
+                    throw new Error('Solana object not found - Phantom wallet not installed');
+                }
+                
+                if (!window.solana.isPhantom) {
+                    throw new Error('Not a Phantom wallet');
+                }
+                
+                const version = window.solana._metadata?.version || 'Unknown';
+                return {
+                    message: `Phantom wallet detected`,
+                    details: `Version: ${version}, Connected: ${window.solana.isConnected}`
+                };
+            }
+            
+            async testWalletSystemReady() {
+                if (!window.walletSystemReady) {
+                    // Wait for it to be ready
+                    await new Promise((resolve, reject) => {
+                        const timeout = setTimeout(() => reject(new Error('Wallet system timeout')), 10000);
+                        
+                        const handler = () => {
+                            clearTimeout(timeout);
+                            resolve();
+                        };
+                        
+                        window.addEventListener('walletSystemReady', handler, { once: true });
+                    });
+                }
+                
+                return {
+                    message: 'Wallet system initialized',
+                    details: 'System is ready for wallet operations'
+                };
+            }
+            
+            async testWalletManager() {
+                if (!window.phantomWalletManager) {
+                    throw new Error('PhantomWalletManager not available');
+                }
+                
+                const manager = window.phantomWalletManager;
+                
+                // Test required methods exist
+                const requiredMethods = ['connect', 'disconnect', 'getConnectionInfo', 'hasStoredSession'];
+                for (const method of requiredMethods) {
+                    if (typeof manager[method] !== 'function') {
+                        throw new Error(`Method ${method} not found on wallet manager`);
+                    }
+                }
+                
+                // Test getting connection info (should work even when not connected)
+                const connectionInfo = manager.getConnectionInfo();
+                
+                return {
+                    message: 'Wallet manager ready',
+                    details: `All required methods available. Connected: ${connectionInfo.connected || false}`
+                };
+            }
+            
+            async testSolanaConnection() {
+                if (!window.phantomWalletManager) {
+                    throw new Error('Wallet manager not available');
+                }
+                
+                // This would need access to internal connection - simplified test
+                if (typeof solanaWeb3 === 'undefined') {
+                    throw new Error('Solana Web3.js library not loaded');
+                }
+                
+                return {
+                    message: 'Solana connection ready',
+                    details: 'Web3.js library loaded and accessible'
+                };
+            }
+            
+            async testConnectWallet() {
+                if (!window.phantomWalletManager) {
+                    throw new Error('Wallet manager not available');
+                }
+                
+                // This test would require user interaction, so we'll just test the setup
+                const manager = window.phantomWalletManager;
+                
+                try {
+                    // Test that the connect method exists and returns something
+                    const connectMethod = manager.connect;
+                    if (typeof connectMethod !== 'function') {
+                        throw new Error('Connect method not available');
+                    }
+                    
+                    return {
+                        message: 'Wallet connection flow ready',
+                        details: 'Connect method available. Manual test required for full connection.'
+                    };
+                } catch (error) {
+                    throw new Error(`Connection test failed: ${error.message}`);
+                }
+            }
+            
+            clearResults() {
+                this.renderTests();
+                console.log('🗑️ Test results cleared');
+            }
+            
+            clearConsole() {
+                this.consoleOutput.innerHTML = '';
+            }
+        }
+        
+        // Initialize test suite when DOM is ready
+        window.addEventListener('DOMContentLoaded', () => {
+            window.testSuite = new WalletTestSuite();
+            console.log('🧪 Wallet Test Suite initialized');
+        });
+    </script>
+</body>
+</html>

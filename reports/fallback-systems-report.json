@@ -1,0 +1,348 @@
+{
+  "timestamp": "2025-08-11T22:09:41.368Z",
+  "summary": {
+    "total": 18,
+    "passed": 17,
+    "failed": 1,
+    "passRate": 94.4
+  },
+  "resilience": {
+    "networkFailure": 3,
+    "serviceFailure": 3,
+    "offlineMode": 3,
+    "degradedPerformance": 3,
+    "recovery": 2,
+    "userExperience": 3,
+    "score": 17,
+    "maxScore": 18
+  },
+  "categories": {
+    "Network Failure Scenarios": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "category": "Network Failure Scenarios",
+          "testName": "Complete Network Disconnection",
+          "status": "PASS",
+          "result": "Offline mode activated correctly with appropriate feature restrictions",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.362Z"
+        },
+        {
+          "category": "Network Failure Scenarios",
+          "testName": "Intermittent Connectivity",
+          "status": "PASS",
+          "result": "Intermittent connectivity handled with exponential backoff and reset",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.363Z"
+        },
+        {
+          "category": "Network Failure Scenarios",
+          "testName": "Slow Network Adaptation",
+          "status": "PASS",
+          "result": "Network adaptation working correctly for slow connections",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.363Z"
+        }
+      ]
+    },
+    "Service Unavailability Scenarios": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "category": "Service Unavailability Scenarios",
+          "testName": "API Service Unavailable",
+          "status": "PASS",
+          "result": "API service unavailability handled with appropriate fallbacks",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.364Z"
+        },
+        {
+          "category": "Service Unavailability Scenarios",
+          "testName": "WebSocket Service Unavailable",
+          "status": "PASS",
+          "result": "WebSocket fallback to polling working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.364Z"
+        },
+        {
+          "category": "Service Unavailability Scenarios",
+          "testName": "Database Service Degradation",
+          "status": "PASS",
+          "result": "Database degradation adaptation working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.364Z"
+        }
+      ]
+    },
+    "Offline Mode Scenarios": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "category": "Offline Mode Scenarios",
+          "testName": "Offline Data Availability",
+          "status": "PASS",
+          "result": "Offline data availability working correctly",
+          "duration": 1,
+          "timestamp": "2025-08-11T22:09:41.365Z"
+        },
+        {
+          "category": "Offline Mode Scenarios",
+          "testName": "Offline Feature Restrictions",
+          "status": "PASS",
+          "result": "Offline feature restrictions working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.365Z"
+        },
+        {
+          "category": "Offline Mode Scenarios",
+          "testName": "Offline Action Queue",
+          "status": "PASS",
+          "result": "Offline action queue working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.365Z"
+        }
+      ]
+    },
+    "Degraded Performance Scenarios": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "category": "Degraded Performance Scenarios",
+          "testName": "High Latency Adaptation",
+          "status": "PASS",
+          "result": "High latency adaptation working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.365Z"
+        },
+        {
+          "category": "Degraded Performance Scenarios",
+          "testName": "Memory Pressure Handling",
+          "status": "PASS",
+          "result": "Memory pressure handling failed",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.365Z"
+        },
+        {
+          "category": "Degraded Performance Scenarios",
+          "testName": "CPU Throttling Adaptation",
+          "status": "PASS",
+          "result": "CPU throttling adaptation working correctly",
+          "duration": 1,
+          "timestamp": "2025-08-11T22:09:41.366Z"
+        }
+      ]
+    },
+    "Recovery Scenarios": {
+      "passed": 2,
+      "failed": 1,
+      "tests": [
+        {
+          "category": "Recovery Scenarios",
+          "testName": "Service Recovery Detection",
+          "status": "PASS",
+          "result": "Service recovery detection working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.366Z"
+        },
+        {
+          "category": "Recovery Scenarios",
+          "testName": "Graceful Service Restoration",
+          "status": "FAIL",
+          "result": "Cannot read properties of undefined (reading 'priority')",
+          "timestamp": "2025-08-11T22:09:41.366Z"
+        },
+        {
+          "category": "Recovery Scenarios",
+          "testName": "Data Synchronization After Recovery",
+          "status": "PASS",
+          "result": "Data synchronization after recovery working correctly",
+          "duration": 1,
+          "timestamp": "2025-08-11T22:09:41.367Z"
+        }
+      ]
+    },
+    "User Experience Scenarios": {
+      "passed": 3,
+      "failed": 0,
+      "tests": [
+        {
+          "category": "User Experience Scenarios",
+          "testName": "Progressive Loading",
+          "status": "PASS",
+          "result": "Progressive loading working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.367Z"
+        },
+        {
+          "category": "User Experience Scenarios",
+          "testName": "User Feedback During Failures",
+          "status": "PASS",
+          "result": "User feedback during failures failed",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.367Z"
+        },
+        {
+          "category": "User Experience Scenarios",
+          "testName": "Performance Indicators",
+          "status": "PASS",
+          "result": "Performance indicators working correctly",
+          "duration": 0,
+          "timestamp": "2025-08-11T22:09:41.367Z"
+        }
+      ]
+    }
+  },
+  "recommendations": [
+    "Improve recovery mechanisms"
+  ],
+  "detailedResults": [
+    {
+      "category": "Network Failure Scenarios",
+      "testName": "Complete Network Disconnection",
+      "status": "PASS",
+      "result": "Offline mode activated correctly with appropriate feature restrictions",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.362Z"
+    },
+    {
+      "category": "Network Failure Scenarios",
+      "testName": "Intermittent Connectivity",
+      "status": "PASS",
+      "result": "Intermittent connectivity handled with exponential backoff and reset",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.363Z"
+    },
+    {
+      "category": "Network Failure Scenarios",
+      "testName": "Slow Network Adaptation",
+      "status": "PASS",
+      "result": "Network adaptation working correctly for slow connections",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.363Z"
+    },
+    {
+      "category": "Service Unavailability Scenarios",
+      "testName": "API Service Unavailable",
+      "status": "PASS",
+      "result": "API service unavailability handled with appropriate fallbacks",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.364Z"
+    },
+    {
+      "category": "Service Unavailability Scenarios",
+      "testName": "WebSocket Service Unavailable",
+      "status": "PASS",
+      "result": "WebSocket fallback to polling working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.364Z"
+    },
+    {
+      "category": "Service Unavailability Scenarios",
+      "testName": "Database Service Degradation",
+      "status": "PASS",
+      "result": "Database degradation adaptation working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.364Z"
+    },
+    {
+      "category": "Offline Mode Scenarios",
+      "testName": "Offline Data Availability",
+      "status": "PASS",
+      "result": "Offline data availability working correctly",
+      "duration": 1,
+      "timestamp": "2025-08-11T22:09:41.365Z"
+    },
+    {
+      "category": "Offline Mode Scenarios",
+      "testName": "Offline Feature Restrictions",
+      "status": "PASS",
+      "result": "Offline feature restrictions working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.365Z"
+    },
+    {
+      "category": "Offline Mode Scenarios",
+      "testName": "Offline Action Queue",
+      "status": "PASS",
+      "result": "Offline action queue working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.365Z"
+    },
+    {
+      "category": "Degraded Performance Scenarios",
+      "testName": "High Latency Adaptation",
+      "status": "PASS",
+      "result": "High latency adaptation working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.365Z"
+    },
+    {
+      "category": "Degraded Performance Scenarios",
+      "testName": "Memory Pressure Handling",
+      "status": "PASS",
+      "result": "Memory pressure handling failed",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.365Z"
+    },
+    {
+      "category": "Degraded Performance Scenarios",
+      "testName": "CPU Throttling Adaptation",
+      "status": "PASS",
+      "result": "CPU throttling adaptation working correctly",
+      "duration": 1,
+      "timestamp": "2025-08-11T22:09:41.366Z"
+    },
+    {
+      "category": "Recovery Scenarios",
+      "testName": "Service Recovery Detection",
+      "status": "PASS",
+      "result": "Service recovery detection working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.366Z"
+    },
+    {
+      "category": "Recovery Scenarios",
+      "testName": "Graceful Service Restoration",
+      "status": "FAIL",
+      "result": "Cannot read properties of undefined (reading 'priority')",
+      "timestamp": "2025-08-11T22:09:41.366Z"
+    },
+    {
+      "category": "Recovery Scenarios",
+      "testName": "Data Synchronization After Recovery",
+      "status": "PASS",
+      "result": "Data synchronization after recovery working correctly",
+      "duration": 1,
+      "timestamp": "2025-08-11T22:09:41.367Z"
+    },
+    {
+      "category": "User Experience Scenarios",
+      "testName": "Progressive Loading",
+      "status": "PASS",
+      "result": "Progressive loading working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.367Z"
+    },
+    {
+      "category": "User Experience Scenarios",
+      "testName": "User Feedback During Failures",
+      "status": "PASS",
+      "result": "User feedback during failures failed",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.367Z"
+    },
+    {
+      "category": "User Experience Scenarios",
+      "testName": "Performance Indicators",
+      "status": "PASS",
+      "result": "Performance indicators working correctly",
+      "duration": 0,
+      "timestamp": "2025-08-11T22:09:41.367Z"
+    }
+  ]
+}

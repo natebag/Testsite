@@ -47,10 +47,26 @@ const API_CONFIG = {
   API_PREFIX: '/api',
   API_VERSION: 'v1',
   
-  // CORS Settings
-  CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  // CORS Settings - Enhanced for development
+  CORS_ORIGIN: process.env.CORS_ORIGIN || [
+    'http://localhost:9000', // Frontend development server
+    'http://localhost:3000', // Main development server
+    'http://localhost:3001', // Demo server
+    'http://127.0.0.1:9000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001'
+  ],
   CORS_METHODS: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  CORS_HEADERS: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  CORS_HEADERS: [
+    'Content-Type', 
+    'Authorization', 
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers',
+    'X-API-Key'
+  ],
   
   // Rate Limiting
   GLOBAL_RATE_LIMIT: {
@@ -68,8 +84,16 @@ const API_CONFIG = {
   // Socket.IO Configuration
   SOCKET_CONFIG: {
     cors: {
-      origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-      methods: ['GET', 'POST']
+      origin: [
+        'http://localhost:9000', // Frontend development server
+        'http://localhost:3000', // Main development server
+        'http://localhost:3001', // Demo server
+        'http://127.0.0.1:9000',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001'
+      ],
+      methods: ['GET', 'POST'],
+      credentials: true
     },
     transports: ['websocket', 'polling']
   }
@@ -141,13 +165,20 @@ class MLGApiServer {
       crossOriginEmbedderPolicy: false
     }));
     
-    // CORS configuration
-    this.app.use(cors({
+    // CORS configuration with enhanced options
+    const corsOptions = {
       origin: this.options.CORS_ORIGIN,
       methods: this.options.CORS_METHODS,
       allowedHeaders: this.options.CORS_HEADERS,
-      credentials: true
-    }));
+      credentials: true,
+      maxAge: 86400, // 24 hours for preflight cache
+      optionsSuccessStatus: 200 // Support legacy browsers
+    };
+    
+    this.app.use(cors(corsOptions));
+    
+    // Handle preflight requests explicitly
+    this.app.options('*', cors(corsOptions));
     
     // Compression
     this.app.use(compression());

@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG API Integration Test Suite</title>
+    
+    <!-- External Dependencies -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
+    <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+    
+    <!-- MLG Core Components -->
+    <script src="src/js/mlg-error-handler.js"></script>
+    <script src="src/js/mlg-cache-manager.js"></script>
+    <script src="src/js/mlg-api-client.js"></script>
+    <script src="src/js/mlg-auth-manager.js"></script>
+    <script src="src/js/mlg-websocket-manager.js"></script>
+    
+    <style>
+        /* Test result styles */
+        .test-pass { border-left: 4px solid #10b981; background-color: rgba(16, 185, 129, 0.1); }
+        .test-fail { border-left: 4px solid #ef4444; background-color: rgba(239, 68, 68, 0.1); }
+        .test-pending { border-left: 4px solid #f59e0b; background-color: rgba(245, 158, 11, 0.1); }
+        .test-info { border-left: 4px solid #3b82f6; background-color: rgba(59, 130, 246, 0.1); }
+        .console-output { background: #0f172a; color: #94a3b8; font-family: 'Courier New', monospace; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-6">
+
+<!-- Header -->
+<div class="max-w-7xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-4xl font-bold text-green-400 mb-2">🎮 MLG API Integration Test Suite</h1>
+            <p class="text-gray-400">Comprehensive testing of all Task 14.0 API integration components</p>
+        </div>
+        <div class="flex space-x-4">
+            <button id="run-all-tests" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-semibold">
+                Run All Tests
+            </button>
+            <button id="clear-results" class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded-lg font-semibold">
+                Clear Results
+            </button>
+        </div>
+    </div>
+
+    <!-- Test Status Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-gray-800 p-4 rounded-lg">
+            <div class="text-2xl font-bold text-green-400" id="tests-passed">0</div>
+            <div class="text-sm text-gray-400">Tests Passed</div>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-lg">
+            <div class="text-2xl font-bold text-red-400" id="tests-failed">0</div>
+            <div class="text-sm text-gray-400">Tests Failed</div>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-lg">
+            <div class="text-2xl font-bold text-yellow-400" id="tests-pending">0</div>
+            <div class="text-sm text-gray-400">Tests Pending</div>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-lg">
+            <div class="text-2xl font-bold text-blue-400" id="test-coverage">0%</div>
+            <div class="text-sm text-gray-400">Coverage</div>
+        </div>
+    </div>
+
+    <!-- Test Results Container -->
+    <div id="test-results" class="space-y-6">
+        <!-- Test results will be populated here -->
+    </div>
+
+    <!-- Console Output -->
+    <div class="mt-8">
+        <h3 class="text-xl font-bold mb-4">Console Output</h3>
+        <div id="console-output" class="console-output p-4 rounded-lg h-64 overflow-y-auto"></div>
+    </div>
+</div>
+
+<script>
+// Test Suite Implementation
+class MLGTestSuite {
+    constructor() {
+        this.testResults = [];
+        this.testStats = {
+            passed: 0,
+            failed: 0,
+            pending: 0,
+            total: 0
+        };
+        this.consoleOutput = [];
+        this.init();
+    }
+
+    init() {
+        // Hook into console methods to capture output
+        this.setupConsoleCapture();
+        
+        // Setup event listeners
+        document.getElementById('run-all-tests').addEventListener('click', () => this.runAllTests());
+        document.getElementById('clear-results').addEventListener('click', () => this.clearResults());
+        
+        // Auto-run tests on load
+        setTimeout(() => this.runAllTests(), 1000);
+    }
+
+    setupConsoleCapture() {
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+
+        console.log = (...args) => {
+            this.addConsoleOutput('LOG', args.join(' '));
+            originalLog.apply(console, args);
+        };
+
+        console.warn = (...args) => {
+            this.addConsoleOutput('WARN', args.join(' '));
+            originalWarn.apply(console, args);
+        };
+
+        console.error = (...args) => {
+            this.addConsoleOutput('ERROR', args.join(' '));
+            originalError.apply(console, args);
+        };
+    }
+
+    addConsoleOutput(level, message) {
+        const timestamp = new Date().toLocaleTimeString();
+        this.consoleOutput.push(`[${timestamp}] ${level}: ${message}`);
+        
+        // Keep only last 100 messages
+        if (this.consoleOutput.length > 100) {
+            this.consoleOutput = this.consoleOutput.slice(-100);
+        }
+        
+        this.updateConsoleDisplay();
+    }
+
+    updateConsoleDisplay() {
+        const outputElement = document.getElementById('console-output');
+        outputElement.innerHTML = this.consoleOutput.join('\n');
+        outputElement.scrollTop = outputElement.scrollHeight;
+    }
+
+    async runAllTests() {
+        this.clearResults();
+        
+        console.log('🚀 Starting MLG API Integration Test Suite');
+        
+        // Run all test categories
+        await this.testErrorHandler();
+        await this.testApiClient();
+        await this.testAuthManager();
+        await this.testWebSocketManager();
+        await this.testCacheManager();
+        await this.testIntegrationFlows();
+        await this.testFallbackSystems();
+        
+        this.updateStats();
+        this.renderResults();
+        
+        console.log('✅ All tests completed');
+    }
+
+    // MLGErrorHandler Tests
+    async testErrorHandler() {
+        const category = 'MLGErrorHandler Tests';
+        this.addTestResult(category, 'Starting error handler tests...', 'info');
+
+        try {
+            // Test 1: Error categorization
+            await this.runTest(category, 'Error Categorization', async () => {
+                const handler = window.MLGErrorHandler;
+                
+                // Test network timeout error
+                const timeoutError = new Error('Connection timeout after 10 seconds');
+                const categoryCode = handler.categorizeError(timeoutError);
+                this.assert(categoryCode === 'E74', `Expected E74, got ${categoryCode}`);
+                
+                // Test wallet disconnected error
+                const walletError = new Error('Wallet disconnected unexpectedly');
+                const walletCode = handler.categorizeError(walletError);
+                this.assert(walletCode === '0102', `Expected 0102, got ${walletCode}`);
+                
+                // Test 404 error
+                const notFoundError = new Error('404 not found');
+                const notFoundCode = handler.categorizeError(notFoundError);
+                this.assert(notFoundCode === 'D01', `Expected D01, got ${notFoundCode}`);
+                
+                return 'All error categories correctly identified';
+            });
+
+            // Test 2: Gaming-themed messages
+            await this.runTest(category, 'Gaming-Themed Error Messages', async () => {
+                const handler = window.MLGErrorHandler;
+                const errorInfo = handler.ERROR_MESSAGES['E74'];
+                
+                this.assert(errorInfo.title.includes('Red Ring'), 'Should reference Xbox 360 Red Ring');
+                this.assert(errorInfo.icon === '🎮', 'Should have gaming icon');
+                this.assert(errorInfo.category === 'network', 'Should be network category');
+                
+                return 'Gaming-themed messages are properly configured';
+            });
+
+            // Test 3: Recovery strategies
+            await this.runTest(category, 'Recovery Strategies', async () => {
+                const handler = window.MLGErrorHandler;
+                const networkStrategy = handler.RECOVERY_STRATEGIES.network;
+                
+                this.assert(networkStrategy.maxRetries === 3, 'Network should have 3 max retries');
+                this.assert(networkStrategy.backoffMultiplier === 2, 'Should use exponential backoff');
+                this.assert(networkStrategy.successMessage.includes('Achievement'), 'Should have achievement-style message');
+                
+                return 'Recovery strategies properly configured';
+            });
+
+            // Test 4: Circuit breaker functionality
+            await this.runTest(category, 'Circuit Breakers', async () => {
+                const handler = window.MLGErrorHandler;
+                
+                // Check if circuit breakers are initialized
+                const apiBreaker = handler.circuitBreakers.get('api');
+                this.assert(apiBreaker, 'API circuit breaker should exist');
+                this.assert(apiBreaker.state === 'closed', 'Initial state should be closed');
+                this.assert(apiBreaker.threshold === 5, 'Should have correct failure threshold');
+                
+                return 'Circuit breakers are properly initialized';
+            });
+
+            // Test 5: Notification system
+            await this.runTest(category, 'Notification System', async () => {
+                const handler = window.MLGErrorHandler;
+                
+                // Test notification creation (should not throw)
+                handler.showErrorNotification('Test Error', 'This is a test error', '⚠️');
+                
+                // Check if notification container was created
+                const container = document.getElementById('mlg-error-notifications');
+                this.assert(container, 'Notification container should be created');
+                
+                return 'Notification system working correctly';
+            });
+
+        } catch (error) {
+            this.addTestResult(category, `Error handler tests failed: ${error.message}`, 'fail');
+        }
+    }
+
+    // MLGApiClient Tests
+    async testApiClient() {
+        const category = 'MLGApiClient Tests';
+        this.addTestResult(category, 'Starting API client tests...', 'info');
+
+        try {
+            // Test 1: Client initialization
+            await this.runTest(category, 'Client Initialization', async () => {
+                const client = window.MLGApiClient;
+                
+                this.assert(client, 'MLGApiClient should be available globally');
+                this.assert(client.baseURL === '/api', 'Should have correct base URL');
+                this.assert(client.timeout === 10000, 'Should have 10 second timeout');
+                this.assert(client.endpoints, 'Should have endpoints configuration');
+                
+                return 'API client properly initialized';
+            });
+
+            // Test 2: Endpoint configuration
+            await this.runTest(category, 'Endpoint Configuration', async () => {
+                const client = window.MLGApiClient;
+                
+                this.assert(client.endpoints.auth.login === '/auth/login', 'Auth endpoints configured');
+                this.assert(client.endpoints.clans.list === '/clans', 'Clan endpoints configured');
+                this.assert(client.endpoints.voting.active === '/votes/active', 'Voting endpoints configured');
+                this.assert(client.endpoints.content.create === '/content', 'Content endpoints configured');
+                
+                return 'All endpoints properly configured';
+            });
+
+            // Test 3: Request interceptors
+            await this.runTest(category, 'Request Interceptors', async () => {
+                const client = window.MLGApiClient;
+                
+                this.assert(client.requestInterceptors.length > 0, 'Should have request interceptors');
+                this.assert(client.responseInterceptors.length > 0, 'Should have response interceptors');
+                
+                return 'Interceptors are configured';
+            });
+
+            // Test 4: Cache integration
+            await this.runTest(category, 'Cache Integration', async () => {
+                const client = window.MLGApiClient;
+                
+                this.assert(client.cacheManager, 'Should have cache manager reference');
+                this.assert(client.cache, 'Should have fallback cache');
+                this.assert(typeof client.clearCache === 'function', 'Should have cache clearing method');
+                
+                return 'Cache integration working';
+            });
+
+            // Test 5: High-level API methods
+            await this.runTest(category, 'High-Level API Methods', async () => {
+                const client = window.MLGApiClient;
+                
+                // Check that all main API methods exist
+                const methods = ['login', 'logout', 'getUserProfile', 'getClans', 'createClan', 'getActiveVotes', 'castVote'];
+                
+                methods.forEach(method => {
+                    this.assert(typeof client[method] === 'function', `${method} should be a function`);
+                });
+                
+                return 'All high-level API methods are available';
+            });
+
+        } catch (error) {
+            this.addTestResult(category, `API client tests failed: ${error.message}`, 'fail');
+        }
+    }
+
+    // MLGAuthManager Tests
+    async testAuthManager() {
+        const category = 'MLGAuthManager Tests';
+        this.addTestResult(category, 'Starting auth manager tests...', 'info');
+
+        try {
+            // Test 1: Manager initialization
+            await this.runTest(category, 'Manager Initialization', async () => {
+                const auth = window.MLGAuthManager;
+                
+                this.assert(auth, 'MLGAuthManager should be available globally');
+                this.assert(auth.tokenKey === 'mlg_auth_token', 'Should have correct token key');
+                this.assert(auth.fingerprint, 'Should have device fingerprint');
+                this.assert(auth.encryptionKey, 'Should have encryption key');
+                
+                return 'Auth manager properly initialized';
+            });
+
+            // Test 2: Device fingerprinting
+            await this.runTest(category, 'Device Fingerprinting', async () => {
+                const auth = window.MLGAuthManager;
+                
+                this.assert(typeof auth.fingerprint === 'string', 'Fingerprint should be string');
+                this.assert(auth.fingerprint.length > 10, 'Fingerprint should be substantial');
+                
+                return 'Device fingerprinting working';
+            });
+
+            // Test 3: Encryption system
+            await this.runTest(category, 'Token Encryption', async () => {
+                const auth = window.MLGAuthManager;
+                
+                const testData = 'test-token-data';
+                const encrypted = auth.encryptData(testData);
+                const decrypted = auth.decryptData(encrypted);
+                
+                this.assert(encrypted !== testData, 'Data should be encrypted');
+                this.assert(decrypted === testData, 'Data should decrypt correctly');
+                
+                return 'Token encryption working correctly';
+            });
+
+            // Test 4: Session management
+            await this.runTest(category, 'Session Management', async () => {
+                const auth = window.MLGAuthManager;
+                
+                this.assert(typeof auth.startSession === 'function', 'Should have startSession method');
+                this.assert(typeof auth.stopSession === 'function', 'Should have stopSession method');
+                this.assert(typeof auth.updateLastActivity === 'function', 'Should have activity tracking');
+                
+                return 'Session management methods available';
+            });
+
+            // Test 5: Security features
+            await this.runTest(category, 'Security Features', async () => {
+                const auth = window.MLGAuthManager;
+                
+                this.assert(auth.tokenExpiryBuffer === 5 * 60 * 1000, 'Should have 5 minute expiry buffer');
+                this.assert(auth.maxRefreshAttempts === 3, 'Should limit refresh attempts');
+                this.assert(auth.activityTimeout === 15 * 60 * 1000, 'Should have 15 minute activity timeout');
+                
+                return 'Security features properly configured';
+            });
+
+        } catch (error) {
+            this.addTestResult(category, `Auth manager tests failed: ${error.message}`, 'fail');
+        }
+    }
+
+    // MLGWebSocketManager Tests  
+    async testWebSocketManager() {
+        const category = 'MLGWebSocketManager Tests';
+        this.addTestResult(category, 'Starting WebSocket manager tests...', 'info');
+
+        try {
+            // Test 1: Manager initialization
+            await this.runTest(category, 'Manager Initialization', async () => {
+                const ws = window.MLGWebSocketManager;
+                
+                this.assert(ws, 'MLGWebSocketManager should be available globally');
+                this.assert(ws.serverUrl, 'Should have server URL');
+                this.assert(ws.subscriptions, 'Should have subscriptions map');
+                this.assert(ws.roomSubscriptions, 'Should have room subscriptions set');
+                
+                return 'WebSocket manager properly initialized';
+            });
+
+            // Test 2: Subscription system
+            await this.runTest(category, 'Subscription System', async () => {
+                const ws = window.MLGWebSocketManager;
+                
+                // Test subscription
+                const callback = (data) => console.log('Test callback', data);
+                const result = ws.subscribe('test-room', callback);
+                
+                this.assert(result === true, 'Subscription should succeed');
+                this.assert(ws.subscriptions.has('test-room'), 'Room should be in subscriptions');
+                
+                // Test unsubscription
+                ws.unsubscribe('test-room', callback);
+                this.assert(!ws.subscriptions.has('test-room'), 'Room should be removed from subscriptions');
+                
+                return 'Subscription system working correctly';
+            });
+
+            // Test 3: Connection status tracking
+            await this.runTest(category, 'Connection Status', async () => {
+                const ws = window.MLGWebSocketManager;
+                
+                const status = ws.getConnectionStatus();
+                
+                this.assert(typeof status === 'object', 'Should return status object');
+                this.assert(typeof status.isConnected === 'boolean', 'Should have connection status');
+                this.assert(Array.isArray(status.roomSubscriptions), 'Should have room subscriptions array');
+                
+                return 'Connection status tracking working';
+            });
+
+            // Test 4: Fallback system
+            await this.runTest(category, 'Polling Fallback', async () => {
+                const ws = window.MLGWebSocketManager;
+                
+                this.assert(typeof ws.initPollingFallback === 'function', 'Should have polling fallback');
+                this.assert(typeof ws.pollForUpdates === 'function', 'Should have update polling');
+                
+                return 'Fallback system available';
+            });
+
+            // Test 5: Event handling
+            await this.runTest(category, 'Event System', async () => {
+                const ws = window.MLGWebSocketManager;
+                
+                this.assert(ws.listeners, 'Should have event listeners');
+                this.assert(typeof ws.addEventListener === 'function', 'Should have event listener method');
+                this.assert(typeof ws.notifyListeners === 'function', 'Should have notification method');
+                
+                return 'Event system properly configured';
+            });
+
+        } catch (error) {
+            this.addTestResult(category, `WebSocket manager tests failed: ${error.message}`, 'fail');
+        }
+    }
+
+    // MLGCacheManager Tests
+    async testCacheManager() {
+        const category = 'MLGCacheManager Tests';
+        this.addTestResult(category, 'Starting cache manager tests...', 'info');
+
+        try {
+            // Test 1: Manager initialization
+            await this.runTest(category, 'Manager Initialization', async () => {
+                const cache = window.MLGCacheManager;
+                
+                this.assert(cache, 'MLGCacheManager should be available globally');
+                this.assert(cache.memoryCache, 'Should have memory cache');
+                this.assert(cache.defaultTTL === 5 * 60 * 1000, 'Should have 5 minute default TTL');
+                this.assert(cache.strategies, 'Should have caching strategies');
+                
+                return 'Cache manager properly initialized';
+            });
+
+            // Test 2: Cache operations
+            await this.runTest(category, 'Basic Cache Operations', async () => {
+                const cache = window.MLGCacheManager;
+                
+                const testKey = 'test-key';
+                const testData = { message: 'test data', timestamp: Date.now() };
+                
+                // Test set/get
+                cache.set(testKey, testData);
+                const retrieved = cache.get(testKey);
+                
+                this.assert(retrieved, 'Should retrieve cached data');
+                this.assert(retrieved.message === testData.message, 'Retrieved data should match');
+                
+                // Test delete
+                const deleted = cache.delete(testKey);
+                this.assert(deleted === true, 'Should delete successfully');
+                this.assert(cache.get(testKey) === null, 'Data should be removed');
+                
+                return 'Basic cache operations working';
+            });
+
+            // Test 3: TTL and expiration
+            await this.runTest(category, 'TTL and Expiration', async () => {
+                const cache = window.MLGCacheManager;
+                
+                const testKey = 'ttl-test';
+                const testData = { test: 'ttl data' };
+                
+                // Set with very short TTL
+                cache.set(testKey, testData, { ttl: 100 });
+                
+                // Should be available immediately
+                this.assert(cache.get(testKey) !== null, 'Should be available immediately');
+                
+                // Wait for expiration
+                await new Promise(resolve => setTimeout(resolve, 150));
+                
+                // Should be expired
+                this.assert(cache.get(testKey) === null, 'Should be expired after TTL');
+                
+                return 'TTL expiration working correctly';
+            });
+
+            // Test 4: Compression
+            await this.runTest(category, 'Data Compression', async () => {
+                const cache = window.MLGCacheManager;
+                
+                // Create large data that should trigger compression
+                const largeData = { data: 'x'.repeat(2000) };
+                const testKey = 'compression-test';
+                
+                cache.set(testKey, largeData);
+                
+                // Check if compression was used
+                this.assert(cache.stats.compressions > 0, 'Should have compressed data');
+                
+                // Verify data integrity after compression
+                const retrieved = cache.get(testKey);
+                this.assert(retrieved.data === largeData.data, 'Compressed data should decompress correctly');
+                
+                return 'Data compression working correctly';
+            });
+
+            // Test 5: Performance analytics
+            await this.runTest(category, 'Performance Analytics', async () => {
+                const cache = window.MLGCacheManager;
+                
+                const stats = cache.getStats();
+                
+                this.assert(typeof stats === 'object', 'Should return stats object');
+                this.assert(typeof stats.hitRate === 'number', 'Should have hit rate');
+                this.assert(typeof stats.memoryItems === 'number', 'Should have memory item count');
+                
+                const report = cache.getPerformanceReport();
+                this.assert(report.stats, 'Report should have stats');
+                this.assert(Array.isArray(report.recommendations), 'Should have recommendations');
+                
+                return 'Performance analytics working';
+            });
+
+        } catch (error) {
+            this.addTestResult(category, `Cache manager tests failed: ${error.message}`, 'fail');
+        }
+    }
+
+    // Integration Flow Tests
+    async testIntegrationFlows() {
+        const category = 'Integration Flow Tests';
+        this.addTestResult(category, 'Starting integration flow tests...', 'info');
+
+        try {
+            // Test 1: Component interaction
+            await this.runTest(category, 'Component Interaction', async () => {
+                const errorHandler = window.MLGErrorHandler;
+                const apiClient = window.MLGApiClient;
+                const cacheManager = window.MLGCacheManager;
+                const authManager = window.MLGAuthManager;
+                
+                // Verify components can reference each other
+                this.assert(apiClient.errorHandler === errorHandler, 'API client should reference error handler');
+                this.assert(apiClient.cacheManager === cacheManager, 'API client should reference cache manager');
+                this.assert(authManager.errorHandler === errorHandler, 'Auth manager should reference error handler');
+                
+                return 'Components properly integrated';
+            });
+
+            // Test 2: Error propagation
+            await this.runTest(category, 'Error Propagation', async () => {
+                const errorHandler = window.MLGErrorHandler;
+                
+                // Test error handling with context
+                const testError = new Error('Integration test error');
+                const result = await errorHandler.executeWithErrorHandling(
+                    async () => { throw testError; },
+                    { operation: 'test', dataType: 'userProfile' }
+                );
+                
+                this.assert(result.success === false, 'Should handle error');
+                this.assert(result.data, 'Should provide fallback data');
+                
+                return 'Error propagation working correctly';
+            });
+
+            // Test 3: Cache integration with API
+            await this.runTest(category, 'API-Cache Integration', async () => {
+                const apiClient = window.MLGApiClient;
+                const cacheManager = window.MLGCacheManager;
+                
+                // Clear cache first
+                cacheManager.clear();
+                
+                // Mock a successful GET request
+                const originalRequest = apiClient.request;
+                apiClient.request = async (config) => {
+                    if (config.method === 'GET') {
+                        return { success: true, data: { mock: 'data' } };
+                    }
+                    return originalRequest.call(apiClient, config);
+                };
+                
+                // Test cached request
+                const result1 = await apiClient.get('/test', { cache: true });
+                const result2 = await apiClient.get('/test', { cache: true });
+                
+                this.assert(result1, 'First request should succeed');
+                this.assert(result2, 'Second request should succeed (from cache)');
+                
+                // Restore original method
+                apiClient.request = originalRequest;
+                
+                return 'API-Cache integration working';
+            });
+
+        } catch (error) {
+            this.addTestResult(category, `Integration flow tests failed: ${error.message}`, 'fail');
+        }
+    }
+
+    // Fallback System Tests
+    async testFallbackSystems() {
+        const category = 'Fallback System Tests';
+        this.addTestResult(category, 'Starting fallback system tests...', 'info');
+
+        try {
+            // Test 1: Error handler fallbacks
+            await this.runTest(category, 'Error Handler Fallbacks', async () => {
+                const errorHandler = window.MLGErrorHandler;
+                
+                // Test fallback data retrieval
+                const fallback = await errorHandler.getFallbackData({ 
+                    operation: 'getUserProfile', 
+                    dataType: 'userProfile' 
+                });
+                
+                this.assert(fallback, 'Should provide fallback data');
+                this.assert(fallback.fallback === true, 'Should be marked as fallback');
+                this.assert(fallback.data, 'Should have actual data');
+                
+                return 'Error handler fallbacks working';
+            });
+
+            // Test 2: WebSocket polling fallback
+            await this.runTest(category, 'WebSocket Polling Fallback', async () => {
+                const wsManager = window.MLGWebSocketManager;
+                
+                // Test fallback initialization
+                wsManager.initPollingFallback();
+                
+                this.assert(wsManager.fallbackMode === true, 'Should enable fallback mode');
+                this.assert(wsManager.fallbackInterval, 'Should have polling interval');
+                
+                return 'WebSocket polling fallback working';
+            });
+
+            // Test 3: Cache fallbacks
+            await this.runTest(category, 'Cache Fallback Systems', async () => {
+                const apiClient = window.MLGApiClient;
+                
+                // Test that API client has fallback cache when enhanced cache unavailable
+                this.assert(apiClient.cache, 'Should have fallback cache');
+                this.assert(typeof apiClient.getCacheStats === 'function', 'Should have cache stats method');
+                
+                return 'Cache fallback systems working';
+            });
+
+        } catch (error) {
+            this.addTestResult(category, `Fallback system tests failed: ${error.message}`, 'fail');
+        }
+    }
+
+    // Utility methods for test execution
+    async runTest(category, testName, testFunction) {
+        try {
+            const result = await testFunction();
+            this.addTestResult(category, `✅ ${testName}: ${result}`, 'pass');
+            this.testStats.passed++;
+        } catch (error) {
+            this.addTestResult(category, `❌ ${testName}: ${error.message}`, 'fail');
+            this.testStats.failed++;
+            console.error(`Test failed: ${testName}`, error);
+        }
+        this.testStats.total++;
+    }
+
+    assert(condition, message) {
+        if (!condition) {
+            throw new Error(message || 'Assertion failed');
+        }
+    }
+
+    addTestResult(category, message, type) {
+        this.testResults.push({
+            category,
+            message,
+            type,
+            timestamp: new Date().toLocaleTimeString()
+        });
+    }
+
+    clearResults() {
+        this.testResults = [];
+        this.testStats = { passed: 0, failed: 0, pending: 0, total: 0 };
+        this.consoleOutput = [];
+        this.renderResults();
+        this.updateStats();
+        this.updateConsoleDisplay();
+    }
+
+    updateStats() {
+        document.getElementById('tests-passed').textContent = this.testStats.passed;
+        document.getElementById('tests-failed').textContent = this.testStats.failed;
+        document.getElementById('tests-pending').textContent = this.testStats.pending;
+        
+        const coverage = this.testStats.total > 0 
+            ? Math.round((this.testStats.passed / this.testStats.total) * 100)
+            : 0;
+        document.getElementById('test-coverage').textContent = coverage + '%';
+    }
+
+    renderResults() {
+        const container = document.getElementById('test-results');
+        container.innerHTML = '';
+
+        // Group results by category
+        const grouped = {};
+        this.testResults.forEach(result => {
+            if (!grouped[result.category]) {
+                grouped[result.category] = [];
+            }
+            grouped[result.category].push(result);
+        });
+
+        // Render each category
+        Object.entries(grouped).forEach(([category, results]) => {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.className = 'bg-gray-800 rounded-lg p-6';
+
+            const categoryHeader = document.createElement('h3');
+            categoryHeader.className = 'text-xl font-bold mb-4 text-blue-400';
+            categoryHeader.textContent = category;
+            categoryDiv.appendChild(categoryHeader);
+
+            const resultsList = document.createElement('div');
+            resultsList.className = 'space-y-2';
+
+            results.forEach(result => {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `p-3 rounded-lg test-${result.type}`;
+                
+                const resultContent = document.createElement('div');
+                resultContent.className = 'flex justify-between items-start';
+                
+                const message = document.createElement('div');
+                message.className = 'font-mono text-sm';
+                message.textContent = result.message;
+                
+                const timestamp = document.createElement('div');
+                timestamp.className = 'text-xs text-gray-400';
+                timestamp.textContent = result.timestamp;
+                
+                resultContent.appendChild(message);
+                resultContent.appendChild(timestamp);
+                resultDiv.appendChild(resultContent);
+                resultsList.appendChild(resultDiv);
+            });
+
+            categoryDiv.appendChild(resultsList);
+            container.appendChild(categoryDiv);
+        });
+    }
+}
+
+// Initialize test suite when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    window.testSuite = new MLGTestSuite();
+});
+
+// Ensure components are loaded before running tests
+window.addEventListener('load', () => {
+    // Give additional time for all components to initialize
+    setTimeout(() => {
+        if (window.testSuite) {
+            console.log('🎮 MLG Test Suite Ready');
+        }
+    }, 2000);
+});
+</script>
+
+</body>
+</html>

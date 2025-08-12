@@ -14,11 +14,36 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Enable CORS for development
-app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://127.0.0.1:3000'],
-  credentials: true
-}));
+// Enhanced CORS Configuration for MLG.clan Development
+const corsOptions = {
+  origin: [
+    'http://localhost:9000', // Frontend development server
+    'http://localhost:3000', // Main development server
+    'http://localhost:3001', // Demo server
+    'http://127.0.0.1:9000',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers',
+    'X-API-Key'
+  ],
+  credentials: true,
+  maxAge: 86400, // 24 hours for preflight cache
+  optionsSuccessStatus: 200 // Support legacy browsers
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests explicitly
+app.options('*', cors(corsOptions));
 
 // Parse JSON bodies
 app.use(express.json());

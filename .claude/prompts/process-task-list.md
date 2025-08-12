@@ -45,3 +45,4 @@ When working with task lists, the AI must:
 4. Keep "Relevant Files" accurate and up to date.
 5. Before starting work, check which sub‑task is next.
 6. After implementing a sub‑task, update the file and then pause for user approval.
+7. utilizing the completion protocol from process 2 can we keep updated logs in the ceo process and keep me updated on the tasks as completed 
