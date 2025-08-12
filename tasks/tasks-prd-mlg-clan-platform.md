@@ -144,9 +144,9 @@ When all sub-tasks in a parent task are complete:
 
 - [x] 4.0 Content Curation & Submission Platform **[Agent: retro-xbox-ui-designer → ui-production-builder]**
   - [x] 4.1 Create content submission form with metadata fields **[Agent: retro-xbox-ui-designer → ui-production-builder]**
-  - [x] 4.2 Implement content validation and file type checking **[Agent: general-purpose]**
+  - [x] 4.2 Implement content validation and file type checking **[Agent: orchestration-product-manager]**
   - [x] 4.3 Build content storage and retrieval system **[Agent: api-contract-designer]**
-  - [x] 4.4 Create content ranking algorithm based on votes and engagement **[Agent: general-purpose]**
+  - [x] 4.4 Create content ranking algorithm based on votes and engagement **[Agent: orchestration-product-manager]**
   - [x] 4.5 Implement content sorting (by votes, recency, trending) **[Agent: retro-xbox-ui-designer → ui-production-builder]**
   - [x] 4.6 Add community-driven content moderation through voting **[Agent: web3-wallet-verifier]**
   - [x] 4.7 Create content reward system for high-performing submissions **[Agent: web3-wallet-verifier]**
@@ -156,10 +156,10 @@ When all sub-tasks in a parent task are complete:
 
 - [x] 5.0 Clan Management & Leaderboard System **[Agent: retro-xbox-ui-designer → ui-production-builder + web3-wallet-verifier]**
   - [x] 5.1 Create clan creation functionality with SPL token requirements **[Agent: web3-wallet-verifier]**
-  - [x] 5.2 Implement clan member invitation and approval system **[Agent: general-purpose]**
-  - [x] 5.3 Build clan member roles and permissions management **[Agent: general-purpose]**
+  - [x] 5.2 Implement clan member invitation and approval system **[Agent: orchestration-product-manager]**
+  - [x] 5.3 Build clan member roles and permissions management **[Agent: orchestration-product-manager]**
   - [x] 5.4 Create clan-specific voting pools and tracking **[Agent: web3-wallet-verifier]**
-  - [x] 5.5 Implement clan leaderboard based on collective votes **[Agent: general-purpose]**
+  - [x] 5.5 Implement clan leaderboard based on collective votes **[Agent: orchestration-product-manager]**
   - [x] 5.6 Add clan statistics and performance metrics **[Agent: metrics-analytics-architect]**
   - [x] 5.7 Create clan management UI with member roster display **[Agent: retro-xbox-ui-designer → ui-production-builder]**
   - [x] 5.8 Build clan leaderboard UI with rankings and stats **[Agent: retro-xbox-ui-designer → ui-production-builder]**
@@ -224,18 +224,25 @@ When all sub-tasks in a parent task are complete:
 - src/clans/clan-voting.js
 - src/content/content-validator.js
 
+**BUILD SYSTEM (Task 16.2 - Completed):**
+- vite.config.js - Complete Vite build configuration with React support, code splitting, and optimization
+- package.json - Updated with React and Vite dependencies
+- dist/ - Production build output with optimized bundles and assets
+- src/ui/components/clan-management-ui.jsx - Renamed from .js for JSX support
+- src/ui/components/clan-leaderboard-ui.jsx - Renamed from .js for JSX support
+
 **DEMOS TO INTEGRATE**: /demo/voting, /demo/burn-vote, /demo/clan-management, /demo/content-submission contain fully functional features that must be integrated into the main platform, NOT just linked to!
 
-- [x] 7.0 Backend Persistence & Data Architecture **[Agent: api-contract-designer + database-architect]**
+- [x] 7.0 Backend Persistence & Data Architecture **[Agent: api-contract-designer]**
   - [x] 7.1 Design and implement PostgreSQL/MongoDB database schema for all platform data **[Agent: api-contract-designer]**
   - [x] 7.2 Create user authentication and session management system **[Agent: api-contract-designer]**
-  - [x] 7.3 Implement data persistence for voting, content, and clan systems **[Agent: database-architect]**
+  - [x] 7.3 Implement data persistence for voting, content, and clan systems **[Agent: api-contract-designer]**
   - [x] 7.4 Build comprehensive API endpoints for frontend-backend communication **[Agent: api-contract-designer]**
-  - [x] 7.5 Create caching strategies and performance optimization (Redis/Memcached) **[Agent: performance-optimization-specialist]**
+  - [x] 7.5 Create caching strategies and performance optimization (Redis/Memcached) **[Agent: security-performance-auditor]**
   - [x] 7.6 Implement real-time data synchronization with WebSocket connections **[Agent: api-contract-designer]**
-  - [x] 7.7 Build backup and recovery systems with automated snapshots **[Agent: database-architect]**
-  - [x] 7.8 Create migration tools and data versioning for platform updates **[Agent: database-architect]**
-  - [x] 7.9 Implement API rate limiting and security middleware **[Agent: security-compliance-specialist]**
+  - [x] 7.7 Build backup and recovery systems with automated snapshots **[Agent: api-contract-designer]**
+  - [x] 7.8 Create migration tools and data versioning for platform updates **[Agent: api-contract-designer]**
+  - [x] 7.9 Implement API rate limiting and security middleware **[Agent: security-performance-auditor]**
   - [x] 7.10 Test backend systems with load testing and data integrity validation **[Agent: universal-testing-verification]**
 
 - [x] 8.0 Comprehensive Web3 & Wallet Testing **[Agent: web3-wallet-verifier + universal-testing-verification]**
@@ -245,12 +252,12 @@ When all sub-tasks in a parent task are complete:
   - [ ] 8.4 Build network switching and failover testing (devnet/mainnet) **[Agent: web3-wallet-verifier]**
   - [ ] 8.5 Implement gas optimization and fee estimation with user-friendly display **[Agent: web3-wallet-verifier]**
   - [ ] 8.6 Create robust error handling and recovery testing for failed transactions **[Agent: web3-wallet-verifier]**
-  - [ ] 8.7 Conduct security audit and penetration testing for wallet integrations **[Agent: security-compliance-specialist]**
-  - [ ] 8.8 Perform load testing with concurrent transactions and high user volumes **[Agent: performance-optimization-specialist]**
+  - [ ] 8.7 Conduct security audit and penetration testing for wallet integrations **[Agent: security-performance-auditor]**
+  - [ ] 8.8 Perform load testing with concurrent transactions and high user volumes **[Agent: security-performance-auditor]**
   - [ ] 8.9 Test cross-browser compatibility and mobile wallet connections **[Agent: universal-testing-verification]**
   - [ ] 8.10 Validate token burn mechanics and voting system under stress conditions **[Agent: web3-wallet-verifier]**
 
-- [ ] 9.0 Advanced Content & Media System **[Agent: api-contract-designer + content-media-specialist]**
+- [ ] 9.0 Advanced Content & Media System **[Agent: api-contract-designer + ui-production-builder]**
   - [ ] 9.1 Implement YouTube integration with API for video embedding and metadata **[Agent: api-contract-designer]**
   - [ ] 9.2 Create Facebook video embedding with proper authentication and permissions **[Agent: api-contract-designer]**
   - [ ] 9.3 Build Instagram posts and reels integration with graph API **[Agent: api-contract-designer]**
@@ -259,35 +266,35 @@ When all sub-tasks in a parent task are complete:
   - [ ] 9.6 Build Twitch clips and VODs embedding with Helix API **[Agent: api-contract-designer]**
   - [ ] 9.7 Add Vimeo and Dailymotion video platform support **[Agent: api-contract-designer]**
   - [ ] 9.8 Implement direct file uploads with CDN integration and transcoding **[Agent: api-contract-designer]**
-  - [ ] 9.9 Create content aggregation and curation system with automated thumbnail generation **[Agent: content-media-specialist]**
+  - [ ] 9.9 Create content aggregation and curation system with automated thumbnail generation **[Agent: ui-production-builder]**
   - [ ] 9.10 Build video analytics and engagement tracking across all platforms **[Agent: metrics-analytics-architect]**
   - [ ] 9.11 Test multi-platform content integration with performance and reliability validation **[Agent: universal-testing-verification]**
 
-- [ ] 10.0 Mobile App & Cross-Platform **[Agent: mobile-app-architect + cross-platform-specialist]**
-  - [ ] 10.1 Create React Native mobile application with native wallet integration **[Agent: mobile-app-architect]**
-  - [ ] 10.2 Implement cross-platform data synchronization between web and mobile **[Agent: mobile-app-architect]**
-  - [ ] 10.3 Build mobile-optimized wallet integration with biometric authentication **[Agent: mobile-app-architect]**
-  - [ ] 10.4 Create push notification system for governance alerts and clan activities **[Agent: mobile-app-architect]**
-  - [ ] 10.5 Implement offline-first capabilities with intelligent sync mechanisms **[Agent: mobile-app-architect]**
-  - [ ] 10.6 Build mobile-specific UI components with gesture-based interactions **[Agent: mobile-app-architect]**
-  - [ ] 10.7 Create app store optimization and deployment pipeline (iOS/Android) **[Agent: mobile-app-architect]**
-  - [ ] 10.8 Implement mobile performance optimization and battery usage monitoring **[Agent: mobile-app-architect]**
-  - [ ] 10.9 Add mobile-specific features like camera integration for content creation **[Agent: mobile-app-architect]**
+- [ ] 10.0 Mobile App & Cross-Platform **[Agent: ui-production-builder + orchestration-product-manager]**
+  - [ ] 10.1 Create React Native mobile application with native wallet integration **[Agent: ui-production-builder]**
+  - [ ] 10.2 Implement cross-platform data synchronization between web and mobile **[Agent: ui-production-builder]**
+  - [ ] 10.3 Build mobile-optimized wallet integration with biometric authentication **[Agent: ui-production-builder]**
+  - [ ] 10.4 Create push notification system for governance alerts and clan activities **[Agent: ui-production-builder]**
+  - [ ] 10.5 Implement offline-first capabilities with intelligent sync mechanisms **[Agent: ui-production-builder]**
+  - [ ] 10.6 Build mobile-specific UI components with gesture-based interactions **[Agent: ui-production-builder]**
+  - [ ] 10.7 Create app store optimization and deployment pipeline (iOS/Android) **[Agent: ui-production-builder]**
+  - [ ] 10.8 Implement mobile performance optimization and battery usage monitoring **[Agent: ui-production-builder]**
+  - [ ] 10.9 Add mobile-specific features like camera integration for content creation **[Agent: ui-production-builder]**
   - [ ] 10.10 Test mobile application with cross-platform compatibility and performance benchmarks **[Agent: universal-testing-verification]**
 
-- [ ] 11.0 Enterprise & Scaling **[Agent: enterprise-architect + performance-optimization-specialist]**
+- [ ] 11.0 Enterprise & Scaling **[Agent: orchestration-product-manager + security-performance-auditor]**
   - [ ] 11.1 Build advanced analytics and business intelligence dashboard with custom reporting **[Agent: metrics-analytics-architect]**
-  - [ ] 11.2 Implement multi-tenant clan hosting with white-labeling capabilities **[Agent: enterprise-architect]**
-  - [ ] 11.3 Create enterprise clan management tools with bulk operations and admin controls **[Agent: enterprise-architect]**
-  - [ ] 11.4 Build advanced security framework with compliance features (SOC2, GDPR) **[Agent: security-compliance-specialist]**
+  - [ ] 11.2 Implement multi-tenant clan hosting with white-labeling capabilities **[Agent: orchestration-product-manager]**
+  - [ ] 11.3 Create enterprise clan management tools with bulk operations and admin controls **[Agent: orchestration-product-manager]**
+  - [ ] 11.4 Build advanced security framework with compliance features (SOC2, GDPR) **[Agent: security-performance-auditor]**
   - [ ] 11.5 Create API marketplace for third-party integrations and developer ecosystem **[Agent: api-contract-designer]**
-  - [ ] 11.6 Implement performance optimization for 10,000+ concurrent users with load balancing **[Agent: performance-optimization-specialist]**
-  - [ ] 11.7 Build enterprise billing and subscription management system **[Agent: enterprise-architect]**
-  - [ ] 11.8 Create advanced monitoring and alerting system with SLA tracking **[Agent: performance-optimization-specialist]**
-  - [ ] 11.9 Implement disaster recovery and backup systems with 99.9% uptime guarantee **[Agent: enterprise-architect]**
+  - [ ] 11.6 Implement performance optimization for 10,000+ concurrent users with load balancing **[Agent: security-performance-auditor]**
+  - [ ] 11.7 Build enterprise billing and subscription management system **[Agent: orchestration-product-manager]**
+  - [ ] 11.8 Create advanced monitoring and alerting system with SLA tracking **[Agent: security-performance-auditor]**
+  - [ ] 11.9 Implement disaster recovery and backup systems with 99.9% uptime guarantee **[Agent: orchestration-product-manager]**
   - [ ] 11.10 Test enterprise features with stress testing and security penetration testing **[Agent: universal-testing-verification]**
 
-- [x] 12.0 DAO Governance & Treasury System **[Agent: web3-wallet-verifier + blockchain-governance-architect]**
+- [x] 12.0 DAO Governance & Treasury System **[Agent: web3-wallet-verifier]**
   - [x] 12.1 Implement multi-signature DAO governance with proposal creation system **[Agent: web3-wallet-verifier]**
   - [x] 12.2 Create treasury access controls with role-based financial permissions **[Agent: web3-wallet-verifier]**
   - [x] 12.3 Build community treasury voting system with weighted allocation mechanisms **[Agent: web3-wallet-verifier]**
@@ -296,7 +303,7 @@ When all sub-tasks in a parent task are complete:
   - [x] 12.6 Build financial analytics dashboard with treasury performance tracking **[Agent: metrics-analytics-architect]**
   - [x] 12.7 Implement proposal voting UI with delegation and proxy voting capabilities **[Agent: ui-production-builder]**
   - [x] 12.8 Create treasury management interface with spending approval workflows **[Agent: ui-production-builder]**
-  - [x] 12.9 Add governance notification system and voting reminders **[Agent: general-purpose]**
+  - [x] 12.9 Add governance notification system and voting reminders **[Agent: orchestration-product-manager]**
   - [x] 12.10 Test DAO governance flows with multi-signature validation and security audit **[Agent: universal-testing-verification]**
 
 ## 🔧 NEW IMPROVEMENT TASKS - Navigation & Functionality Fixes
@@ -343,27 +350,27 @@ When all sub-tasks in a parent task are complete:
   - [x] 15.10 Test all interactive elements for proper functionality **[Agent: universal-testing-verification + orchestration-product-manager]**
   - [x] 15.11 Verify CLAUDE.md compliance and workflow adherence **[Agent: claude-md-compliance-checker]**
 
-- [ ] 16.0 Consolidate and Optimize Codebase **[Agent: general-purpose]**
-  - [x] 16.1 Merge duplicate JavaScript functionality from demos into main site **[Agent: general-purpose]**
-  - [ ] 16.2 Create a proper build system (webpack/vite) for bundling **[Agent: general-purpose]**
-  - [ ] 16.3 Minimize and optimize JavaScript and CSS files **[Agent: general-purpose]**
-  - [ ] 16.4 Implement proper module system (ES6 modules or CommonJS) **[Agent: general-purpose]**
-  - [ ] 16.5 Remove unused code and dead dependencies **[Agent: general-purpose]**
-  - [ ] 16.6 Organize file structure for better maintainability **[Agent: general-purpose]**
-  - [ ] 16.7 Create shared component library for reusable UI elements **[Agent: ui-production-builder]**
-  - [ ] 16.8 Implement proper state management (Redux/Context API) **[Agent: general-purpose]**
-  - [ ] 16.9 Add proper TypeScript definitions for type safety **[Agent: general-purpose]**
-  - [ ] 16.10 Document code architecture and component relationships **[Agent: general-purpose]**
-  - [ ] 16.11 Verify CLAUDE.md compliance and workflow adherence **[Agent: claude-md-compliance-checker]**
+- [x] 16.0 Consolidate and Optimize Codebase **[Agent: orchestration-product-manager]**
+  - [x] 16.1 Merge duplicate JavaScript functionality from demos into main site **[Agent: orchestration-product-manager]**
+  - [x] 16.2 Create a proper build system (webpack/vite) for bundling **[Agent: orchestration-product-manager]**
+  - [x] 16.3 Minimize and optimize JavaScript and CSS files **[Agent: security-performance-auditor]**
+  - [x] 16.4 Implement proper module system (ES6 modules or CommonJS) **[Agent: orchestration-product-manager]**
+  - [x] 16.5 Remove unused code and dead dependencies **[Agent: orchestration-product-manager]**
+  - [x] 16.6 Organize file structure for better maintainability **[Agent: orchestration-product-manager]**
+  - [x] 16.7 Create shared component library for reusable UI elements **[Agent: ui-production-builder]**
+  - [x] 16.8 Implement proper state management (Redux/Context API) **[Agent: orchestration-product-manager]**
+  - [x] 16.9 Add proper TypeScript definitions for type safety **[Agent: orchestration-product-manager]**
+  - [x] 16.10 Document code architecture and component relationships **[Agent: orchestration-product-manager]**
+  - [x] 16.11 Verify CLAUDE.md compliance and workflow adherence **[Agent: claude-md-compliance-checker]**
 
-- [ ] 17.0 Performance Optimization & Loading **[Agent: orchestration-product-manager + performance-optimization-specialist]**
-  - [ ] 17.1 Implement lazy loading for images and heavy components **[Agent: performance-optimization-specialist]**
-  - [ ] 17.2 Add progressive web app (PWA) capabilities **[Agent: performance-optimization-specialist]**
-  - [ ] 17.3 Optimize initial page load time to under 3 seconds **[Agent: performance-optimization-specialist]**
-  - [ ] 17.4 Implement proper caching strategies for static assets **[Agent: performance-optimization-specialist]**
-  - [ ] 17.5 Add CDN integration for media content delivery **[Agent: performance-optimization-specialist]**
-  - [ ] 17.6 Optimize database queries and API response times **[Agent: performance-optimization-specialist]**
-  - [ ] 17.7 Implement code splitting for faster initial loads **[Agent: performance-optimization-specialist]**
+- [ ] 17.0 Performance Optimization & Loading **[Agent: orchestration-product-manager + security-performance-auditor]**
+  - [ ] 17.1 Implement lazy loading for images and heavy components **[Agent: security-performance-auditor]**
+  - [ ] 17.2 Add progressive web app (PWA) capabilities **[Agent: security-performance-auditor]**
+  - [ ] 17.3 Optimize initial page load time to under 3 seconds **[Agent: security-performance-auditor]**
+  - [ ] 17.4 Implement proper caching strategies for static assets **[Agent: security-performance-auditor]**
+  - [ ] 17.5 Add CDN integration for media content delivery **[Agent: security-performance-auditor]**
+  - [ ] 17.6 Optimize database queries and API response times **[Agent: api-contract-designer]**
+  - [ ] 17.7 Implement code splitting for faster initial loads **[Agent: security-performance-auditor]**
   - [ ] 17.8 Add performance monitoring and analytics **[Agent: metrics-analytics-architect]**
   - [ ] 17.9 Optimize Web3 interactions for gas efficiency **[Agent: web3-wallet-verifier]**
   - [ ] 17.10 Load test with 1000+ concurrent users **[Agent: universal-testing-verification]**
@@ -379,32 +386,32 @@ When all sub-tasks in a parent task are complete:
   - [ ] 18.7 Implement swipe gestures for mobile navigation **[Agent: ui-production-builder]**
   - [ ] 18.8 Add mobile-specific features (share, save to home) **[Agent: ui-production-builder]**
   - [ ] 18.9 Test on real devices (iOS Safari, Android Chrome) **[Agent: universal-testing-verification]**
-  - [ ] 18.10 Optimize mobile performance and battery usage **[Agent: performance-optimization-specialist]**
+  - [ ] 18.10 Optimize mobile performance and battery usage **[Agent: security-performance-auditor]**
   - [ ] 18.11 Verify CLAUDE.md compliance and workflow adherence **[Agent: claude-md-compliance-checker]**
 
-- [ ] 19.0 Security Hardening & Compliance **[Agent: orchestration-product-manager + security-compliance-specialist]**
-  - [ ] 19.1 Implement Content Security Policy (CSP) headers **[Agent: security-compliance-specialist]**
-  - [ ] 19.2 Add input sanitization and XSS protection **[Agent: security-compliance-specialist]**
-  - [ ] 19.3 Implement rate limiting on all API endpoints **[Agent: security-compliance-specialist]**
-  - [ ] 19.4 Add HTTPS enforcement and SSL certificate setup **[Agent: security-compliance-specialist]**
-  - [ ] 19.5 Implement proper authentication and session management **[Agent: security-compliance-specialist]**
-  - [ ] 19.6 Add audit logging for all critical actions **[Agent: security-compliance-specialist]**
-  - [ ] 19.7 Implement GDPR compliance for user data **[Agent: security-compliance-specialist]**
-  - [ ] 19.8 Add DDoS protection and rate limiting **[Agent: security-compliance-specialist]**
+- [ ] 19.0 Security Hardening & Compliance **[Agent: orchestration-product-manager + security-performance-auditor]**
+  - [ ] 19.1 Implement Content Security Policy (CSP) headers **[Agent: security-performance-auditor]**
+  - [ ] 19.2 Add input sanitization and XSS protection **[Agent: security-performance-auditor]**
+  - [ ] 19.3 Implement rate limiting on all API endpoints **[Agent: security-performance-auditor]**
+  - [ ] 19.4 Add HTTPS enforcement and SSL certificate setup **[Agent: security-performance-auditor]**
+  - [ ] 19.5 Implement proper authentication and session management **[Agent: security-performance-auditor]**
+  - [ ] 19.6 Add audit logging for all critical actions **[Agent: security-performance-auditor]**
+  - [ ] 19.7 Implement GDPR compliance for user data **[Agent: security-performance-auditor]**
+  - [ ] 19.8 Add DDoS protection and rate limiting **[Agent: security-performance-auditor]**
   - [ ] 19.9 Secure all Web3 interactions and private keys **[Agent: web3-wallet-verifier]**
   - [ ] 19.10 Conduct security penetration testing **[Agent: universal-testing-verification]**
   - [ ] 19.11 Verify CLAUDE.md compliance and workflow adherence **[Agent: claude-md-compliance-checker]**
 
-- [ ] 20.0 Production Deployment Preparation **[Agent: orchestration-product-manager + general-purpose]**
-  - [ ] 20.1 Set up CI/CD pipeline for automated deployments **[Agent: general-purpose]**
-  - [ ] 20.2 Configure production environment variables **[Agent: general-purpose]**
+- [ ] 20.0 Production Deployment Preparation **[Agent: orchestration-product-manager]**
+  - [ ] 20.1 Set up CI/CD pipeline for automated deployments **[Agent: orchestration-product-manager]**
+  - [ ] 20.2 Configure production environment variables **[Agent: orchestration-product-manager]**
   - [ ] 20.3 Set up monitoring and error tracking (Sentry, LogRocket) **[Agent: metrics-analytics-architect]**
-  - [ ] 20.4 Implement proper logging and debugging tools **[Agent: general-purpose]**
-  - [ ] 20.5 Create deployment scripts and rollback procedures **[Agent: general-purpose]**
-  - [ ] 20.6 Set up database migrations for production **[Agent: database-architect]**
-  - [ ] 20.7 Configure load balancing and auto-scaling **[Agent: performance-optimization-specialist]**
-  - [ ] 20.8 Implement health checks and uptime monitoring **[Agent: general-purpose]**
-  - [ ] 20.9 Create production backup and disaster recovery plan **[Agent: database-architect]**
+  - [ ] 20.4 Implement proper logging and debugging tools **[Agent: orchestration-product-manager]**
+  - [ ] 20.5 Create deployment scripts and rollback procedures **[Agent: orchestration-product-manager]**
+  - [ ] 20.6 Set up database migrations for production **[Agent: api-contract-designer]**
+  - [ ] 20.7 Configure load balancing and auto-scaling **[Agent: security-performance-auditor]**
+  - [ ] 20.8 Implement health checks and uptime monitoring **[Agent: orchestration-product-manager]**
+  - [ ] 20.9 Create production backup and disaster recovery plan **[Agent: api-contract-designer]**
   - [ ] 20.10 Final production readiness testing and checklist **[Agent: universal-testing-verification]**
   - [ ] 20.11 Verify CLAUDE.md compliance and workflow adherence **[Agent: claude-md-compliance-checker]**
 
@@ -434,10 +441,10 @@ When all sub-tasks in a parent task are complete:
   - [ ] 23.5 Implement vote milestone celebration animations **[Agent: ui-production-builder]**
   - [ ] 23.6 Verify CLAUDE.md compliance and workflow adherence **[Agent: claude-md-compliance-checker]**
 
-- [ ] 24.0 **Montage Vault & Curated Content** **[Agent: content-media-specialist]**
-  - [ ] 24.1 Create officially curated highlight reels from top community clips **[Agent: content-media-specialist]**
+- [ ] 24.0 **Montage Vault & Curated Content** **[Agent: ui-production-builder]**
+  - [ ] 24.1 Create officially curated highlight reels from top community clips **[Agent: ui-production-builder]**
   - [ ] 24.2 Build montage vault archive for past montages **[Agent: api-contract-designer]**
-  - [ ] 24.3 Implement montage creation tools and editor **[Agent: content-media-specialist]**
+  - [ ] 24.3 Implement montage creation tools and editor **[Agent: ui-production-builder]**
   - [ ] 24.4 Add montage approval workflow for curators **[Agent: ui-production-builder]**
   - [ ] 24.5 Create montage viewing interface with history access **[Agent: ui-production-builder]**
 
@@ -466,7 +473,7 @@ When all sub-tasks in a parent task are complete:
   - [ ] 28.1 Add alerts for when someone votes on your clip **[Agent: ui-production-builder]**
   - [ ] 28.2 Create leaderboard change notifications **[Agent: ui-production-builder]**
   - [ ] 28.3 Implement tournament starting alerts **[Agent: ui-production-builder]**
-  - [ ] 28.4 Add push notification system for mobile **[Agent: mobile-app-architect]**
+  - [ ] 28.4 Add push notification system for mobile **[Agent: ui-production-builder]**
   - [ ] 28.5 Create notification preferences and settings **[Agent: ui-production-builder]**
 
 - [ ] 29.0 **Activity Feed & Social Features** **[Agent: ui-production-builder]**

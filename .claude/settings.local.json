@@ -42,7 +42,21 @@
       "Bash(npm run test:coverage:*)",
       "Bash(npx jest:*)",
       "Bash(npm run build:*)",
-      "Bash(timeout 10 npm run dev:frontend)"
+      "Bash(timeout 10 npm run dev:frontend)",
+      "Bash(sed:*)",
+      "Bash(npm run preview:*)",
+      "Bash(npm audit:*)",
+      "Bash(NODE_ENV=production npm run build:vite)",
+      "Bash(ANALYZE=true npm run build:vite)",
+      "Bash(npm run audit:performance:*)",
+      "Bash(timeout 10 npm run preview)",
+      "Bash(timeout 5 curl -s \"http://localhost:4174\")",
+      "Bash(npm run test:*)",
+      "Bash(npx vite build:*)",
+      "Bash(vite build)",
+      "Bash(npm ls:*)",
+      "Bash(find:*)",
+      "Bash(npm run type:check:*)"
     ],
     "deny": []
   }

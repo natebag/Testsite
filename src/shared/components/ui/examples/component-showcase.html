@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan UI Component Showcase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../../../styles/main.css">
+    <style>
+        /* Custom gaming theme overrides */
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            min-height: 100vh;
+        }
+        
+        .component-section {
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+    </style>
+</head>
+<body class="text-white font-sans">
+    <div class="container mx-auto px-6 py-8">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-green-400 to-cyan-400 bg-clip-text text-transparent">
+                MLG.clan UI Component Library
+            </h1>
+            <p class="text-xl text-gray-300">Gaming-themed components with Xbox 360 aesthetics</p>
+        </header>
+
+        <!-- Buttons Section -->
+        <section class="component-section rounded-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-green-400">Buttons</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-white">Primary Variants</h3>
+                    <div class="space-y-3">
+                        <div id="button-primary"></div>
+                        <div id="button-secondary"></div>
+                        <div id="button-accent"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-white">Gaming Variants</h3>
+                    <div class="space-y-3">
+                        <div id="button-gaming"></div>
+                        <div id="button-xbox"></div>
+                        <div id="button-burn"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-white">States</h3>
+                    <div class="space-y-3">
+                        <div id="button-loading"></div>
+                        <div id="button-disabled"></div>
+                        <div id="button-fullwidth"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block rounded-lg p-4">
+                <pre class="text-green-300 text-sm"><code>Button({
+  variant: 'primary',
+  size: 'md',
+  onClick: () => alert('Button clicked!'),
+  children: 'Click Me'
+})</code></pre>
+            </div>
+        </section>
+
+        <!-- Gaming Tiles Section -->
+        <section class="component-section rounded-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-green-400">Gaming Tiles</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                <div id="tile-default"></div>
+                <div id="tile-gaming"></div>
+                <div id="tile-xbox"></div>
+                <div id="tile-success"></div>
+                <div id="tile-warning"></div>
+                <div id="tile-danger"></div>
+            </div>
+
+            <div class="code-block rounded-lg p-4">
+                <pre class="text-green-300 text-sm"><code>GamingTile({
+  title: 'Player Stats',
+  subtitle: 'View your gaming statistics',
+  icon: '🎮',
+  variant: 'gaming',
+  onClick: () => navigateToStats()
+})</code></pre>
+            </div>
+        </section>
+
+        <!-- Xbox Buttons Section -->
+        <section class="component-section rounded-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-green-400">Xbox Controller Buttons</h2>
+            
+            <div class="flex flex-wrap gap-8 justify-center mb-6">
+                <div id="xbox-button-a"></div>
+                <div id="xbox-button-b"></div>
+                <div id="xbox-button-x"></div>
+                <div id="xbox-button-y"></div>
+            </div>
+
+            <div class="text-center mb-6">
+                <div id="xbox-button-group"></div>
+            </div>
+
+            <div class="code-block rounded-lg p-4">
+                <pre class="text-green-300 text-sm"><code>XboxButton({
+  buttonType: 'A',
+  size: 'lg',
+  label: 'Accept',
+  onClick: () => handleAccept()
+})</code></pre>
+            </div>
+        </section>
+
+        <!-- Loading States Section -->
+        <section class="component-section rounded-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-green-400">Loading States</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                <div class="text-center">
+                    <h3 class="text-sm font-semibold mb-3 text-gray-300">Default</h3>
+                    <div id="loading-default"></div>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-sm font-semibold mb-3 text-gray-300">Gaming</h3>
+                    <div id="loading-gaming"></div>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-sm font-semibold mb-3 text-gray-300">Xbox</h3>
+                    <div id="loading-xbox"></div>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-sm font-semibold mb-3 text-gray-300">Burn</h3>
+                    <div id="loading-burn"></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="text-center">
+                    <h3 class="text-sm font-semibold mb-3 text-gray-300">Dots</h3>
+                    <div id="loading-dots"></div>
+                </div>
+                <div class="text-center">
+                    <h3 class="text-sm font-semibold mb-3 text-gray-300">Bars</h3>
+                    <div id="loading-bars"></div>
+                </div>
+            </div>
+
+            <div class="code-block rounded-lg p-4">
+                <pre class="text-green-300 text-sm"><code>LoadingSpinner({
+  variant: 'xbox',
+  size: 'lg',
+  text: 'Loading game data...'
+})</code></pre>
+            </div>
+        </section>
+
+        <!-- Skeleton Loaders Section -->
+        <section class="component-section rounded-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-green-400">Skeleton Loaders</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-white">Gaming Card Skeleton</h3>
+                    <div id="skeleton-gaming-card"></div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-white">Leaderboard Skeleton</h3>
+                    <div id="skeleton-leaderboard"></div>
+                </div>
+            </div>
+
+            <div class="code-block rounded-lg p-4">
+                <pre class="text-green-300 text-sm"><code>GamingCardSkeleton({})
+LeaderboardSkeleton({ items: 5 })</code></pre>
+            </div>
+        </section>
+
+        <!-- Burn Button Section -->
+        <section class="component-section rounded-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-green-400">Burn Buttons</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div class="text-center">
+                    <h3 class="text-lg font-semibold mb-3 text-white">Single Burn Button</h3>
+                    <div id="burn-button-single"></div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-white">Quick Burn Options</h3>
+                    <div id="burn-button-quick"></div>
+                </div>
+            </div>
+
+            <div class="code-block rounded-lg p-4">
+                <pre class="text-green-300 text-sm"><code>BurnButton({
+  burnAmount: 100,
+  tokenSymbol: 'MLG',
+  onBurn: ({ amount, tokenSymbol }) => {
+    console.log(`Burning ${amount} ${tokenSymbol} tokens`);
+  }
+})</code></pre>
+            </div>
+        </section>
+
+        <!-- Form Components Section -->
+        <section class="component-section rounded-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-green-400">Form Components</h2>
+            
+            <div class="max-w-2xl mx-auto">
+                <div id="gaming-form-example"></div>
+            </div>
+
+            <div class="code-block rounded-lg p-4 mt-6">
+                <pre class="text-green-300 text-sm"><code>GamingForm({
+  title: 'Join Tournament',
+  onSubmit: (data) => console.log(data),
+  children: FormField({ ... })
+})</code></pre>
+            </div>
+        </section>
+
+        <!-- Modal Example -->
+        <section class="component-section rounded-xl p-8 mb-8">
+            <h2 class="text-2xl font-bold mb-6 text-green-400">Modal Dialog</h2>
+            
+            <div class="text-center mb-6">
+                <button id="show-modal-btn" class="btn-primary">Show Modal Example</button>
+            </div>
+
+            <div class="code-block rounded-lg p-4">
+                <pre class="text-green-300 text-sm"><code>Modal({
+  isOpen: true,
+  title: 'Confirm Action',
+  onClose: () => setModalOpen(false),
+  children: 'Modal content goes here...'
+})</code></pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        // Import component library
+        import { 
+            Button, 
+            GamingTile, 
+            XboxButton, 
+            XboxButtonGroup,
+            LoadingSpinner,
+            GamingCardSkeleton,
+            LeaderboardSkeleton,
+            BurnButton,
+            QuickBurnButtons,
+            GamingForm,
+            FormField,
+            Input,
+            Modal
+        } from '../index.js';
+
+        // Initialize components
+        function initializeComponents() {
+            // Buttons
+            document.getElementById('button-primary').innerHTML = Button({
+                variant: 'primary',
+                children: 'Primary Button',
+                onClick: () => alert('Primary clicked!')
+            });
+
+            document.getElementById('button-secondary').innerHTML = Button({
+                variant: 'secondary',
+                children: 'Secondary Button'
+            });
+
+            document.getElementById('button-accent').innerHTML = Button({
+                variant: 'accent',
+                children: 'Accent Button'
+            });
+
+            document.getElementById('button-gaming').innerHTML = Button({
+                variant: 'gaming',
+                children: 'Gaming Button'
+            });
+
+            document.getElementById('button-xbox').innerHTML = Button({
+                variant: 'xbox',
+                children: 'Xbox Button'
+            });
+
+            document.getElementById('button-burn').innerHTML = Button({
+                variant: 'burn',
+                children: 'Burn Button'
+            });
+
+            document.getElementById('button-loading').innerHTML = Button({
+                variant: 'primary',
+                loading: true,
+                children: 'Loading...'
+            });
+
+            document.getElementById('button-disabled').innerHTML = Button({
+                variant: 'primary',
+                disabled: true,
+                children: 'Disabled'
+            });
+
+            document.getElementById('button-fullwidth').innerHTML = Button({
+                variant: 'primary',
+                fullWidth: true,
+                children: 'Full Width'
+            });
+
+            // Gaming Tiles
+            document.getElementById('tile-default').innerHTML = GamingTile({
+                title: 'Player Stats',
+                subtitle: 'View your performance',
+                icon: '🎮',
+                variant: 'default',
+                children: 'Check your gaming statistics and achievements.'
+            });
+
+            document.getElementById('tile-gaming').innerHTML = GamingTile({
+                title: 'Tournaments',
+                subtitle: 'Join competitions',
+                icon: '⚔️',
+                variant: 'gaming',
+                badge: 'NEW',
+                children: 'Participate in upcoming gaming tournaments.'
+            });
+
+            document.getElementById('tile-xbox').innerHTML = GamingTile({
+                title: 'Xbox Live',
+                subtitle: 'Connect your account',
+                icon: '🎯',
+                variant: 'success',
+                children: 'Link your Xbox Live account for enhanced features.'
+            });
+
+            document.getElementById('tile-success').innerHTML = GamingTile({
+                title: 'Achievements',
+                subtitle: 'Unlock rewards',
+                icon: '🏆',
+                variant: 'success',
+                children: 'View your unlocked achievements and progress.'
+            });
+
+            document.getElementById('tile-warning').innerHTML = GamingTile({
+                title: 'Maintenance',
+                subtitle: 'Server update',
+                icon: '⚠️',
+                variant: 'warning',
+                children: 'Scheduled maintenance in progress.'
+            });
+
+            document.getElementById('tile-danger').innerHTML = GamingTile({
+                title: 'Account Alert',
+                subtitle: 'Action required',
+                icon: '🚨',
+                variant: 'danger',
+                children: 'Your account requires immediate attention.'
+            });
+
+            // Xbox Buttons
+            document.getElementById('xbox-button-a').innerHTML = XboxButton({
+                buttonType: 'A',
+                size: 'lg',
+                label: 'Accept',
+                onClick: () => alert('A button pressed!')
+            });
+
+            document.getElementById('xbox-button-b').innerHTML = XboxButton({
+                buttonType: 'B',
+                size: 'lg',
+                label: 'Cancel'
+            });
+
+            document.getElementById('xbox-button-x').innerHTML = XboxButton({
+                buttonType: 'X',
+                size: 'lg',
+                label: 'Action'
+            });
+
+            document.getElementById('xbox-button-y').innerHTML = XboxButton({
+                buttonType: 'Y',
+                size: 'lg',
+                label: 'Menu'
+            });
+
+            document.getElementById('xbox-button-group').innerHTML = XboxButtonGroup({
+                onAccept: () => alert('Accepted!'),
+                onCancel: () => alert('Cancelled!'),
+                onAction: () => alert('Action!'),
+                onMenu: () => alert('Menu!')
+            });
+
+            // Loading Spinners
+            document.getElementById('loading-default').innerHTML = LoadingSpinner({
+                variant: 'default',
+                size: 'lg'
+            });
+
+            document.getElementById('loading-gaming').innerHTML = LoadingSpinner({
+                variant: 'gaming',
+                size: 'lg'
+            });
+
+            document.getElementById('loading-xbox').innerHTML = LoadingSpinner({
+                variant: 'xbox',
+                size: 'lg'
+            });
+
+            document.getElementById('loading-burn').innerHTML = LoadingSpinner({
+                variant: 'burn',
+                size: 'lg'
+            });
+
+            document.getElementById('loading-dots').innerHTML = LoadingSpinner({
+                variant: 'dots',
+                size: 'lg'
+            });
+
+            document.getElementById('loading-bars').innerHTML = LoadingSpinner({
+                variant: 'bars',
+                size: 'lg'
+            });
+
+            // Skeleton Loaders
+            document.getElementById('skeleton-gaming-card').innerHTML = GamingCardSkeleton({});
+            document.getElementById('skeleton-leaderboard').innerHTML = LeaderboardSkeleton({ items: 3 });
+
+            // Burn Buttons
+            document.getElementById('burn-button-single').innerHTML = BurnButton({
+                burnAmount: 100,
+                tokenSymbol: 'MLG',
+                onBurn: ({ amount, tokenSymbol }) => {
+                    alert(`Burned ${amount} ${tokenSymbol} tokens!`);
+                }
+            });
+
+            document.getElementById('burn-button-quick').innerHTML = QuickBurnButtons({
+                amounts: [10, 50, 100, 500],
+                tokenSymbol: 'MLG',
+                onBurn: ({ amount, tokenSymbol }) => {
+                    alert(`Quick burned ${amount} ${tokenSymbol} tokens!`);
+                }
+            });
+
+            // Gaming Form
+            document.getElementById('gaming-form-example').innerHTML = GamingForm({
+                title: 'Join Tournament',
+                subtitle: 'Enter your details to participate',
+                onSubmit: (data) => {
+                    alert('Form submitted: ' + JSON.stringify(data, null, 2));
+                },
+                children: `
+                    ${FormField({
+                        label: 'Gamertag',
+                        required: true,
+                        children: Input({
+                            name: 'gamertag',
+                            placeholder: 'Enter your gamertag',
+                            required: true
+                        })
+                    })}
+                    ${FormField({
+                        label: 'Email',
+                        required: true,
+                        children: Input({
+                            name: 'email',
+                            type: 'email',
+                            placeholder: 'Enter your email',
+                            required: true
+                        })
+                    })}
+                    ${FormField({
+                        label: 'Preferred Game',
+                        children: Input({
+                            name: 'game',
+                            placeholder: 'e.g., Call of Duty, Halo'
+                        })
+                    })}
+                    ${Button({
+                        type: 'submit',
+                        variant: 'primary',
+                        fullWidth: true,
+                        children: 'Join Tournament'
+                    })}
+                `
+            });
+
+            // Modal Example
+            let modalOpen = false;
+            const showModalBtn = document.getElementById('show-modal-btn');
+            
+            showModalBtn.addEventListener('click', () => {
+                modalOpen = true;
+                updateModal();
+            });
+
+            function updateModal() {
+                const existingModal = document.getElementById('example-modal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+
+                if (modalOpen) {
+                    const modalHtml = Modal({
+                        isOpen: modalOpen,
+                        title: 'Example Modal',
+                        size: 'md',
+                        onClose: () => {
+                            modalOpen = false;
+                            updateModal();
+                        },
+                        children: `
+                            <p class="text-gray-300 mb-4">
+                                This is an example modal dialog with gaming aesthetics.
+                            </p>
+                            <p class="text-sm text-gray-400">
+                                Click outside or press ESC to close.
+                            </p>
+                        `
+                    });
+
+                    document.body.insertAdjacentHTML('beforeend', 
+                        `<div id="example-modal">${modalHtml}</div>`
+                    );
+                }
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initializeComponents);
+    </script>
+</body>
+</html>

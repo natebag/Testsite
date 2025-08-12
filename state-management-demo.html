@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG.clan State Management Demo</title>
+    
+    <!-- MLG Platform Meta Tags -->
+    <meta name="mlg-platform" content="state-management-demo">
+    <meta name="mlg-wallet-auto-init" content="true">
+    <meta name="mlg-features" content="state,wallet,voting,clan,user">
+    
+    <!-- Core Styles -->
+    <link rel="stylesheet" href="src/styles/main.css">
+    
+    <!-- Xbox 360 Gaming Aesthetics -->
+    <style>
+        :root {
+            --xbox-green: #6ab04c;
+            --xbox-dark: #0b1426;
+            --xbox-surface: #1a1a2e;
+            --xbox-accent: #ff9f43;
+        }
+        
+        body {
+            background: var(--xbox-dark);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: 
+                radial-gradient(circle at 25% 25%, var(--xbox-green) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, var(--xbox-accent) 0%, transparent 50%);
+            background-attachment: fixed;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 12px;
+            border: 2px solid var(--xbox-green);
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .demo-card {
+            background: rgba(26, 26, 46, 0.9);
+            border: 2px solid var(--xbox-green);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .demo-card h3 {
+            color: var(--xbox-green);
+            margin-top: 0;
+            border-bottom: 1px solid var(--xbox-green);
+            padding-bottom: 10px;
+        }
+        
+        .btn {
+            background: var(--xbox-green);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            background: #8bc34a;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-danger {
+            background: #ff6b6b;
+        }
+        
+        .btn-danger:hover {
+            background: #ff5252;
+        }
+        
+        .btn-warning {
+            background: var(--xbox-accent);
+        }
+        
+        .btn-warning:hover {
+            background: #ffb74d;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .status-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .status-item strong {
+            color: var(--xbox-green);
+        }
+        
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--xbox-green);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 300px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .alert.error {
+            background: #ff6b6b;
+        }
+        
+        .alert.warning {
+            background: var(--xbox-accent);
+        }
+        
+        .achievements {
+            margin-top: 15px;
+        }
+        
+        .achievement {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid gold;
+            border-radius: 6px;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        
+        .achievement-name {
+            color: gold;
+            font-weight: bold;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .loading::after {
+            content: " 🎮";
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 12px;
+            border: 2px solid var(--xbox-green);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎮 MLG.clan State Management System</h1>
+            <p>Interactive demonstration of the comprehensive state management system</p>
+            <p><strong>Task 16.8 Implementation</strong> - React Context API with persistence</p>
+        </div>
+        
+        <!-- State Management Demo Grid -->
+        <div class="demo-grid">
+            <!-- Wallet State Demo -->
+            <div class="demo-card">
+                <h3>💰 Wallet State Management</h3>
+                <div id="wallet-status">
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <strong>Status:</strong><br>
+                            <span id="wallet-connected">Disconnected</span>
+                        </div>
+                        <div class="status-item">
+                            <strong>Network:</strong><br>
+                            <span id="wallet-network">-</span>
+                        </div>
+                        <div class="status-item">
+                            <strong>SOL Balance:</strong><br>
+                            <span id="wallet-balance">0.0000</span>
+                        </div>
+                        <div class="status-item">
+                            <strong>MLG Balance:</strong><br>
+                            <span id="wallet-mlg">0.00</span>
+                        </div>
+                    </div>
+                    <div id="wallet-address" style="font-family: monospace; font-size: 0.8em; margin: 10px 0;"></div>
+                </div>
+                <div>
+                    <button id="connect-wallet" class="btn">Connect Wallet</button>
+                    <button id="disconnect-wallet" class="btn btn-danger" style="display: none;">Disconnect</button>
+                    <button id="update-balance" class="btn btn-warning">Update Balance</button>
+                </div>
+            </div>
+            
+            <!-- Voting State Demo -->
+            <div class="demo-card">
+                <h3>🗳️ Voting State Management</h3>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <strong>Free Votes:</strong><br>
+                        <span id="free-votes">1</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Total Used:</strong><br>
+                        <span id="total-votes">0</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Burn Votes:</strong><br>
+                        <span id="burn-votes">0</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Active:</strong><br>
+                        <span id="active-votes">0</span>
+                    </div>
+                </div>
+                <div>
+                    <button id="free-vote" class="btn">Use Free Vote</button>
+                    <button id="burn-vote-1" class="btn btn-warning">Burn 1</button>
+                    <button id="burn-vote-4" class="btn btn-warning">Burn 4</button>
+                    <button id="reset-votes" class="btn">Reset Daily</button>
+                </div>
+            </div>
+            
+            <!-- Clan State Demo -->
+            <div class="demo-card">
+                <h3>🏛️ Clan State Management</h3>
+                <div id="clan-info">
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <strong>Clan:</strong><br>
+                            <span id="clan-name">None</span>
+                        </div>
+                        <div class="status-item">
+                            <strong>Members:</strong><br>
+                            <span id="clan-members">0</span>
+                        </div>
+                        <div class="status-item">
+                            <strong>Ranking:</strong><br>
+                            <span id="clan-ranking">-</span>
+                        </div>
+                        <div class="status-item">
+                            <strong>Invites:</strong><br>
+                            <span id="clan-invites">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <button id="join-clan" class="btn">Join Demo Clan</button>
+                    <button id="leave-clan" class="btn btn-danger" style="display: none;">Leave Clan</button>
+                    <button id="add-invite" class="btn btn-warning">Add Invitation</button>
+                </div>
+            </div>
+            
+            <!-- User State Demo -->
+            <div class="demo-card">
+                <h3>👤 User State Management</h3>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <strong>Profile:</strong><br>
+                        <span id="user-profile">Not Loaded</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Achievements:</strong><br>
+                        <span id="user-achievements">0</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Notifications:</strong><br>
+                        <span id="user-notifications">0</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Total Votes:</strong><br>
+                        <span id="user-votes">0</span>
+                    </div>
+                </div>
+                <div id="user-achievements-list" class="achievements"></div>
+                <div>
+                    <button id="load-profile" class="btn">Load Profile</button>
+                    <button id="add-achievement" class="btn btn-warning">Add Achievement</button>
+                    <button id="add-notification" class="btn">Add Notification</button>
+                </div>
+            </div>
+            
+            <!-- Settings State Demo -->
+            <div class="demo-card">
+                <h3>⚙️ Settings State Management</h3>
+                <div style="margin-bottom: 15px;">
+                    <label><strong>Theme:</strong></label><br>
+                    <select id="theme-select" class="btn" style="width: 100%;">
+                        <option value="xbox">Xbox 360</option>
+                        <option value="dark">Dark</option>
+                        <option value="light">Light</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label><strong>Language:</strong></label><br>
+                    <select id="language-select" class="btn" style="width: 100%;">
+                        <option value="en">English</option>
+                        <option value="es">Español</option>
+                        <option value="fr">Français</option>
+                    </select>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" id="notifications-enabled" checked> 
+                        Enable Notifications
+                    </label>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button id="reset-settings" class="btn btn-danger">Reset Settings</button>
+                </div>
+            </div>
+            
+            <!-- UI State Demo -->
+            <div class="demo-card">
+                <h3>🎨 UI State Management</h3>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <strong>Active Alerts:</strong><br>
+                        <span id="ui-alerts">0</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Loading States:</strong><br>
+                        <span id="ui-loading">0</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Current Page:</strong><br>
+                        <span id="ui-page">demo</span>
+                    </div>
+                    <div class="status-item">
+                        <strong>Sidebar:</strong><br>
+                        <span id="ui-sidebar">Closed</span>
+                    </div>
+                </div>
+                <div>
+                    <button id="add-alert-success" class="btn">Success Alert</button>
+                    <button id="add-alert-error" class="btn btn-danger">Error Alert</button>
+                    <button id="toggle-loading" class="btn btn-warning">Toggle Loading</button>
+                    <button id="toggle-sidebar" class="btn">Toggle Sidebar</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Persistence Demo -->
+        <div class="demo-card">
+            <h3>💾 State Persistence Demo</h3>
+            <p>The state management system automatically persists important data to localStorage. 
+               Refresh this page to see persistence in action!</p>
+            <div class="status-grid">
+                <div class="status-item">
+                    <strong>Storage Keys:</strong><br>
+                    <span id="storage-keys">0</span>
+                </div>
+                <div class="status-item">
+                    <strong>Storage Size:</strong><br>
+                    <span id="storage-size">0 KB</span>
+                </div>
+            </div>
+            <div>
+                <button id="save-state" class="btn">Save State</button>
+                <button id="load-state" class="btn btn-warning">Load State</button>
+                <button id="clear-state" class="btn btn-danger">Clear Persistence</button>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <h3>🎯 State Management Features</h3>
+            <ul style="text-align: left; max-width: 600px; margin: 0 auto;">
+                <li><strong>React Context API</strong> - Centralized state management</li>
+                <li><strong>Domain Separation</strong> - Wallet, Voting, Clan, User, Settings, UI</li>
+                <li><strong>Automatic Persistence</strong> - Important state saved to localStorage</li>
+                <li><strong>Type Safety</strong> - TypeScript-style type definitions</li>
+                <li><strong>Action Creators</strong> - Consistent action patterns</li>
+                <li><strong>Custom Hooks</strong> - Domain-specific React hooks</li>
+                <li><strong>Optimized Re-renders</strong> - Individual context subscriptions</li>
+                <li><strong>Development Tools</strong> - State validation and debugging</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Demo JavaScript -->
+    <script type="module">
+        // Simulate state management system for demo
+        // In real implementation, this would use the React Context API
+        
+        class MLGStateDemo {
+            constructor() {
+                this.state = {
+                    wallet: {
+                        isConnected: false,
+                        address: null,
+                        balance: 0,
+                        mlgBalance: 0,
+                        network: 'mainnet-beta'
+                    },
+                    voting: {
+                        dailyVotesRemaining: 1,
+                        totalVotesUsed: 0,
+                        burnVotesAvailable: 0,
+                        activeVotes: []
+                    },
+                    clan: {
+                        currentClan: null,
+                        membersList: [],
+                        invitations: [],
+                        stats: { ranking: null, totalMembers: 0 }
+                    },
+                    user: {
+                        profile: null,
+                        achievements: [],
+                        notifications: [],
+                        stats: { totalVotes: 0 }
+                    },
+                    settings: {
+                        theme: 'xbox',
+                        language: 'en',
+                        notifications: { enabled: true }
+                    },
+                    ui: {
+                        alerts: [],
+                        loading: {},
+                        currentPage: 'demo',
+                        sidebarOpen: false
+                    }
+                };
+                
+                this.loadFromStorage();
+                this.updateUI();
+                this.bindEvents();
+            }
+            
+            // Simulate state updates
+            updateState(domain, updates) {
+                this.state[domain] = { ...this.state[domain], ...updates };
+                this.updateUI();
+                this.saveToStorage();
+            }
+            
+            // Simulate wallet connection
+            connectWallet() {
+                const addresses = [
+                    'ExampleWallet123...abc',
+                    'MLGUser456...def', 
+                    'GamerWallet789...ghi'
+                ];
+                
+                this.updateState('wallet', {
+                    isConnected: true,
+                    address: addresses[Math.floor(Math.random() * addresses.length)],
+                    balance: Math.random() * 5 * 1000000000, // Random SOL balance
+                    mlgBalance: Math.random() * 1000 // Random MLG balance
+                });
+                
+                this.addAlert('success', 'Wallet Connected', 'Your wallet has been connected successfully');
+            }
+            
+            // Simulate voting
+            useVote(type, amount = 1) {
+                if (type === 'free' && this.state.voting.dailyVotesRemaining <= 0) {
+                    this.addAlert('error', 'No Free Votes', 'You have used all your free votes today');
+                    return;
+                }
+                
+                const updates = {
+                    totalVotesUsed: this.state.voting.totalVotesUsed + amount,
+                    activeVotes: [...this.state.voting.activeVotes, { id: Date.now(), type }]
+                };
+                
+                if (type === 'free') {
+                    updates.dailyVotesRemaining = this.state.voting.dailyVotesRemaining - 1;
+                } else {
+                    updates.burnVotesAvailable = Math.max(0, this.state.voting.burnVotesAvailable - amount);
+                }
+                
+                this.updateState('voting', updates);
+                this.addAlert('success', 'Vote Submitted', `Your ${type} vote has been recorded`);
+                
+                // Simulate vote completion
+                setTimeout(() => {
+                    this.updateState('voting', {
+                        activeVotes: this.state.voting.activeVotes.filter(v => v.id !== updates.activeVotes[updates.activeVotes.length - 1].id)
+                    });
+                }, 2000);
+            }
+            
+            // Add alert
+            addAlert(type, title, message) {
+                const alert = {
+                    id: Date.now(),
+                    type, title, message,
+                    timestamp: new Date().toISOString()
+                };
+                
+                this.updateState('ui', {
+                    alerts: [...this.state.ui.alerts, alert]
+                });
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    this.updateState('ui', {
+                        alerts: this.state.ui.alerts.filter(a => a.id !== alert.id)
+                    });
+                }, 5000);
+            }
+            
+            // Update UI elements
+            updateUI() {
+                // Wallet
+                document.getElementById('wallet-connected').textContent = 
+                    this.state.wallet.isConnected ? 'Connected' : 'Disconnected';
+                document.getElementById('wallet-network').textContent = this.state.wallet.network;
+                document.getElementById('wallet-balance').textContent = 
+                    (this.state.wallet.balance / 1000000000).toFixed(4);
+                document.getElementById('wallet-mlg').textContent = 
+                    this.state.wallet.mlgBalance.toFixed(2);
+                document.getElementById('wallet-address').textContent = 
+                    this.state.wallet.address || '';
+                
+                // Show/hide wallet buttons
+                document.getElementById('connect-wallet').style.display = 
+                    this.state.wallet.isConnected ? 'none' : 'inline-block';
+                document.getElementById('disconnect-wallet').style.display = 
+                    this.state.wallet.isConnected ? 'inline-block' : 'none';
+                
+                // Voting
+                document.getElementById('free-votes').textContent = this.state.voting.dailyVotesRemaining;
+                document.getElementById('total-votes').textContent = this.state.voting.totalVotesUsed;
+                document.getElementById('burn-votes').textContent = this.state.voting.burnVotesAvailable;
+                document.getElementById('active-votes').textContent = this.state.voting.activeVotes.length;
+                
+                // Clan
+                document.getElementById('clan-name').textContent = 
+                    this.state.clan.currentClan?.name || 'None';
+                document.getElementById('clan-members').textContent = this.state.clan.stats.totalMembers;
+                document.getElementById('clan-ranking').textContent = 
+                    this.state.clan.stats.ranking ? `#${this.state.clan.stats.ranking}` : '-';
+                document.getElementById('clan-invites').textContent = this.state.clan.invitations.length;
+                
+                // Show/hide clan buttons
+                document.getElementById('join-clan').style.display = 
+                    this.state.clan.currentClan ? 'none' : 'inline-block';
+                document.getElementById('leave-clan').style.display = 
+                    this.state.clan.currentClan ? 'inline-block' : 'none';
+                
+                // User
+                document.getElementById('user-profile').textContent = 
+                    this.state.user.profile?.username || 'Not Loaded';
+                document.getElementById('user-achievements').textContent = this.state.user.achievements.length;
+                document.getElementById('user-notifications').textContent = this.state.user.notifications.length;
+                document.getElementById('user-votes').textContent = this.state.user.stats.totalVotes;
+                
+                // User achievements
+                const achievementsList = document.getElementById('user-achievements-list');
+                achievementsList.innerHTML = '';
+                this.state.user.achievements.slice(0, 3).forEach(achievement => {
+                    const div = document.createElement('div');
+                    div.className = 'achievement';
+                    div.innerHTML = `
+                        <div class="achievement-name">${achievement.name}</div>
+                        <div style="font-size: 0.8em;">${achievement.description}</div>
+                    `;
+                    achievementsList.appendChild(div);
+                });
+                
+                // Settings
+                document.getElementById('theme-select').value = this.state.settings.theme;
+                document.getElementById('language-select').value = this.state.settings.language;
+                document.getElementById('notifications-enabled').checked = this.state.settings.notifications.enabled;
+                
+                // UI
+                document.getElementById('ui-alerts').textContent = this.state.ui.alerts.length;
+                document.getElementById('ui-loading').textContent = 
+                    Object.values(this.state.ui.loading).filter(Boolean).length;
+                document.getElementById('ui-page').textContent = this.state.ui.currentPage;
+                document.getElementById('ui-sidebar').textContent = 
+                    this.state.ui.sidebarOpen ? 'Open' : 'Closed';
+                
+                // Storage info
+                this.updateStorageInfo();
+                
+                // Render alerts
+                this.renderAlerts();
+            }
+            
+            // Render alerts
+            renderAlerts() {
+                // Remove existing alerts
+                document.querySelectorAll('.alert').forEach(el => el.remove());
+                
+                // Add current alerts
+                this.state.ui.alerts.forEach((alert, index) => {
+                    const alertEl = document.createElement('div');
+                    alertEl.className = `alert ${alert.type}`;
+                    alertEl.style.top = `${20 + index * 80}px`;
+                    alertEl.innerHTML = `
+                        <strong>${alert.title}</strong><br>
+                        ${alert.message}
+                    `;
+                    document.body.appendChild(alertEl);
+                });
+            }
+            
+            // Storage simulation
+            saveToStorage() {
+                const persistentData = {
+                    wallet: { address: this.state.wallet.address, network: this.state.wallet.network },
+                    settings: this.state.settings,
+                    user: { preferences: this.state.user.preferences }
+                };
+                localStorage.setItem('mlg_clan_demo_state', JSON.stringify(persistentData));
+            }
+            
+            loadFromStorage() {
+                const stored = localStorage.getItem('mlg_clan_demo_state');
+                if (stored) {
+                    try {
+                        const data = JSON.parse(stored);
+                        if (data.wallet) this.state.wallet = { ...this.state.wallet, ...data.wallet };
+                        if (data.settings) this.state.settings = { ...this.state.settings, ...data.settings };
+                        if (data.user) this.state.user = { ...this.state.user, ...data.user };
+                    } catch (e) {
+                        console.error('Failed to load state:', e);
+                    }
+                }
+            }
+            
+            updateStorageInfo() {
+                const keys = Object.keys(localStorage).filter(key => key.startsWith('mlg_clan'));
+                document.getElementById('storage-keys').textContent = keys.length;
+                
+                const size = keys.reduce((total, key) => {
+                    return total + (localStorage.getItem(key)?.length || 0);
+                }, 0);
+                document.getElementById('storage-size').textContent = `${(size / 1024).toFixed(1)} KB`;
+            }
+            
+            // Event bindings
+            bindEvents() {
+                // Wallet events
+                document.getElementById('connect-wallet').onclick = () => this.connectWallet();
+                document.getElementById('disconnect-wallet').onclick = () => {
+                    this.updateState('wallet', {
+                        isConnected: false,
+                        address: null,
+                        balance: 0,
+                        mlgBalance: 0
+                    });
+                    this.addAlert('info', 'Wallet Disconnected', 'Your wallet has been disconnected');
+                };
+                document.getElementById('update-balance').onclick = () => {
+                    this.updateState('wallet', {
+                        balance: Math.random() * 5 * 1000000000,
+                        mlgBalance: Math.random() * 1000
+                    });
+                    this.addAlert('info', 'Balance Updated', 'Wallet balances have been refreshed');
+                };
+                
+                // Voting events
+                document.getElementById('free-vote').onclick = () => this.useVote('free');
+                document.getElementById('burn-vote-1').onclick = () => this.useVote('burn', 1);
+                document.getElementById('burn-vote-4').onclick = () => this.useVote('burn', 4);
+                document.getElementById('reset-votes').onclick = () => {
+                    this.updateState('voting', {
+                        dailyVotesRemaining: 1,
+                        totalVotesUsed: 0,
+                        burnVotesAvailable: Math.floor(Math.random() * 5)
+                    });
+                    this.addAlert('success', 'Votes Reset', 'Daily votes have been reset');
+                };
+                
+                // Clan events
+                document.getElementById('join-clan').onclick = () => {
+                    this.updateState('clan', {
+                        currentClan: {
+                            id: 'demo_clan',
+                            name: 'Demo MLG Clan',
+                            description: 'A demonstration clan'
+                        },
+                        stats: {
+                            totalMembers: Math.floor(Math.random() * 50) + 10,
+                            ranking: Math.floor(Math.random() * 100) + 1
+                        }
+                    });
+                    this.addAlert('success', 'Clan Joined', 'You have joined the Demo MLG Clan');
+                };
+                document.getElementById('leave-clan').onclick = () => {
+                    this.updateState('clan', {
+                        currentClan: null,
+                        stats: { totalMembers: 0, ranking: null }
+                    });
+                    this.addAlert('info', 'Clan Left', 'You have left your clan');
+                };
+                document.getElementById('add-invite').onclick = () => {
+                    const clanNames = ['Elite Gamers', 'Pro MLG Squad', 'Champion Clan'];
+                    this.updateState('clan', {
+                        invitations: [...this.state.clan.invitations, {
+                            id: Date.now(),
+                            clanName: clanNames[Math.floor(Math.random() * clanNames.length)],
+                            inviterName: `Player${Math.floor(Math.random() * 1000)}`
+                        }]
+                    });
+                    this.addAlert('info', 'Clan Invitation', 'You have received a new clan invitation');
+                };
+                
+                // User events
+                document.getElementById('load-profile').onclick = () => {
+                    this.updateState('user', {
+                        profile: {
+                            id: 'demo_user',
+                            username: `MLGGamer${Math.floor(Math.random() * 1000)}`,
+                            displayName: 'MLG Demo User'
+                        },
+                        stats: {
+                            totalVotes: Math.floor(Math.random() * 100)
+                        }
+                    });
+                    this.addAlert('success', 'Profile Loaded', 'User profile has been loaded');
+                };
+                document.getElementById('add-achievement').onclick = () => {
+                    const achievements = [
+                        { name: 'First Vote', description: 'Cast your first vote' },
+                        { name: 'Daily Voter', description: 'Vote every day for a week' },
+                        { name: 'Clan Member', description: 'Join your first clan' },
+                        { name: 'Token Burner', description: 'Burn tokens for voting power' }
+                    ];
+                    const achievement = achievements[Math.floor(Math.random() * achievements.length)];
+                    achievement.id = Date.now();
+                    this.updateState('user', {
+                        achievements: [...this.state.user.achievements, achievement]
+                    });
+                    this.addAlert('success', 'Achievement Unlocked!', `You earned: ${achievement.name}`);
+                };
+                document.getElementById('add-notification').onclick = () => {
+                    this.updateState('user', {
+                        notifications: [...this.state.user.notifications, {
+                            id: Date.now(),
+                            title: 'Demo Notification',
+                            message: 'This is a demonstration notification'
+                        }]
+                    });
+                    this.addAlert('info', 'Notification Added', 'A new notification has been added');
+                };
+                
+                // Settings events
+                document.getElementById('theme-select').onchange = (e) => {
+                    this.updateState('settings', { theme: e.target.value });
+                    this.addAlert('info', 'Theme Changed', `Theme updated to ${e.target.value}`);
+                };
+                document.getElementById('language-select').onchange = (e) => {
+                    this.updateState('settings', { language: e.target.value });
+                    this.addAlert('info', 'Language Changed', `Language updated to ${e.target.value}`);
+                };
+                document.getElementById('notifications-enabled').onchange = (e) => {
+                    this.updateState('settings', {
+                        notifications: { ...this.state.settings.notifications, enabled: e.target.checked }
+                    });
+                };
+                document.getElementById('reset-settings').onclick = () => {
+                    this.updateState('settings', {
+                        theme: 'xbox',
+                        language: 'en',
+                        notifications: { enabled: true }
+                    });
+                    this.addAlert('info', 'Settings Reset', 'All settings have been reset to defaults');
+                };
+                
+                // UI events
+                document.getElementById('add-alert-success').onclick = () => {
+                    this.addAlert('success', 'Success Alert', 'This is a success message');
+                };
+                document.getElementById('add-alert-error').onclick = () => {
+                    this.addAlert('error', 'Error Alert', 'This is an error message');
+                };
+                document.getElementById('toggle-loading').onclick = () => {
+                    const isLoading = this.state.ui.loading.demo;
+                    this.updateState('ui', {
+                        loading: { ...this.state.ui.loading, demo: !isLoading }
+                    });
+                };
+                document.getElementById('toggle-sidebar').onclick = () => {
+                    this.updateState('ui', {
+                        sidebarOpen: !this.state.ui.sidebarOpen
+                    });
+                };
+                
+                // Persistence events
+                document.getElementById('save-state').onclick = () => {
+                    this.saveToStorage();
+                    this.addAlert('success', 'State Saved', 'Application state has been saved to localStorage');
+                };
+                document.getElementById('load-state').onclick = () => {
+                    this.loadFromStorage();
+                    this.updateUI();
+                    this.addAlert('info', 'State Loaded', 'Application state has been loaded from localStorage');
+                };
+                document.getElementById('clear-state').onclick = () => {
+                    localStorage.removeItem('mlg_clan_demo_state');
+                    this.updateStorageInfo();
+                    this.addAlert('warning', 'State Cleared', 'Persistent state has been cleared');
+                };
+            }
+        }
+        
+        // Initialize demo
+        const demo = new MLGStateDemo();
+        
+        console.log('🎮 MLG.clan State Management Demo Initialized');
+        console.log('This demo simulates the React Context API state management system');
+        console.log('In production, this would use the actual React components and hooks');
+    </script>
+</body>
+</html>

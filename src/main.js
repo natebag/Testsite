@@ -8,38 +8,41 @@
 // Import core styles
 import './styles/main.css'
 
+// Import state management system
+import './shared/utils/state/index.js'
+
 // Import core MLG systems
-import './js/mlg-api-client-consolidated.js'
-import './js/mlg-wallet-init-consolidated.js'
-import './js/mlg-websocket-manager.js'
-import './js/mlg-error-handler.js'
-import './js/mlg-cache-manager.js'
-import './js/mlg-offline-manager.js'
-import './js/mlg-connection-status.js'
-import './js/mlg-fallback-system.js'
-import './js/mlg-loading-states.js'
-import './js/mlg-error-logger.js'
-import './js/mlg-error-system.js'
+import './shared/utils/api/mlg-api-client-consolidated.js'
+import './shared/utils/wallet/mlg-wallet-init-consolidated.js'
+import './core/websocket/mlg-websocket-manager.js'
+import './shared/utils/error/mlg-error-handler.js'
+import './shared/utils/cache/mlg-cache-manager.js'
+import './shared/utils/offline/mlg-offline-manager.js'
+import './shared/utils/mlg-connection-status.js'
+import './shared/utils/offline/mlg-fallback-system.js'
+import './shared/utils/loading/mlg-loading-states.js'
+import './shared/utils/error/mlg-error-logger.js'
+import './shared/utils/error/mlg-error-system.js'
 
 // Import UI components
-import './ui/components/gaming-loading-states.js'
-import './ui/components/xbox-page-transitions.js'
-import './ui/components/wallet-loading-states.js'
-import './ui/components/vote-burn-loading.js'
-import './ui/components/gaming-upload-progress.js'
-import './ui/components/mlg-loading-system.js'
+import './shared/components/gaming-loading-states.js'
+import './shared/components/xbox-page-transitions.js'
+import './shared/components/wallet-loading-states.js'
+import './shared/components/vote-burn-loading.js'
+import './shared/components/gaming-upload-progress.js'
+import './shared/components/mlg-loading-system.js'
 
 // Import core production components for Task 16.1
-import './ui/components/burn-vote-confirmation-ui.js'
-import './ui/components/content-submission-form.js'
-import './ui/components/clan-management-ui.js'
-import './ui/components/clan-leaderboard-ui.js'
+import './shared/components/burn-vote-confirmation-ui.js'
+import './shared/components/content-submission-form.js'
+import './shared/components/clan-management-ui.jsx'
+import './shared/components/clan-leaderboard-ui.jsx'
 
 // Import core systems
-import './voting/solana-voting-system.js'
-import './wallet/phantom-wallet.js'
-import './clans/clan-voting.js'
-import './content/content-validator.js'
+import './features/voting/solana-voting-system.js'
+import './features/wallet/phantom-wallet.js'
+import './features/clans/clan-voting.js'
+import './features/content/content-validator.js'
 
 // Initialize application
 class MLGApplication {
@@ -213,6 +216,36 @@ if (document.readyState === 'loading') {
 
 // Export for manual initialization if needed
 window.MLGApplication = mlgApp
+
+// Make state management system available globally for React components
+window.MLGStateManagement = {
+  // Import state management when needed
+  async getStateManager() {
+    const stateModule = await import('./shared/utils/state/index.js');
+    return stateModule.default;
+  },
+  
+  // Quick access to main components
+  async getProvider() {
+    const { MLGStateProvider } = await import('./shared/utils/state/index.js');
+    return MLGStateProvider;
+  },
+  
+  async getHooks() {
+    const stateModule = await import('./shared/utils/state/index.js');
+    return {
+      useWallet: stateModule.useWallet,
+      useVoting: stateModule.useVoting,
+      useClan: stateModule.useClan,
+      useUser: stateModule.useUser,
+      useSettings: stateModule.useSettings,
+      useUI: stateModule.useUI
+    };
+  }
+};
+
+console.log('🎮 MLG.clan State Management System Loaded');
+console.log('✅ Task 16.8 - Proper state management (React Context API) implemented');
 
 // Export for module systems
 export { MLGApplication }
