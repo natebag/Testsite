@@ -281,14 +281,17 @@
               Trending Content
             </h3>
             <div class="flex space-x-2">
-              <button class="bg-gaming-surface hover:bg-gaming-blue px-4 py-2 rounded-lg text-sm transition-colors">
-                Latest
+              <button class="vote-sort-btn bg-gaming-surface hover:bg-gaming-blue px-4 py-2 rounded-lg text-sm transition-colors" data-sort="latest">
+                🕒 Latest
               </button>
-              <button class="bg-gaming-blue text-white px-4 py-2 rounded-lg text-sm">
-                Trending
+              <button class="vote-sort-btn bg-gaming-blue text-white px-4 py-2 rounded-lg text-sm" data-sort="trending">
+                🔥 Trending
               </button>
-              <button class="bg-gaming-surface hover:bg-gaming-blue px-4 py-2 rounded-lg text-sm transition-colors">
-                Top Rated
+              <button class="vote-sort-btn bg-gaming-surface hover:bg-gaming-blue px-4 py-2 rounded-lg text-sm transition-colors" data-sort="top">
+                🏆 Top Rated
+              </button>
+              <button class="vote-sort-btn bg-gaming-surface hover:bg-gaming-blue px-4 py-2 rounded-lg text-sm transition-colors" data-sort="cost">
+                💰 Vote Cost
               </button>
             </div>
           </div>
@@ -497,7 +500,15 @@
         
         // Buy votes button
         document.getElementById('buy-votes').addEventListener('click', () => {
-          this.showNotification('🛒 Vote purchasing interface coming soon!', 'info');
+          this.showBuyVotesDialog();
+        });
+
+        // Vote content sorting buttons
+        document.querySelectorAll('.vote-sort-btn').forEach(sortBtn => {
+          sortBtn.addEventListener('click', (e) => {
+            this.setActiveVoteSortButton(e.target);
+            this.sortVoteContent(e.target.dataset.sort);
+          });
         });
       }
       
@@ -915,6 +926,90 @@
         if (window.lucide) {
           window.lucide.createIcons();
         }
+      }
+
+      setActiveVoteSortButton(clickedButton) {
+        // Remove active class from all sort buttons
+        document.querySelectorAll('.vote-sort-btn').forEach(btn => {
+          btn.classList.remove('bg-gaming-blue', 'text-white');
+          btn.classList.add('bg-gaming-surface');
+        });
+        
+        // Add active class to clicked button
+        clickedButton.classList.add('bg-gaming-blue', 'text-white');
+        clickedButton.classList.remove('bg-gaming-surface');
+      }
+
+      sortVoteContent(sortType) {
+        console.log(`🗳️ Sorting vote content by: ${sortType}`);
+        
+        const contentContainer = document.getElementById('content-list');
+        if (!contentContainer) return;
+        
+        const contentItems = Array.from(contentContainer.children);
+        
+        // Generate sorting data if not present
+        contentItems.forEach((item, index) => {
+          if (!item.dataset.voteData) {
+            const baseVotes = Math.floor(Math.random() * 500) + 50;
+            const voteCost = [0, 25, 50, 75, 100][Math.floor(Math.random() * 5)];
+            const hoursOld = Math.floor(Math.random() * 48) + 1;
+            
+            item.dataset.voteData = JSON.stringify({
+              votes: baseVotes,
+              cost: voteCost,
+              timestamp: Date.now() - (hoursOld * 60 * 60 * 1000),
+              trendingScore: baseVotes * (voteCost + 1) / (hoursOld + 1)
+            });
+          }
+        });
+        
+        // Sort items based on type
+        contentItems.sort((a, b) => {
+          const aData = JSON.parse(a.dataset.voteData || '{}');
+          const bData = JSON.parse(b.dataset.voteData || '{}');
+          
+          switch(sortType) {
+            case 'latest':
+              return (bData.timestamp || 0) - (aData.timestamp || 0);
+            case 'trending':
+              return (bData.trendingScore || 0) - (aData.trendingScore || 0);
+            case 'top':
+              return (bData.votes || 0) - (aData.votes || 0);
+            case 'cost':
+              return (bData.cost || 0) - (aData.cost || 0);
+            default:
+              return 0;
+          }
+        });
+        
+        // Re-append sorted items with animation
+        contentItems.forEach((item, index) => {
+          setTimeout(() => {
+            contentContainer.appendChild(item);
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(20px)';
+            
+            setTimeout(() => {
+              item.style.transition = 'all 0.3s ease';
+              item.style.opacity = '1';
+              item.style.transform = 'translateX(0)';
+            }, 50);
+          }, index * 75);
+        });
+        
+        // Update UI to reflect sort
+        this.showNotification(`📊 Vote content sorted by ${this.getVoteSortDisplayName(sortType)}`, 'info');
+      }
+
+      getVoteSortDisplayName(sortType) {
+        const names = {
+          latest: 'newest submissions',
+          trending: 'trending score',
+          top: 'highest votes',
+          cost: 'vote cost'
+        };
+        return names[sortType] || sortType;
       }
 
       startVotersLeaderboardUpdates() {

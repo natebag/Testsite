@@ -409,14 +409,17 @@
               Trending Content
             </h3>
             <div class="flex space-x-2">
-              <button class="bg-gaming-blue text-white px-4 py-2 rounded-lg text-sm">
-                Hot
+              <button id="sort-hot" class="content-sort-btn bg-gaming-blue text-white px-4 py-2 rounded-lg text-sm" data-sort="hot">
+                🔥 Hot
               </button>
-              <button class="bg-gaming-surface hover:bg-gaming-blue px-4 py-2 rounded-lg text-sm transition-colors">
-                Recent
+              <button id="sort-recent" class="content-sort-btn bg-gaming-surface hover:bg-gaming-blue px-4 py-2 rounded-lg text-sm transition-colors" data-sort="recent">
+                🕒 Recent
               </button>
-              <button class="bg-gaming-surface hover:bg-gaming-blue px-4 py-2 rounded-lg text-sm transition-colors">
-                Top Rated
+              <button id="sort-top" class="content-sort-btn bg-gaming-surface hover:bg-gaming-blue px-4 py-2 rounded-lg text-sm transition-colors" data-sort="top">
+                🏆 Top Rated
+              </button>
+              <button id="sort-views" class="content-sort-btn bg-gaming-surface hover:bg-gaming-blue px-4 py-2 rounded-lg text-sm transition-colors" data-sort="views">
+                👁️ Most Viewed
               </button>
             </div>
           </div>
@@ -741,14 +744,27 @@
         if (tagsInput) {
           tagsInput.addEventListener('input', (e) => {
             this.validateTags(e.target.value);
+            this.saveFormDraft();
           });
         }
+
+        // Auto-save form draft for all form fields
+        this.setupFormDraftSaving();
         
         // Search functionality
         const searchInput = document.getElementById('content-search');
         if (searchInput) {
+          // Load saved search query
+          const savedSearch = localStorage.getItem('mlg_content_search');
+          if (savedSearch) {
+            searchInput.value = savedSearch;
+            this.performSearch(savedSearch);
+          }
+          
           searchInput.addEventListener('input', (e) => {
             this.performSearch(e.target.value);
+            // Save search query
+            localStorage.setItem('mlg_content_search', e.target.value);
           });
         }
         
@@ -757,6 +773,25 @@
           filter.addEventListener('click', (e) => {
             this.setActiveFilter(e.target);
             this.performSearch(searchInput ? searchInput.value : '');
+            // Save active filter
+            localStorage.setItem('mlg_content_filter', e.target.dataset.filter);
+          });
+        });
+
+        // Load saved filter
+        const savedFilter = localStorage.getItem('mlg_content_filter');
+        if (savedFilter) {
+          const filterBtn = document.querySelector(`[data-filter="${savedFilter}"]`);
+          if (filterBtn) {
+            this.setActiveFilter(filterBtn);
+          }
+        }
+
+        // Content sorting buttons
+        document.querySelectorAll('.content-sort-btn').forEach(sortBtn => {
+          sortBtn.addEventListener('click', (e) => {
+            this.setActiveSortButton(e.target);
+            this.sortContent(e.target.dataset.sort);
           });
         });
 
@@ -919,6 +954,90 @@
           }
         }, 20000);
       }
+
+      setupFormDraftSaving() {
+        const formFields = [
+          { id: 'content-platform', name: 'platform' },
+          { id: 'content-url', name: 'contentUrl' },
+          { id: 'content-title', name: 'title' },
+          { id: 'content-description', name: 'description' },
+          { id: 'content-category', name: 'category' },
+          { id: 'content-tags', name: 'tags' }
+        ];
+
+        formFields.forEach(field => {
+          const element = document.getElementById(field.id);
+          if (element) {
+            element.addEventListener('input', () => {
+              this.saveFormDraft();
+            });
+            element.addEventListener('change', () => {
+              this.saveFormDraft();
+            });
+          }
+        });
+
+        // Load saved draft on page load
+        this.loadFormDraft();
+      }
+
+      saveFormDraft() {
+        const formData = {
+          platform: document.getElementById('content-platform')?.value || '',
+          contentUrl: document.getElementById('content-url')?.value || '',
+          title: document.getElementById('content-title')?.value || '',
+          description: document.getElementById('content-description')?.value || '',
+          category: document.getElementById('content-category')?.value || '',
+          tags: document.getElementById('content-tags')?.value || '',
+          timestamp: Date.now()
+        };
+
+        localStorage.setItem('mlg_content_draft', JSON.stringify(formData));
+        console.log('💾 Content form draft saved');
+      }
+
+      loadFormDraft() {
+        const savedDraft = localStorage.getItem('mlg_content_draft');
+        if (!savedDraft) return;
+
+        try {
+          const draft = JSON.parse(savedDraft);
+          
+          // Only load if draft is less than 24 hours old
+          const hoursSinceLastSave = (Date.now() - draft.timestamp) / (1000 * 60 * 60);
+          if (hoursSinceLastSave > 24) {
+            localStorage.removeItem('mlg_content_draft');
+            return;
+          }
+
+          // Restore form fields
+          document.getElementById('content-platform').value = draft.platform || '';
+          document.getElementById('content-url').value = draft.contentUrl || '';
+          document.getElementById('content-title').value = draft.title || '';
+          document.getElementById('content-description').value = draft.description || '';
+          document.getElementById('content-category').value = draft.category || '';
+          document.getElementById('content-tags').value = draft.tags || '';
+
+          // Update character counters
+          this.updateCharacterCounter('title', draft.title || '', 100);
+          this.updateCharacterCounter('description', draft.description || '', 500);
+          
+          // Validate tags
+          if (draft.tags) {
+            this.validateTags(draft.tags);
+          }
+
+          console.log('📋 Content form draft loaded');
+        } catch (error) {
+          console.error('Failed to load form draft:', error);
+          localStorage.removeItem('mlg_content_draft');
+        }
+      }
+
+      clearFormDraft() {
+        localStorage.removeItem('mlg_content_draft');
+        console.log('🗑️ Content form draft cleared');
+      }
       
       async handleContentSubmission(event) {
         try {
@@ -960,6 +1079,9 @@
             
             // Clear character counters
             this.resetCharacterCounters();
+            
+            // Clear form draft since submission was successful
+            this.clearFormDraft();
             
             // Show success notification
             this.showNotification('🎉 Content submitted successfully!', 'success');
@@ -1237,6 +1359,90 @@
         // Add active class to clicked filter
         clickedFilter.classList.add('active', 'bg-gaming-blue', 'text-white');
         clickedFilter.classList.remove('bg-gaming-surface', 'text-gray-400');
+      }
+
+      setActiveSortButton(clickedButton) {
+        // Remove active class from all sort buttons
+        document.querySelectorAll('.content-sort-btn').forEach(btn => {
+          btn.classList.remove('bg-gaming-blue', 'text-white');
+          btn.classList.add('bg-gaming-surface');
+        });
+        
+        // Add active class to clicked button
+        clickedButton.classList.add('bg-gaming-blue', 'text-white');
+        clickedButton.classList.remove('bg-gaming-surface');
+      }
+
+      sortContent(sortType) {
+        console.log(`🔄 Sorting content by: ${sortType}`);
+        
+        const contentContainer = document.getElementById('trending-content');
+        if (!contentContainer) return;
+        
+        const contentItems = Array.from(contentContainer.children);
+        
+        // Generate sorting data if not present
+        contentItems.forEach((item, index) => {
+          if (!item.dataset.sortData) {
+            const baseVotes = Math.floor(Math.random() * 1000) + 100;
+            const baseViews = Math.floor(Math.random() * 50000) + 5000;
+            const daysOld = Math.floor(Math.random() * 30) + 1;
+            
+            item.dataset.sortData = JSON.stringify({
+              votes: baseVotes,
+              views: baseViews,
+              timestamp: Date.now() - (daysOld * 24 * 60 * 60 * 1000),
+              hotScore: baseVotes + (baseViews / 100) - (daysOld * 10)
+            });
+          }
+        });
+        
+        // Sort items based on type
+        contentItems.sort((a, b) => {
+          const aData = JSON.parse(a.dataset.sortData || '{}');
+          const bData = JSON.parse(b.dataset.sortData || '{}');
+          
+          switch(sortType) {
+            case 'hot':
+              return (bData.hotScore || 0) - (aData.hotScore || 0);
+            case 'recent':
+              return (bData.timestamp || 0) - (aData.timestamp || 0);
+            case 'top':
+              return (bData.votes || 0) - (aData.votes || 0);
+            case 'views':
+              return (bData.views || 0) - (aData.views || 0);
+            default:
+              return 0;
+          }
+        });
+        
+        // Re-append sorted items with animation
+        contentItems.forEach((item, index) => {
+          setTimeout(() => {
+            contentContainer.appendChild(item);
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+              item.style.transition = 'all 0.3s ease';
+              item.style.opacity = '1';
+              item.style.transform = 'translateY(0)';
+            }, 50);
+          }, index * 50);
+        });
+        
+        // Update UI to reflect sort
+        this.showNotification(`📊 Content sorted by ${this.getSortDisplayName(sortType)}`, 'info');
+      }
+
+      getSortDisplayName(sortType) {
+        const names = {
+          hot: 'trending score',
+          recent: 'newest first',
+          top: 'highest rated',
+          views: 'most viewed'
+        };
+        return names[sortType] || sortType;
       }
       
       highlightSearchTerms(item, query) {

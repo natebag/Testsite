@@ -135,6 +135,29 @@
       to { box-shadow: 0 0 20px var(--neon-green), 0 0 30px var(--neon-green); }
     }
     
+    .clan-sort-btn {
+      background: rgba(26, 26, 46, 0.8);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      color: rgba(255, 255, 255, 0.7);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .clan-sort-btn:hover {
+      border-color: rgba(0, 255, 136, 0.4);
+      background: rgba(0, 255, 136, 0.1);
+      color: white;
+    }
+    
+    .clan-sort-btn.active {
+      background: var(--neon-green);
+      color: black;
+      font-weight: bold;
+      border-color: var(--neon-green);
+    }
+
     @keyframes float {
       0% { transform: translateY(0px); }
       50% { transform: translateY(-20px); }
@@ -532,7 +555,7 @@
               </div>
             </div>
             
-            <button class="w-full bg-gaming-blue hover:bg-blue-600 px-6 py-3 rounded-lg font-bold transition-colors">
+            <button id="browse-clans-btn" class="w-full bg-gaming-blue hover:bg-blue-600 px-6 py-3 rounded-lg font-bold transition-colors">
               Browse All Clans
             </button>
           </div>
@@ -561,6 +584,61 @@
       </div>
     </div>
   </footer>
+
+  <!-- Clan Browser Modal -->
+  <div id="clan-browser-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-gaming-surface border border-gaming-accent rounded-lg p-6 max-w-4xl mx-4 max-h-[90vh] overflow-hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold text-gaming-blue">🏛️ Clan Browser</h3>
+        <button id="close-browser-modal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+      </div>
+      
+      <!-- Search and Filters -->
+      <div class="mb-6 space-y-4">
+        <div class="flex space-x-4">
+          <input type="text" id="clan-search-input" placeholder="Search clans..." class="flex-1 bg-gaming-bg border border-gaming-accent border-opacity-20 rounded-lg px-4 py-2 text-white focus:border-gaming-accent focus:outline-none">
+          <select id="clan-type-filter" class="bg-gaming-bg border border-gaming-accent border-opacity-20 rounded-lg px-4 py-2 text-white focus:border-gaming-accent focus:outline-none">
+            <option value="all">All Types</option>
+            <option value="competitive">Competitive</option>
+            <option value="casual">Casual</option>
+            <option value="recruiting">Recruiting</option>
+          </select>
+        </div>
+        
+        <div class="flex space-x-2 text-sm">
+          <button class="clan-sort-btn active" data-sort="members">👥 Members</button>
+          <button class="clan-sort-btn" data-sort="wins">🏆 Wins</button>
+          <button class="clan-sort-btn" data-sort="founded">📅 Founded</button>
+          <button class="clan-sort-btn" data-sort="rating">⭐ Rating</button>
+        </div>
+      </div>
+      
+      <!-- Clan List -->
+      <div class="max-h-96 overflow-y-auto space-y-3" id="clan-browser-list">
+        <!-- Dynamic clan list will be populated here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Join Clan Confirmation Modal -->
+  <div id="join-clan-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-gaming-surface border border-gaming-accent rounded-lg p-6 max-w-md mx-4">
+      <div class="text-center">
+        <h3 class="text-xl font-bold text-gaming-blue mb-4">🎯 Join Clan</h3>
+        <div id="join-clan-info" class="mb-6">
+          <!-- Clan info will be populated here -->
+        </div>
+        <div class="flex space-x-3">
+          <button id="confirm-join-clan" class="flex-1 bg-gaming-blue hover:bg-blue-600 text-white px-4 py-2 rounded font-bold transition-colors">
+            Join Clan
+          </button>
+          <button id="cancel-join-clan" class="flex-1 bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded font-bold transition-colors">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
     // Initialize clan platform
@@ -1145,8 +1223,204 @@
       }
       
       showClanBrowser() {
-        this.showNotification('🔍 Clan browser interface coming soon!', 'info');
-        // TODO: Implement clan browser modal/interface
+        console.log('🏛️ Opening clan browser...');
+        
+        // Populate clan list
+        this.populateClanBrowser();
+        
+        // Show modal
+        document.getElementById('clan-browser-modal').classList.remove('hidden');
+        
+        // Set up modal event listeners
+        this.setupClanBrowserEventListeners();
+      }
+      
+      setupClanBrowserEventListeners() {
+        // Close modal
+        document.getElementById('close-browser-modal').onclick = () => this.closeClanBrowser();
+        
+        // Search functionality
+        document.getElementById('clan-search-input').addEventListener('input', (e) => {
+          this.filterClans(e.target.value);
+        });
+        
+        // Type filter
+        document.getElementById('clan-type-filter').addEventListener('change', (e) => {
+          this.filterClans(document.getElementById('clan-search-input').value, e.target.value);
+        });
+        
+        // Sort buttons
+        document.querySelectorAll('.clan-sort-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.clan-sort-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            this.sortClans(btn.dataset.sort);
+          });
+        });
+        
+        // Join clan modal handlers
+        document.getElementById('cancel-join-clan').onclick = () => this.closeJoinClanModal();
+        document.getElementById('confirm-join-clan').onclick = () => this.confirmJoinClan();
+        
+        // Close on outside click
+        document.getElementById('clan-browser-modal').addEventListener('click', (e) => {
+          if (e.target.id === 'clan-browser-modal') {
+            this.closeClanBrowser();
+          }
+        });
+      }
+      
+      populateClanBrowser() {
+        const clanList = document.getElementById('clan-browser-list');
+        const clans = this.generateClanList();
+        
+        clanList.innerHTML = clans.map(clan => `
+          <div class="clan-browser-item p-4 bg-gaming-bg rounded-lg border border-gaming-accent border-opacity-20 hover:border-opacity-40 transition-all" data-clan-id="${clan.id}">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-r ${clan.gradient} rounded-lg flex items-center justify-center">
+                  <span class="text-lg font-bold text-white">${clan.tag}</span>
+                </div>
+                <div>
+                  <h4 class="font-bold text-white">${clan.name}</h4>
+                  <div class="flex items-center space-x-4 text-sm text-gray-400">
+                    <span>👥 ${clan.members}/50</span>
+                    <span>🏆 ${clan.wins}W</span>
+                    <span>⭐ ${clan.rating}</span>
+                    <span class="text-${clan.recruiting ? 'green' : 'red'}-400">${clan.recruiting ? '✅ Recruiting' : '❌ Closed'}</span>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">${clan.description}</p>
+                </div>
+              </div>
+              <div class="text-right">
+                ${clan.recruiting ? 
+                  `<button class="join-clan-btn bg-gaming-blue hover:bg-blue-600 px-4 py-2 rounded text-sm font-bold transition-colors" data-clan-id="${clan.id}">Join</button>` :
+                  `<span class="text-gray-500 text-sm">Full</span>`
+                }
+              </div>
+            </div>
+          </div>
+        `).join('');
+        
+        // Add join button event listeners
+        document.querySelectorAll('.join-clan-btn').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const clanId = e.target.dataset.clanId;
+            const clan = clans.find(c => c.id === clanId);
+            this.showJoinClanModal(clan);
+          });
+        });
+      }
+      
+      generateClanList() {
+        return [
+          { id: '1', name: 'Elite Gamers', tag: 'EG', members: 45, wins: 289, rating: 4.8, recruiting: true, description: 'Competitive Valorant and CS:GO clan', gradient: 'from-purple-500 to-pink-500' },
+          { id: '2', name: 'Victory Squad', tag: 'VS', members: 38, wins: 156, rating: 4.5, recruiting: true, description: 'Multi-game casual and competitive', gradient: 'from-blue-500 to-cyan-500' },
+          { id: '3', name: 'Apex Legends', tag: 'APX', members: 50, wins: 423, rating: 4.9, recruiting: false, description: 'Top-tier Apex Legends specialists', gradient: 'from-orange-500 to-red-500' },
+          { id: '4', name: 'Fortnite Masters', tag: 'FM', members: 42, wins: 234, rating: 4.6, recruiting: true, description: 'Fortnite competitive and creative', gradient: 'from-green-500 to-blue-500' },
+          { id: '5', name: 'Call of Duty Elite', tag: 'COD', members: 35, wins: 178, rating: 4.3, recruiting: true, description: 'Warzone and multiplayer focus', gradient: 'from-gray-500 to-gray-700' },
+          { id: '6', name: 'Rocket League Pro', tag: 'RLP', members: 28, wins: 312, rating: 4.7, recruiting: true, description: 'Professional Rocket League team', gradient: 'from-yellow-500 to-orange-500' }
+        ];
+      }
+      
+      showJoinClanModal(clan) {
+        const joinInfo = document.getElementById('join-clan-info');
+        joinInfo.innerHTML = `
+          <div class="text-center">
+            <div class="w-16 h-16 bg-gradient-to-r ${clan.gradient} rounded-lg flex items-center justify-center mx-auto mb-4">
+              <span class="text-2xl font-bold text-white">${clan.tag}</span>
+            </div>
+            <h4 class="text-lg font-bold text-white mb-2">${clan.name}</h4>
+            <p class="text-gray-400 text-sm mb-4">${clan.description}</p>
+            <div class="grid grid-cols-3 gap-2 text-sm">
+              <div>
+                <div class="text-gaming-accent font-bold">${clan.members}/50</div>
+                <div class="text-gray-500">Members</div>
+              </div>
+              <div>
+                <div class="text-gaming-accent font-bold">${clan.wins}</div>
+                <div class="text-gray-500">Wins</div>
+              </div>
+              <div>
+                <div class="text-gaming-accent font-bold">${clan.rating}⭐</div>
+                <div class="text-gray-500">Rating</div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // Store clan data for confirmation
+        document.getElementById('confirm-join-clan').dataset.clanId = clan.id;
+        
+        // Show join modal
+        document.getElementById('join-clan-modal').classList.remove('hidden');
+      }
+      
+      confirmJoinClan() {
+        const clanId = document.getElementById('confirm-join-clan').dataset.clanId;
+        console.log(`🎯 Joining clan ${clanId}...`);
+        
+        // Close modals
+        this.closeJoinClanModal();
+        this.closeClanBrowser();
+        
+        // Show success notification
+        this.showNotification('🎉 Successfully joined clan! Welcome to the team!', 'success');
+      }
+      
+      closeJoinClanModal() {
+        document.getElementById('join-clan-modal').classList.add('hidden');
+      }
+      
+      closeClanBrowser() {
+        document.getElementById('clan-browser-modal').classList.add('hidden');
+        console.log('❌ Clan browser closed');
+      }
+      
+      filterClans(searchTerm = '', type = 'all') {
+        const items = document.querySelectorAll('.clan-browser-item');
+        items.forEach(item => {
+          const name = item.querySelector('h4').textContent.toLowerCase();
+          const description = item.querySelector('p').textContent.toLowerCase();
+          const isRecruiting = item.textContent.includes('✅ Recruiting');
+          
+          const matchesSearch = !searchTerm || name.includes(searchTerm.toLowerCase()) || description.includes(searchTerm.toLowerCase());
+          const matchesType = type === 'all' || 
+                             (type === 'recruiting' && isRecruiting) ||
+                             (type === 'competitive' && description.includes('competitive')) ||
+                             (type === 'casual' && description.includes('casual'));
+          
+          item.style.display = matchesSearch && matchesType ? '' : 'none';
+        });
+      }
+      
+      sortClans(sortBy) {
+        const container = document.getElementById('clan-browser-list');
+        const items = Array.from(container.querySelectorAll('.clan-browser-item'));
+        
+        items.sort((a, b) => {
+          let aVal, bVal;
+          
+          switch(sortBy) {
+            case 'members':
+              aVal = parseInt(a.textContent.match(/👥 (\d+)/)[1]);
+              bVal = parseInt(b.textContent.match(/👥 (\d+)/)[1]);
+              return bVal - aVal;
+            case 'wins':
+              aVal = parseInt(a.textContent.match(/🏆 (\d+)W/)[1]);
+              bVal = parseInt(b.textContent.match(/🏆 (\d+)W/)[1]);
+              return bVal - aVal;
+            case 'rating':
+              aVal = parseFloat(a.textContent.match(/⭐ ([\d.]+)/)[1]);
+              bVal = parseFloat(b.textContent.match(/⭐ ([\d.]+)/)[1]);
+              return bVal - aVal;
+            default:
+              return 0;
+          }
+        });
+        
+        // Re-append sorted items
+        items.forEach(item => container.appendChild(item));
       }
       
       performClanSearch(query) {

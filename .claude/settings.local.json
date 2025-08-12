@@ -37,7 +37,10 @@
       "Bash(start chrome wallet-debug-test.html)",
       "Bash(start chrome http://localhost:8080/wallet-debug-test.html)",
       "Bash(start chrome:*)",
-      "Bash(npm run test-voting:*)"
+      "Bash(npm run test-voting:*)",
+      "Bash(timeout 5 curl -s \"http://localhost:3000\")",
+      "Bash(npm run test:coverage:*)",
+      "Bash(npx jest:*)"
     ],
     "deny": []
   }

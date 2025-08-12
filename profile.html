@@ -672,12 +672,84 @@
     </div>
   </footer>
 
+  <!-- Edit Profile Modal -->
+  <div id="edit-profile-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-gaming-surface border border-gaming-accent rounded-lg p-6 max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold text-gaming-accent">✏️ Edit Profile</h3>
+        <button id="close-edit-modal" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+      </div>
+      
+      <form id="edit-profile-form" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Display Name</label>
+            <input type="text" id="edit-display-name" class="w-full bg-gaming-bg border border-gaming-accent border-opacity-20 rounded-lg px-4 py-2 text-white focus:border-gaming-accent focus:outline-none" placeholder="Your display name">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Gaming Tag</label>
+            <input type="text" id="edit-gaming-tag" class="w-full bg-gaming-bg border border-gaming-accent border-opacity-20 rounded-lg px-4 py-2 text-white focus:border-gaming-accent focus:outline-none" placeholder="YourTag#1234">
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Bio</label>
+          <textarea id="edit-bio" rows="3" class="w-full bg-gaming-bg border border-gaming-accent border-opacity-20 rounded-lg px-4 py-2 text-white focus:border-gaming-accent focus:outline-none resize-none" placeholder="Tell others about yourself..."></textarea>
+          <div class="text-xs text-gray-400 mt-1">
+            <span id="bio-char-count">0</span>/500 characters
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Main Game</label>
+            <select id="edit-main-game" class="w-full bg-gaming-bg border border-gaming-accent border-opacity-20 rounded-lg px-4 py-2 text-white focus:border-gaming-accent focus:outline-none">
+              <option value="">Select your main game</option>
+              <option value="valorant">Valorant</option>
+              <option value="apex">Apex Legends</option>
+              <option value="fortnite">Fortnite</option>
+              <option value="csgo">CS:GO</option>
+              <option value="warzone">Call of Duty: Warzone</option>
+              <option value="overwatch">Overwatch 2</option>
+              <option value="rocket-league">Rocket League</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Skill Level</label>
+            <select id="edit-skill-level" class="w-full bg-gaming-bg border border-gaming-accent border-opacity-20 rounded-lg px-4 py-2 text-white focus:border-gaming-accent focus:outline-none">
+              <option value="">Select skill level</option>
+              <option value="casual">Casual</option>
+              <option value="competitive">Competitive</option>
+              <option value="semi-pro">Semi-Pro</option>
+              <option value="professional">Professional</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="flex space-x-3 mt-6">
+          <button type="submit" class="flex-1 bg-gaming-accent hover:bg-green-400 text-black px-4 py-2 rounded font-bold transition-colors">
+            💾 Save Changes
+          </button>
+          <button type="button" id="cancel-edit" class="flex-1 bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded font-bold transition-colors">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     // Profile Platform
     class ProfilePlatform {
       constructor() {
-        this.userProfile = {
+        // Load saved profile from localStorage or use defaults
+        const savedProfile = localStorage.getItem('mlg_user_profile');
+        this.userProfile = savedProfile ? JSON.parse(savedProfile) : {
           name: 'ProGamer2024',
+          tag: 'PG2024#1337',
+          bio: 'Competitive gamer and content creator',
+          mainGame: 'valorant',
+          skillLevel: 'competitive',
           level: 47,
           wins: 1247,
           tournaments: 23,
@@ -756,8 +828,127 @@
       }
       
       openEditModal() {
-        this.showNotification('🛠️ Profile editor opening soon!', 'info');
-        // In a real implementation, this would open a modal with editable fields
+        console.log('✏️ Opening edit profile modal...');
+        
+        // Populate form with current profile data
+        document.getElementById('edit-display-name').value = this.userProfile.name || '';
+        document.getElementById('edit-gaming-tag').value = this.userProfile.tag || '';
+        document.getElementById('edit-bio').value = this.userProfile.bio || '';
+        document.getElementById('edit-main-game').value = this.userProfile.mainGame || '';
+        document.getElementById('edit-skill-level').value = this.userProfile.skillLevel || '';
+        
+        // Update character counter
+        this.updateBioCharCounter();
+        
+        // Show modal
+        document.getElementById('edit-profile-modal').classList.remove('hidden');
+        
+        // Set up modal event listeners
+        this.setupModalEventListeners();
+      }
+      
+      setupModalEventListeners() {
+        // Close modal buttons
+        document.getElementById('close-edit-modal').onclick = () => this.closeEditModal();
+        document.getElementById('cancel-edit').onclick = () => this.closeEditModal();
+        
+        // Bio character counter
+        document.getElementById('edit-bio').addEventListener('input', () => {
+          this.updateBioCharCounter();
+        });
+        
+        // Form submission
+        document.getElementById('edit-profile-form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.saveProfileChanges();
+        });
+        
+        // Close on outside click
+        document.getElementById('edit-profile-modal').addEventListener('click', (e) => {
+          if (e.target.id === 'edit-profile-modal') {
+            this.closeEditModal();
+          }
+        });
+        
+        // Escape key to close
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && !document.getElementById('edit-profile-modal').classList.contains('hidden')) {
+            this.closeEditModal();
+          }
+        });
+      }
+      
+      closeEditModal() {
+        document.getElementById('edit-profile-modal').classList.add('hidden');
+        console.log('❌ Edit profile modal closed');
+      }
+      
+      updateBioCharCounter() {
+        const bioText = document.getElementById('edit-bio').value;
+        const charCount = bioText.length;
+        const counter = document.getElementById('bio-char-count');
+        
+        counter.textContent = charCount;
+        
+        // Update color based on character count
+        if (charCount > 450) {
+          counter.parentElement.className = counter.parentElement.className.replace(/text-gray-400|text-gaming-yellow/, 'text-gaming-red');
+        } else if (charCount > 350) {
+          counter.parentElement.className = counter.parentElement.className.replace(/text-gray-400|text-gaming-red/, 'text-gaming-yellow');
+        } else {
+          counter.parentElement.className = counter.parentElement.className.replace(/text-gaming-red|text-gaming-yellow/, 'text-gray-400');
+        }
+      }
+      
+      async saveProfileChanges() {
+        console.log('💾 Saving profile changes...');
+        
+        const formData = {
+          displayName: document.getElementById('edit-display-name').value.trim(),
+          gamingTag: document.getElementById('edit-gaming-tag').value.trim(),
+          bio: document.getElementById('edit-bio').value.trim(),
+          mainGame: document.getElementById('edit-main-game').value,
+          skillLevel: document.getElementById('edit-skill-level').value
+        };
+        
+        // Validate required fields
+        if (!formData.displayName) {
+          this.showNotification('⚠️ Display name is required!', 'warning');
+          return;
+        }
+        
+        try {
+          // Update local profile data
+          this.userProfile.name = formData.displayName;
+          this.userProfile.tag = formData.gamingTag;
+          this.userProfile.bio = formData.bio;
+          this.userProfile.mainGame = formData.mainGame;
+          this.userProfile.skillLevel = formData.skillLevel;
+          
+          // Update display
+          this.updateProfileDisplay();
+          
+          // Close modal
+          this.closeEditModal();
+          
+          // Show success notification
+          this.showNotification('✅ Profile updated successfully!', 'success');
+          
+          // Persist to localStorage for demo
+          localStorage.setItem('mlg_user_profile', JSON.stringify(this.userProfile));
+          
+          // In a real implementation, this would save to API
+          if (window.MLGApiClient && typeof window.MLGApiClient.updateProfile === 'function') {
+            await window.MLGApiClient.updateProfile(formData);
+            console.log('📡 Profile saved to server');
+          } else {
+            console.log('💾 Profile saved locally (API not available)');
+          }
+          
+        } catch (error) {
+          console.error('Failed to save profile:', error);
+          this.showNotification('❌ Failed to save profile changes', 'error');
+        }
       }
       
       shareProfile() {
