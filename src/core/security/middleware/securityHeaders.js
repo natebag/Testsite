@@ -18,6 +18,15 @@
 
 import helmet from 'helmet';
 import { createHash, randomBytes } from 'crypto';
+import { 
+  gamingCSPMiddleware, 
+  cspNonceMiddleware, 
+  cspViolationHandler,
+  gamingSecurityHeadersMiddleware,
+  createEnvironmentCSP 
+} from '../csp/csp-middleware.js';
+import { web3CSPMiddleware } from '../csp/web3-csp.js';
+import CSPViolationMonitor from '../csp/csp-monitor.js';
 
 /**
  * Security Headers Configuration
@@ -184,6 +193,23 @@ class CSRFTokenManager {
 // Initialize CSRF token manager
 const csrfTokenManager = new CSRFTokenManager();
 
+// Initialize CSP violation monitor
+const cspMonitor = new CSPViolationMonitor({
+  ALERTS: {
+    enableRealTime: process.env.CSP_REAL_TIME_ALERTS !== 'false',
+    enableEmail: process.env.CSP_EMAIL_ALERTS === 'true'
+  }
+});
+
+// Setup monitoring event handlers
+cspMonitor.on('alertTriggered', (alert) => {
+  console.warn('🚨 CSP Security Alert:', alert);
+});
+
+cspMonitor.on('suspiciousActivity', (activity) => {
+  console.warn('🔍 Suspicious CSP Activity Detected:', activity);
+});
+
 /**
  * Create Content Security Policy
  */
@@ -256,48 +282,71 @@ function createContentSecurityPolicy() {
 }
 
 /**
- * Main security headers middleware using Helmet
+ * Enhanced Security Headers Middleware with Gaming and Web3 CSP
  */
-export const securityHeadersMiddleware = helmet({
-  // Content Security Policy
-  contentSecurityPolicy: {
-    directives: createContentSecurityPolicy(),
-    reportOnly: process.env.NODE_ENV !== 'production'
-  },
+export const securityHeadersMiddleware = [
+  // Web3 and blockchain security headers
+  web3CSPMiddleware({
+    network: process.env.SOLANA_NETWORK || 'mainnet-beta',
+    enabledWallets: ['phantom', 'solflare', 'backpack'],
+    enableDeFi: true,
+    enableNFTs: true,
+    enableGamingProtocols: true
+  }),
+  
+  // CSP nonce generation
+  cspNonceMiddleware,
+  
+  // Gaming-specific security headers
+  gamingSecurityHeadersMiddleware,
+  
+  // Environment-specific CSP
+  gamingCSPMiddleware({
+    environment: process.env.NODE_ENV || 'development'
+  }),
+  
+  // CSP violation handling
+  cspViolationHandler,
+  
+  // Traditional Helmet security headers (without CSP)
+  helmet({
+    // Disable CSP here since we handle it above
+    contentSecurityPolicy: false,
 
-  // HTTP Strict Transport Security
-  hsts: SECURITY_HEADERS_CONFIG.HEADERS.HSTS,
+    // HTTP Strict Transport Security
+    hsts: SECURITY_HEADERS_CONFIG.HEADERS.HSTS,
 
-  // X-Frame-Options
-  frameguard: {
-    action: 'deny'
-  },
+    // X-Frame-Options
+    frameguard: {
+      action: 'deny'
+    },
 
-  // X-Content-Type-Options
-  noSniff: true,
+    // X-Content-Type-Options
+    noSniff: true,
 
-  // X-XSS-Protection
-  xssFilter: true,
+    // X-XSS-Protection
+    xssFilter: true,
 
-  // Referrer Policy
-  referrerPolicy: {
-    policy: SECURITY_HEADERS_CONFIG.HEADERS.REFERRER_POLICY
-  },
+    // Referrer Policy
+    referrerPolicy: {
+      policy: SECURITY_HEADERS_CONFIG.HEADERS.REFERRER_POLICY
+    },
 
-  // Remove X-Powered-By header
-  hidePoweredBy: true,
+    // Remove X-Powered-By header
+    hidePoweredBy: true,
 
-  // DNS Prefetch Control
-  dnsPrefetchControl: {
-    allow: false
-  },
+    // DNS Prefetch Control
+    dnsPrefetchControl: {
+      allow: false
+    },
 
-  // Expect-CT (deprecated but still useful for older browsers)
-  expectCt: {
-    enforce: true,
-    maxAge: 86400 // 24 hours
-  }
-});
+    // Expect-CT (deprecated but still useful for older browsers)
+    expectCt: {
+      enforce: true,
+      maxAge: 86400 // 24 hours
+    }
+  })
+];
 
 /**
  * Gaming-specific security headers middleware
@@ -534,11 +583,21 @@ export const web3SecurityHeaders = (req, res, next) => {
 export const getCSRFTokenManager = () => csrfTokenManager;
 
 /**
- * Cleanup function for graceful shutdown
+ * Get CSP violation monitor instance
+ */
+export const getCSPMonitor = () => cspMonitor;
+
+/**
+ * Enhanced cleanup function for graceful shutdown
  */
 export const cleanup = () => {
   if (csrfTokenManager.cleanupInterval) {
     clearInterval(csrfTokenManager.cleanupInterval);
+  }
+  
+  // Cleanup CSP monitor
+  if (cspMonitor) {
+    cspMonitor.shutdown();
   }
 };
 
@@ -551,5 +610,13 @@ export default {
   securityMonitoringMiddleware,
   web3SecurityHeaders,
   getCSRFTokenManager,
-  cleanup
+  getCSPMonitor,
+  cleanup,
+  // New CSP system exports
+  gamingCSPMiddleware,
+  cspNonceMiddleware,
+  cspViolationHandler,
+  gamingSecurityHeadersMiddleware,
+  createEnvironmentCSP,
+  web3CSPMiddleware
 };

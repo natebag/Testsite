@@ -27,10 +27,10 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: [['@babel/preset-env', { targets: { node: 'current' }, modules: 'commonjs' }]] }],
   },
   transformIgnorePatterns: [
-    'node_modules/(?!(uuid|@solana)/)'
+    'node_modules/(?!(uuid|@solana|@jest)/)'
   ],
   resetModules: true,
   clearMocks: true,

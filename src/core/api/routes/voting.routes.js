@@ -14,6 +14,8 @@ import { VotingController } from '../controllers/voting.controller.js';
 import { validate, schemas } from '../middleware/validation.middleware.js';
 import { authMiddleware, optionalAuthMiddleware, requireRole } from '../middleware/auth.middleware.js';
 import { rateLimiterMiddleware } from '../middleware/rateLimiter.middleware.js';
+import { gamingRateLimiterMiddleware } from '../middleware/gaming-rate-limiter.js';
+import { web3RateLimiterMiddleware } from '../middleware/web3-rate-limiter.js';
 
 const router = express.Router();
 
@@ -32,7 +34,7 @@ const router = express.Router();
  */
 router.post('/votes/purchase',
   authMiddleware,
-  rateLimiterMiddleware('voting'),
+  web3RateLimiterMiddleware('burn_to_vote'),
   validate(schemas.voting.purchaseVotes),
   VotingController.purchaseVotes
 );
@@ -49,7 +51,7 @@ router.post('/votes/purchase',
  */
 router.post('/votes/cast',
   authMiddleware,
-  rateLimiterMiddleware('voting'),
+  gamingRateLimiterMiddleware('voting'),
   validate(schemas.voting.castVote),
   VotingController.castVote
 );
@@ -63,7 +65,7 @@ router.post('/votes/cast',
  */
 router.get('/votes/daily',
   authMiddleware,
-  rateLimiterMiddleware('user'),
+  gamingRateLimiterMiddleware('general'),
   VotingController.getDailyVoteStatus
 );
 
@@ -86,7 +88,7 @@ router.get('/votes/daily',
  */
 router.post('/proposals',
   authMiddleware,
-  rateLimiterMiddleware('user'),
+  gamingRateLimiterMiddleware('general'),
   validate(schemas.voting.proposal),
   VotingController.createProposal
 );
@@ -106,7 +108,7 @@ router.post('/proposals',
  */
 router.get('/proposals',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('search'),
+  gamingRateLimiterMiddleware('general'),
   VotingController.getProposals
 );
 
@@ -119,7 +121,7 @@ router.get('/proposals',
  */
 router.get('/proposals/:id',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('user'),
+  gamingRateLimiterMiddleware('general'),
   VotingController.getProposal
 );
 
@@ -135,7 +137,7 @@ router.get('/proposals/:id',
  */
 router.post('/proposals/:id/vote',
   authMiddleware,
-  rateLimiterMiddleware('voting'),
+  gamingRateLimiterMiddleware('voting'),
   validate(schemas.voting.voteProposal),
   VotingController.voteOnProposal
 );
@@ -150,7 +152,7 @@ router.post('/proposals/:id/vote',
  */
 router.get('/proposals/:id/results',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('user'),
+  gamingRateLimiterMiddleware('general'),
   VotingController.getProposalResults
 );
 
@@ -172,7 +174,7 @@ router.get('/proposals/:id/results',
  */
 router.get('/history',
   authMiddleware,
-  rateLimiterMiddleware('user'),
+  gamingRateLimiterMiddleware('general'),
   VotingController.getVotingHistory
 );
 
@@ -187,7 +189,7 @@ router.get('/history',
  */
 router.get('/stats',
   authMiddleware,
-  rateLimiterMiddleware('user'),
+  gamingRateLimiterMiddleware('general'),
   VotingController.getVotingStats
 );
 
@@ -202,7 +204,7 @@ router.get('/stats',
  */
 router.get('/trending',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('search'),
+  gamingRateLimiterMiddleware('general'),
   VotingController.getTrendingContent
 );
 
@@ -216,7 +218,7 @@ router.get('/trending',
  */
 router.get('/leaderboard',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('user'),
+  gamingRateLimiterMiddleware('general'),
   async (req, res, next) => {
     try {
       const { period = '30d', limit = 50 } = req.query;
@@ -256,7 +258,7 @@ router.get('/leaderboard',
  */
 router.get('/user/:userId/votes',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('user'),
+  gamingRateLimiterMiddleware('general'),
   async (req, res, next) => {
     try {
       const { userId } = req.params;
@@ -296,7 +298,7 @@ router.get('/user/:userId/votes',
  */
 router.get('/content/:contentId/votes',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('user'),
+  gamingRateLimiterMiddleware('general'),
   async (req, res, next) => {
     try {
       const { contentId } = req.params;
@@ -338,7 +340,7 @@ router.get('/content/:contentId/votes',
  */
 router.post('/proposals/:id/close',
   authMiddleware,
-  rateLimiterMiddleware('user'),
+  gamingRateLimiterMiddleware('general'),
   async (req, res, next) => {
     try {
       const { id: proposalId } = req.params;
@@ -398,7 +400,7 @@ router.post('/proposals/:id/close',
  */
 router.get('/rewards/pending',
   authMiddleware,
-  rateLimiterMiddleware('user'),
+  gamingRateLimiterMiddleware('general'),
   async (req, res, next) => {
     try {
       const votingRepository = req.services.votingRepository;

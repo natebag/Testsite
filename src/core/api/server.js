@@ -22,6 +22,11 @@ import { authMiddleware } from './middleware/auth.middleware.js';
 import { validationMiddleware } from './middleware/validation.middleware.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
 import { rateLimiterMiddleware } from './middleware/rateLimiter.middleware.js';
+import { configureComprehensiveRateLimiting } from './middleware/comprehensive-rate-limiter.js';
+import { rateLimitAnalyticsMiddleware } from './middleware/rate-limit-analytics.js';
+
+// Import DDoS protection
+import { configureDDoSProtection, getDDoSProtectionStatus } from '../security/ddos/ddos-integration.js';
 
 // Import route modules
 import authRoutes from './routes/auth.routes.js';
@@ -151,7 +156,7 @@ class MLGApiServer {
   /**
    * Configure Express middleware
    */
-  setupMiddleware() {
+  async setupMiddleware() {
     // Security middleware
     this.app.use(helmet({
       contentSecurityPolicy: {
@@ -183,8 +188,8 @@ class MLGApiServer {
     // Compression
     this.app.use(compression());
     
-    // Global rate limiting
-    this.app.use(rateLimit(this.options.GLOBAL_RATE_LIMIT));
+    // Configure comprehensive DDoS protection (includes rate limiting)
+    await configureDDoSProtection(this.app);
     
     // Body parsing
     this.app.use(express.json({
@@ -245,6 +250,7 @@ class MLGApiServer {
         api: 'ok',
         database: 'unknown',
         redis: 'unknown',
+        ddos_protection: getDDoSProtectionStatus(),
         timestamp: new Date().toISOString()
       };
       
@@ -385,7 +391,7 @@ class MLGApiServer {
       await this.initializeServices();
       
       // Setup middleware and routes
-      this.setupMiddleware();
+      await this.setupMiddleware();
       this.setupRoutes();
       this.setupSocketIO();
       this.setupErrorHandling();

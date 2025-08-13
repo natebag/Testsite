@@ -19,6 +19,7 @@ import {
   requireClanRole 
 } from '../middleware/auth.middleware.js';
 import { rateLimiterMiddleware } from '../middleware/rateLimiter.middleware.js';
+import { gamingRateLimiterMiddleware } from '../middleware/gaming-rate-limiter.js';
 
 const router = express.Router();
 
@@ -41,7 +42,7 @@ const router = express.Router();
  */
 router.post('/',
   authMiddleware,
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   validate(schemas.clan.create),
   ClanController.createClan
 );
@@ -65,7 +66,7 @@ router.post('/',
  */
 router.get('/',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('search'),
+  gamingRateLimiterMiddleware('general'),
   validate(schemas.clan.search, 'query'),
   ClanController.getClans
 );
@@ -81,7 +82,7 @@ router.get('/',
  */
 router.get('/leaderboard',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   ClanController.getClanLeaderboard
 );
 
@@ -97,7 +98,7 @@ router.get('/leaderboard',
  */
 router.get('/:id',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   ClanController.getClan
 );
 
@@ -119,7 +120,7 @@ router.get('/:id',
 router.put('/:id',
   authMiddleware,
   requireClanRole('admin'),
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   validate(schemas.clan.update),
   ClanController.updateClan
 );
@@ -135,7 +136,7 @@ router.put('/:id',
  */
 router.post('/:id/join',
   authMiddleware,
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   validate(schemas.clan.join),
   ClanController.joinClan
 );
@@ -151,7 +152,7 @@ router.post('/:id/join',
 router.post('/:id/leave',
   authMiddleware,
   requireClanMembership(),
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   ClanController.leaveClan
 );
 
@@ -169,7 +170,7 @@ router.post('/:id/leave',
 router.post('/:id/invite',
   authMiddleware,
   requireClanRole('moderator'),
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   validate(schemas.clan.invite),
   ClanController.inviteMember
 );
@@ -187,7 +188,7 @@ router.post('/:id/invite',
 router.post('/:id/kick',
   authMiddleware,
   requireClanRole('admin'),
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   validate(schemas.clan.kick),
   ClanController.kickMember
 );
@@ -205,7 +206,7 @@ router.post('/:id/kick',
 router.put('/:id/members/:userId/role',
   authMiddleware,
   requireClanRole('admin'),
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   validate(schemas.clan.roleUpdate),
   ClanController.updateMemberRole
 );
@@ -219,7 +220,7 @@ router.put('/:id/members/:userId/role',
  */
 router.get('/:id/stats',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   ClanController.getClanStats
 );
 
@@ -233,7 +234,7 @@ router.get('/:id/stats',
  */
 router.get('/:id/members',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   async (req, res, next) => {
     try {
       const { id: clanId } = req.params;
@@ -284,7 +285,7 @@ router.get('/:id/members',
 router.get('/:id/invitations',
   authMiddleware,
   requireClanMembership(),
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   async (req, res, next) => {
     try {
       const { id: clanId } = req.params;
@@ -324,7 +325,7 @@ router.get('/:id/invitations',
  */
 router.post('/:id/invitations/:invitationId/respond',
   authMiddleware,
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   async (req, res, next) => {
     try {
       const { id: clanId, invitationId } = req.params;
@@ -388,7 +389,7 @@ router.post('/:id/invitations/:invitationId/respond',
  */
 router.get('/:id/activity',
   optionalAuthMiddleware,
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   async (req, res, next) => {
     try {
       const { id: clanId } = req.params;
@@ -428,7 +429,7 @@ router.get('/:id/activity',
 router.post('/:id/transfer-ownership',
   authMiddleware,
   requireClanRole('owner'),
-  rateLimiterMiddleware('clan'),
+  gamingRateLimiterMiddleware('clans'),
   async (req, res, next) => {
     try {
       const { id: clanId } = req.params;
