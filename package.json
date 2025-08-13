@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
+    "start:simple": "node simple-server.js",
     "dev": "nodemon server.js",
     "dev:frontend": "vite --config build/vite.config.js",
     "build": "npm run type:check && node build/build.js",
