@@ -30,6 +30,9 @@
   <link rel="icon" type="image/png" sizes="32x32" href="../assets/icons/icon-192x192.png">
   <link rel="icon" type="image/png" sizes="16x16" href="../assets/icons/icon-192x192.png">
   
+  <!-- MLG Official Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Play:wght@400;700&family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <!-- External Dependencies -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -42,6 +45,14 @@
 
   <!-- MLG Application Bundle (Vite) -->
   <script type="module" src="../../src/main.js"></script>
+  <script type="module" src="../../src/shared/components/mlg-branding-system.js"></script>
+  <script type="module" src="../../src/core/auth/mlg-username-tagging-service.js"></script>
+  <script type="module" src="../../src/shared/utils/mlg-branding-init.js"></script>
+  
+  <!-- MLG Tag Enforcement System (Task 21.5) -->
+  <script type="module" src="../../src/core/auth/mlg-tag-enforcement-system.js"></script>
+  <script type="module" src="../../src/core/auth/mlg-platform-tag-integration.js"></script>
+  <script type="module" src="../../src/core/auth/mlg-tag-enforcement-init.js"></script>
   <meta name="mlg-wallet-auto-init" content="true">
   
   <!-- Tailwind Configuration -->
@@ -49,6 +60,14 @@
     tailwind.config = {
       theme: {
         extend: {
+          fontFamily: {
+            'mlg-primary': ['Rajdhani', 'Segoe UI', 'system-ui', '-apple-system', 'sans-serif'],
+            'mlg-heading': ['Orbitron', 'Segoe UI', 'system-ui', 'sans-serif'],
+            'mlg-display': ['Exo 2', 'Orbitron', 'system-ui', 'sans-serif'],
+            'mlg-gaming': ['Play', 'Rajdhani', 'monospace', 'system-ui'],
+            'mlg-mono': ['Fira Code', 'SF Mono', 'Monaco', 'Cascadia Code', 'monospace'],
+            'sans': ['Rajdhani', 'Segoe UI', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif']
+          },
           colors: {
             'gaming-bg': '#0a0a0f',
             'gaming-surface': '#1a1a2e',
@@ -56,7 +75,19 @@
             'gaming-purple': '#8b5cf6',
             'gaming-blue': '#3b82f6',
             'gaming-yellow': '#fbbf24',
-            'gaming-red': '#ef4444'
+            'gaming-red': '#ef4444',
+            'mlg': {
+              'text-primary': '#ffffff',
+              'text-secondary': '#e5e5e5',
+              'text-tertiary': '#cccccc',
+              'text-muted': '#999999',
+              'text-disabled': '#666666',
+              'text-accent': '#00ff88',
+              'text-brand': '#00d4ff',
+              'text-warning': '#fbbf24',
+              'text-error': '#ef4444',
+              'text-success': '#10b981'
+            }
           },
           animation: {
             'pulse-neon': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
@@ -589,30 +620,37 @@
           </div>
         </div>
 
-        <!-- User Profile -->
-        <div class="card-glow rounded-xl p-8 hover:scale-105 transition-transform cursor-pointer" onclick="navigateToSection('profile')">
+        <!-- MLG User Profile -->
+        <div class="card-glow rounded-xl p-8 hover:scale-105 transition-transform cursor-pointer mlg-branding" onclick="navigateToSection('profile')" data-mlg-branding="card">
           <div class="flex items-center mb-6">
-            <div class="w-12 h-12 bg-gradient-to-r from-gaming-accent to-gaming-blue rounded-lg flex items-center justify-center mr-4">
-              <i data-lucide="user" class="w-6 h-6 text-white"></i>
+            <div class="relative">
+              <div class="w-12 h-12 bg-gradient-to-r from-gaming-accent to-gaming-blue rounded-lg flex items-center justify-center mr-4 border-2 border-gaming-accent border-opacity-50">
+                <i data-lucide="user" class="w-6 h-6 text-white"></i>
+              </div>
+              <div class="absolute -top-1 -right-1 bg-gaming-accent text-black text-xs font-bold px-1 rounded-full border border-gaming-bg">
+                MLG
+              </div>
             </div>
             <div>
-              <h3 class="text-xl font-bold text-transparent bg-gradient-to-r from-gaming-accent to-gaming-blue bg-clip-text">User Profile</h3>
-              <p class="text-gray-400 text-sm">Gaming Profile Management</p>
+              <h3 class="text-xl font-bold text-transparent bg-gradient-to-r from-gaming-accent to-gaming-blue bg-clip-text">
+                🏆 MLG User Profile
+              </h3>
+              <p class="text-gaming-blue text-sm font-semibold">Elite Gaming Profile Management</p>
             </div>
           </div>
-          <p class="text-gray-300 mb-4">Manage your gaming profile, achievements, wallet, clan memberships, and personal statistics.</p>
+          <p class="text-gray-300 mb-4">Manage your <span class="text-gaming-accent font-semibold">MLG gaming profile</span>, achievements, wallet, clan memberships, and elite gaming statistics.</p>
           <div class="space-y-2 text-sm">
             <div class="flex justify-between">
-              <span class="text-gray-400">Profile Level</span>
-              <span class="text-gaming-yellow font-bold">47</span>
+              <span class="text-gray-400">MLG Level</span>
+              <span class="text-gaming-yellow font-bold">47 🏆</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-gray-400">Achievements</span>
-              <span class="text-gaming-blue font-bold">23</span>
+              <span class="text-gray-400">MLG Achievements</span>
+              <span class="text-gaming-blue font-bold">23 ⭐</span>
             </div>
             <div class="flex justify-between">
-              <span class="text-gray-400">Status</span>
-              <span class="text-gaming-accent font-bold">Online</span>
+              <span class="text-gray-400">Elite Status</span>
+              <span class="text-gaming-accent font-bold">🎯 Online</span>
             </div>
           </div>
         </div>

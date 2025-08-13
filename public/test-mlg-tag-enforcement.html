@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLG Tag Enforcement System Test Page</title>
+  
+  <!-- MLG Official Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Play:wght@400;700&family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- MLG Typography System -->
+  <style>
+    /* Import MLG Typography System CSS Variables */
+    :root {
+      /* MLG Font Families */
+      --mlg-font-primary: 'Rajdhani', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --mlg-font-heading: 'Orbitron', 'Segoe UI', system-ui, sans-serif;
+      --mlg-font-display: 'Exo 2', 'Orbitron', system-ui, sans-serif;
+      --mlg-font-gaming: 'Play', 'Rajdhani', monospace, system-ui;
+      --mlg-font-mono: 'Fira Code', 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+      
+      /* MLG Colors */
+      --mlg-text-primary: #ffffff;
+      --mlg-text-secondary: #e5e5e5;
+      --mlg-text-accent: #00ff88;
+      --mlg-text-brand: #00d4ff;
+      --mlg-text-error: #ef4444;
+      --mlg-bg-surface: #1a1a2e;
+      --mlg-bg-primary: #0a0a0f;
+    }
+    
+    body {
+      font-family: var(--mlg-font-primary);
+      background: var(--mlg-bg-primary);
+      color: var(--mlg-text-primary);
+    }
+    
+    .mlg-tag {
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      color: var(--mlg-text-brand);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.875rem;
+      margin-right: 4px;
+    }
+    
+    .mlg-username {
+      color: var(--mlg-text-primary);
+      font-weight: 600;
+    }
+    
+    .mlg-username-tagged {
+      color: var(--mlg-text-accent);
+      text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+    }
+    
+    .test-section {
+      background: var(--mlg-bg-surface);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .test-case {
+      background: rgba(26, 26, 46, 0.5);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 0.5rem 0;
+    }
+    
+    .violation-indicator {
+      color: var(--mlg-text-error);
+      font-weight: bold;
+    }
+    
+    .success-indicator {
+      color: var(--mlg-text-accent);
+      font-weight: bold;
+    }
+    
+    .btn-test {
+      background: linear-gradient(45deg, var(--mlg-text-accent), #16c60c);
+      color: black;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 0.25rem;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-test:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+    
+    .code-block {
+      background: #000;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      font-family: var(--mlg-font-mono);
+      font-size: 0.875rem;
+      overflow-x: auto;
+    }
+    
+    .metrics-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--mlg-bg-surface);
+      border: 1px solid var(--mlg-text-accent);
+      border-radius: 8px;
+      padding: 1rem;
+      min-width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-6">
+  <!-- Header -->
+  <div class="text-center mb-8">
+    <h1 class="text-4xl font-bold mb-4" style="font-family: var(--mlg-font-heading); color: var(--mlg-text-accent);">
+      MLG TAG ENFORCEMENT SYSTEM
+    </h1>
+    <p class="text-lg" style="color: var(--mlg-text-secondary);">
+      Task 21.5 - Comprehensive Tag Validation and Enforcement Testing
+    </p>
+    <div id="initialization-status" class="mt-4 p-3 rounded-lg" style="background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.3);">
+      <span class="violation-indicator">⏳ Initializing enforcement system...</span>
+    </div>
+  </div>
+
+  <!-- Control Panel -->
+  <div class="test-section">
+    <h2 class="text-2xl font-bold mb-4" style="font-family: var(--mlg-font-heading);">🎮 Control Panel</h2>
+    <div class="flex flex-wrap gap-4">
+      <button id="btn-run-security-tests" class="btn-test">🛡️ Run Security Tests</button>
+      <button id="btn-run-performance-tests" class="btn-test">⚡ Run Performance Tests</button>
+      <button id="btn-run-validation-tests" class="btn-test">✅ Run Validation Tests</button>
+      <button id="btn-run-full-suite" class="btn-test">🧪 Run Full Test Suite</button>
+      <button id="btn-scan-platform" class="btn-test">🔍 Scan Platform</button>
+      <button id="btn-clear-results" class="btn-test">🧹 Clear Results</button>
+    </div>
+  </div>
+
+  <!-- Test Cases Section -->
+  <div class="test-section">
+    <h2 class="text-2xl font-bold mb-4" style="font-family: var(--mlg-font-heading);">🧪 Live Test Cases</h2>
+    
+    <!-- Authorized Users -->
+    <div class="test-case">
+      <h3 class="text-lg font-bold mb-2">Authorized MLG Members</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="voting-interface">
+          <span class="username mlg-username" data-user-id="auth_user_1">ProGamer123</span>
+        </div>
+        <div class="clan-roster">
+          <span class="username mlg-username" data-user-id="auth_user_2">MLG_Player</span>
+        </div>
+        <div class="user-profile">
+          <span class="username mlg-username" data-user-id="auth_user_3">ClanLeader</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unauthorized Users with Fake Tags -->
+    <div class="test-case">
+      <h3 class="text-lg font-bold mb-2">Unauthorized Users (Should be Corrected)</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="voting-interface">
+          <span class="username" data-user-id="unauth_user_1">[MLG] FakeMLGMember</span>
+        </div>
+        <div class="clan-roster">
+          <span class="username" data-user-id="unauth_user_2">[ADMIN] FakeAdmin</span>
+        </div>
+        <div class="user-profile">
+          <span class="username" data-user-id="unauth_user_3">[MOD] FakeMod</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- XSS Injection Attempts -->
+    <div class="test-case">
+      <h3 class="text-lg font-bold mb-2">Security Test Cases (XSS Prevention)</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="voting-interface">
+          <span class="username" data-user-id="xss_user_1">&lt;script&gt;alert("xss")&lt;/script&gt;</span>
+        </div>
+        <div class="clan-roster">
+          <span class="username" data-user-id="xss_user_2">User&lt;img src=x onerror=alert(1)&gt;</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance Test Cases -->
+    <div class="test-case">
+      <h3 class="text-lg font-bold mb-2">Performance Test Cases</h3>
+      <div id="performance-test-container" class="grid grid-cols-1 md:grid-cols-4 gap-2">
+        <!-- Will be populated by performance tests -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Section -->
+  <div class="test-section">
+    <h2 class="text-2xl font-bold mb-4" style="font-family: var(--mlg-font-heading);">📊 Test Results</h2>
+    <div id="test-results" class="space-y-4">
+      <p style="color: var(--mlg-text-secondary);">Run tests to see results here...</p>
+    </div>
+  </div>
+
+  <!-- Live Demo Section -->
+  <div class="test-section">
+    <h2 class="text-2xl font-bold mb-4" style="font-family: var(--mlg-font-heading);">🎮 Live Enforcement Demo</h2>
+    <div class="space-y-4">
+      <div>
+        <label class="block mb-2">Test Username:</label>
+        <input id="demo-username" type="text" placeholder="Enter username to test..." 
+               class="w-full p-3 rounded-lg bg-black border border-gray-600 text-white">
+      </div>
+      <div>
+        <label class="block mb-2">User ID:</label>
+        <input id="demo-user-id" type="text" placeholder="Enter user ID..." 
+               class="w-full p-3 rounded-lg bg-black border border-gray-600 text-white">
+      </div>
+      <div class="flex gap-4">
+        <button id="btn-test-enforcement" class="btn-test">🧪 Test Enforcement</button>
+        <button id="btn-authorize-user" class="btn-test">✅ Authorize User</button>
+        <button id="btn-deauthorize-user" class="btn-test">❌ Deauthorize User</button>
+      </div>
+      <div id="demo-result" class="code-block">
+        <span style="color: var(--mlg-text-secondary);">Enter username and user ID above, then click "Test Enforcement" to see results...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documentation Section -->
+  <div class="test-section">
+    <h2 class="text-2xl font-bold mb-4" style="font-family: var(--mlg-font-heading);">📚 Implementation Details</h2>
+    <div class="space-y-4">
+      <div>
+        <h3 class="text-lg font-bold">Components Implemented:</h3>
+        <ul class="list-disc list-inside space-y-1 mt-2" style="color: var(--mlg-text-secondary);">
+          <li><strong>MLGTagEnforcementSystem:</strong> Core enforcement logic with security validation</li>
+          <li><strong>MLGPlatformTagIntegration:</strong> Platform-wide integration and coordination</li>
+          <li><strong>MLGTagEnforcementTestSuite:</strong> Comprehensive testing framework</li>
+          <li><strong>MLGTaggingValidator:</strong> Validation rules and compliance checking</li>
+          <li><strong>MLGTagEnforcementInit:</strong> Initialization and coordination system</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold">Security Features:</h3>
+        <ul class="list-disc list-inside space-y-1 mt-2" style="color: var(--mlg-text-secondary);">
+          <li>XSS injection prevention and sanitization</li>
+          <li>Tag spoofing detection and removal</li>
+          <li>Unauthorized tag enforcement</li>
+          <li>Unicode attack normalization</li>
+          <li>Buffer overflow protection</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-lg font-bold">Performance Features:</h3>
+        <ul class="list-disc list-inside space-y-1 mt-2" style="color: var(--mlg-text-secondary);">
+          <li>Batch processing optimization</li>
+          <li>Intelligent caching system</li>
+          <li>Memory usage monitoring</li>
+          <li>Mobile-optimized processing</li>
+          <li>Real-time performance metrics</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real-time Metrics Panel -->
+  <div id="metrics-panel" class="metrics-panel">
+    <h3 class="text-lg font-bold mb-2" style="color: var(--mlg-text-accent);">📊 Live Metrics</h3>
+    <div id="metrics-content">
+      <p style="color: var(--mlg-text-secondary);">Waiting for system initialization...</p>
+    </div>
+  </div>
+
+  <!-- MLG Tag Enforcement System Scripts -->
+  <script type="module">
+    import { initializeMLGTagEnforcement } from '../src/core/auth/mlg-tag-enforcement-init.js';
+    import { MLGTagEnforcementTestSuite } from '../src/core/auth/mlg-tag-enforcement-test-suite.js';
+
+    // Global state
+    let enforcementSystem = null;
+    let platformIntegration = null;
+    let testSuite = null;
+    let metricsInterval = null;
+
+    // Initialize enforcement system
+    async function initializeSystem() {
+      try {
+        console.log('🚀 Initializing MLG Tag Enforcement System...');
+        
+        const result = await initializeMLGTagEnforcement({
+          mode: 'testing',
+          logger: console,
+          FEATURES: {
+            ENFORCEMENT: true,
+            VALIDATION: true,
+            MONITORING: true,
+            TESTING: true,
+            ANALYTICS: true,
+            DEBUGGING: true
+          }
+        });
+
+        // Get system references
+        enforcementSystem = window.MLGTagEnforcementInit?.enforcementSystem;
+        platformIntegration = window.MLGTagEnforcementInit?.platformIntegration;
+        
+        // Initialize test suite
+        testSuite = new MLGTagEnforcementTestSuite({
+          logger: console
+        });
+
+        // Add authorized users for testing
+        if (enforcementSystem) {
+          enforcementSystem.addAuthorizedUser('auth_user_1');
+          enforcementSystem.addAuthorizedUser('auth_user_2');
+          enforcementSystem.addAuthorizedUser('auth_user_3');
+        }
+
+        updateInitializationStatus(result);
+        setupEventHandlers();
+        startMetricsMonitoring();
+        
+        console.log('✅ MLG Tag Enforcement System initialized successfully');
+        
+      } catch (error) {
+        console.error('❌ Initialization failed:', error);
+        updateInitializationStatus({ success: false, error: error.message });
+      }
+    }
+
+    // Update initialization status
+    function updateInitializationStatus(result) {
+      const statusElement = document.getElementById('initialization-status');
+      
+      if (result.success) {
+        statusElement.innerHTML = `
+          <span class="success-indicator">✅ Enforcement system initialized successfully</span>
+          <div class="text-sm mt-2" style="color: var(--mlg-text-secondary);">
+            Systems: ${Object.keys(result.systems).filter(k => result.systems[k]).join(', ')}
+          </div>
+        `;
+        statusElement.style.background = 'rgba(0, 255, 136, 0.1)';
+        statusElement.style.borderColor = 'rgba(0, 255, 136, 0.3)';
+      } else {
+        statusElement.innerHTML = `
+          <span class="violation-indicator">❌ Initialization failed: ${result.error || 'Unknown error'}</span>
+        `;
+      }
+    }
+
+    // Setup event handlers
+    function setupEventHandlers() {
+      // Test buttons
+      document.getElementById('btn-run-security-tests').onclick = runSecurityTests;
+      document.getElementById('btn-run-performance-tests').onclick = runPerformanceTests;
+      document.getElementById('btn-run-validation-tests').onclick = runValidationTests;
+      document.getElementById('btn-run-full-suite').onclick = runFullTestSuite;
+      document.getElementById('btn-scan-platform').onclick = scanPlatform;
+      document.getElementById('btn-clear-results').onclick = clearResults;
+
+      // Demo buttons
+      document.getElementById('btn-test-enforcement').onclick = testEnforcement;
+      document.getElementById('btn-authorize-user').onclick = authorizeUser;
+      document.getElementById('btn-deauthorize-user').onclick = deauthorizeUser;
+
+      // Listen for enforcement events
+      if (enforcementSystem) {
+        enforcementSystem.on('tag_violation', (violation) => {
+          addTestResult('Security', `Violation detected: ${violation.violationType}`, false, violation);
+        });
+
+        enforcementSystem.on('element_enforced', (data) => {
+          addTestResult('Enforcement', `Element corrected: ${data.result.action}`, true, data);
+        });
+      }
+    }
+
+    // Start metrics monitoring
+    function startMetricsMonitoring() {
+      metricsInterval = setInterval(() => {
+        updateMetricsPanel();
+      }, 2000);
+    }
+
+    // Update metrics panel
+    function updateMetricsPanel() {
+      const metricsContent = document.getElementById('metrics-content');
+      
+      if (!enforcementSystem) {
+        metricsContent.innerHTML = '<p style="color: var(--mlg-text-error);">System not initialized</p>';
+        return;
+      }
+
+      const stats = enforcementSystem.getStatistics();
+      const initStats = window.MLGTagEnforcementInit?.getStatus();
+
+      metricsContent.innerHTML = `
+        <div class="space-y-2 text-sm">
+          <div><strong>Processed Tags:</strong> ${stats.processed || 0}</div>
+          <div><strong>Violations:</strong> ${stats.violations || 0}</div>
+          <div><strong>Corrections:</strong> ${stats.corrections || 0}</div>
+          <div><strong>Authorized Users:</strong> ${stats.authorizedUsers || 0}</div>
+          <div><strong>Cache Size:</strong> ${stats.processedTags || 0}</div>
+          <div><strong>Average Time:</strong> ${(stats.averageProcessingTime || 0).toFixed(2)}ms</div>
+          <div><strong>Memory Usage:</strong> ${Math.round((stats.memoryUsage?.used || 0) / 1024 / 1024)}MB</div>
+          <div><strong>Uptime:</strong> ${Math.round((initStats?.uptime || 0) / 1000)}s</div>
+        </div>
+      `;
+    }
+
+    // Test functions
+    async function runSecurityTests() {
+      if (!testSuite) return;
+      
+      addTestResult('Security', 'Starting security tests...', true);
+      
+      try {
+        await testSuite.runSecurityTests();
+        addTestResult('Security', 'Security tests completed', true);
+      } catch (error) {
+        addTestResult('Security', `Security tests failed: ${error.message}`, false);
+      }
+    }
+
+    async function runPerformanceTests() {
+      if (!testSuite) return;
+      
+      addTestResult('Performance', 'Starting performance tests...', true);
+      
+      try {
+        await testSuite.runPerformanceTests();
+        addTestResult('Performance', 'Performance tests completed', true);
+        
+        // Add performance test elements
+        const container = document.getElementById('performance-test-container');
+        container.innerHTML = '';
+        
+        for (let i = 0; i < 100; i++) {
+          const element = document.createElement('div');
+          element.className = 'voting-interface';
+          element.innerHTML = `<span class="username" data-user-id="perf_user_${i}">PerfUser${i}</span>`;
+          container.appendChild(element);
+        }
+        
+      } catch (error) {
+        addTestResult('Performance', `Performance tests failed: ${error.message}`, false);
+      }
+    }
+
+    async function runValidationTests() {
+      if (!testSuite) return;
+      
+      addTestResult('Validation', 'Starting validation tests...', true);
+      
+      try {
+        await testSuite.runValidationTests();
+        addTestResult('Validation', 'Validation tests completed', true);
+      } catch (error) {
+        addTestResult('Validation', `Validation tests failed: ${error.message}`, false);
+      }
+    }
+
+    async function runFullTestSuite() {
+      if (!testSuite) return;
+      
+      addTestResult('Full Suite', 'Starting complete test suite...', true);
+      
+      try {
+        const result = await testSuite.runCompleteTestSuite({
+          enforcementSystem,
+          platformIntegration
+        });
+        
+        addTestResult('Full Suite', 
+          `Test suite completed: ${result.summary.passedTests}/${result.summary.totalTests} passed (${result.summary.successRate}%)`, 
+          result.summary.successRate >= 80, result);
+          
+      } catch (error) {
+        addTestResult('Full Suite', `Test suite failed: ${error.message}`, false);
+      }
+    }
+
+    async function scanPlatform() {
+      if (!enforcementSystem) return;
+      
+      addTestResult('Platform Scan', 'Starting platform scan...', true);
+      
+      try {
+        const result = await enforcementSystem.scanPlatform();
+        addTestResult('Platform Scan', 
+          `Scan completed: ${result.scannedElements} elements, ${result.violations} violations, ${result.corrections} corrections`, 
+          result.violations === 0, result);
+          
+      } catch (error) {
+        addTestResult('Platform Scan', `Platform scan failed: ${error.message}`, false);
+      }
+    }
+
+    function clearResults() {
+      document.getElementById('test-results').innerHTML = 
+        '<p style="color: var(--mlg-text-secondary);">Results cleared. Run tests to see new results...</p>';
+    }
+
+    // Demo functions
+    function testEnforcement() {
+      const username = document.getElementById('demo-username').value;
+      const userId = document.getElementById('demo-user-id').value;
+      
+      if (!username || !userId || !enforcementSystem) {
+        return;
+      }
+      
+      const result = enforcementSystem.enforceTag(username, userId);
+      
+      document.getElementById('demo-result').innerHTML = `
+        <div><strong>Original Username:</strong> ${result.originalUsername}</div>
+        <div><strong>Enforced Username:</strong> ${result.enforcedUsername}</div>
+        <div><strong>Action:</strong> ${result.action}</div>
+        <div><strong>Violation:</strong> ${result.violation || 'None'}</div>
+        <div><strong>Success:</strong> ${result.success}</div>
+      `;
+    }
+
+    function authorizeUser() {
+      const userId = document.getElementById('demo-user-id').value;
+      
+      if (!userId || !enforcementSystem) {
+        return;
+      }
+      
+      enforcementSystem.addAuthorizedUser(userId);
+      addTestResult('Authorization', `User ${userId} authorized for MLG tags`, true);
+    }
+
+    function deauthorizeUser() {
+      const userId = document.getElementById('demo-user-id').value;
+      
+      if (!userId || !enforcementSystem) {
+        return;
+      }
+      
+      enforcementSystem.removeAuthorizedUser(userId);
+      addTestResult('Authorization', `User ${userId} deauthorized for MLG tags`, true);
+    }
+
+    // Add test result to display
+    function addTestResult(category, message, success, details = null) {
+      const resultsContainer = document.getElementById('test-results');
+      const timestamp = new Date().toLocaleTimeString();
+      
+      const resultElement = document.createElement('div');
+      resultElement.className = 'test-case';
+      
+      const icon = success ? '✅' : '❌';
+      const statusClass = success ? 'success-indicator' : 'violation-indicator';
+      
+      resultElement.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div>
+            <span class="${statusClass}">${icon} [${category}]</span>
+            <span class="ml-2">${message}</span>
+          </div>
+          <span class="text-xs" style="color: var(--mlg-text-secondary);">${timestamp}</span>
+        </div>
+        ${details ? `<details class="mt-2"><summary class="cursor-pointer">View Details</summary><pre class="code-block mt-2 text-xs">${JSON.stringify(details, null, 2)}</pre></details>` : ''}
+      `;
+      
+      resultsContainer.insertBefore(resultElement, resultsContainer.firstChild);
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initializeSystem);
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      if (metricsInterval) {
+        clearInterval(metricsInterval);
+      }
+    });
+  </script>
+</body>
+</html>
