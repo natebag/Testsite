@@ -285,6 +285,7 @@
               <a href="content.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'content.html')">Content Hub</a>
               <a href="dao.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'dao.html')">DAO</a>
               <a href="analytics.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'analytics.html')">Analytics</a>
+              <a href="profile.html" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-surface transition-colors" onclick="handleNavigation(event, 'profile.html')">Profile</a>
             </div>
           </div>
         </div>
@@ -345,6 +346,7 @@
           <a href="content.html" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-accent hover:bg-opacity-20 transition-colors" onclick="handleNavigation(event, 'content.html'); toggleMobileMenu();">Content Hub</a>
           <a href="dao.html" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-accent hover:bg-opacity-20 transition-colors" onclick="handleNavigation(event, 'dao.html'); toggleMobileMenu();">DAO</a>
           <a href="analytics.html" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-accent hover:bg-opacity-20 transition-colors" onclick="handleNavigation(event, 'analytics.html'); toggleMobileMenu();">Analytics</a>
+          <a href="profile.html" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-gaming-accent hover:bg-gaming-accent hover:bg-opacity-20 transition-colors" onclick="handleNavigation(event, 'profile.html'); toggleMobileMenu();">Profile</a>
           
           <!-- Mobile wallet section -->
           <div class="border-t border-gaming-accent border-opacity-30 pt-3 mt-3">
@@ -448,7 +450,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         
         <!-- Vote Vault -->
-        <div class="card-glow rounded-xl p-8 hover:scale-105 transition-transform cursor-pointer" onclick="navigateToSection('vote-vault')">
+        <div class="card-glow rounded-xl p-8 hover:scale-105 transition-transform cursor-pointer" onclick="navigateToSection('voting')">
           <div class="flex items-center mb-6">
             <div class="w-12 h-12 bg-gaming-accent rounded-lg flex items-center justify-center mr-4">
               <i data-lucide="vote" class="w-6 h-6 text-black"></i>
@@ -504,7 +506,7 @@
         </div>
 
         <!-- Content Hub -->
-        <div class="card-glow rounded-xl p-8 hover:scale-105 transition-transform cursor-pointer" onclick="navigateToSection('content-hub')">
+        <div class="card-glow rounded-xl p-8 hover:scale-105 transition-transform cursor-pointer" onclick="navigateToSection('content')">
           <div class="flex items-center mb-6">
             <div class="w-12 h-12 bg-gaming-blue rounded-lg flex items-center justify-center mr-4">
               <i data-lucide="video" class="w-6 h-6 text-white"></i>
@@ -615,6 +617,15 @@
           </div>
         </div>
 
+      </div>
+    </div>
+  </section>
+
+  <!-- Dynamic Content Container -->
+  <section class="py-20 bg-gaming-surface bg-opacity-50 hidden" id="dynamic-content-section">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div id="dynamic-content">
+        <!-- Dynamic content will be loaded here -->
       </div>
     </div>
   </section>
@@ -2080,13 +2091,31 @@
     
     // Universal navigation handler for both SPA and multi-page modes
     function handleNavigation(event, pageUrl) {
+      event.preventDefault();
+      
+      // Convert page URL to section name
+      const sectionMap = {
+        'index.html': 'dashboard',
+        'voting.html': 'voting',
+        'clans.html': 'clans', 
+        'content.html': 'content',
+        'dao.html': 'dao',
+        'analytics.html': 'analytics',
+        'profile.html': 'profile'
+      };
+      
+      const section = sectionMap[pageUrl] || 'dashboard';
+      
       // Check if SPA router is available and ready
       if (window.router && window.router.push && typeof window.router.push === 'function') {
-        event.preventDefault();
-        const routePath = '/' + pageUrl.replace('.html', '').replace('index', 'dashboard');
-        window.router.push(routePath);
+        window.router.push('/' + section);
+      } else {
+        // Direct fallback to loadSection
+        loadSection(section);
       }
-      // If no SPA router, let the default link behavior happen (multi-page navigation)
+      
+      // Update active navigation
+      updateActiveNavigation(pageUrl);
     }
     
     // Active navigation state management
@@ -2114,6 +2143,16 @@
     // Section loading functionality
     function loadSection(section) {
       const contentArea = document.getElementById('dynamic-content');
+      const dynamicContentSection = document.getElementById('dynamic-content-section');
+      
+      // Get all static sections that should be hidden during dynamic navigation
+      const staticSections = [
+        document.querySelector('section.relative.py-20.overflow-hidden'), // Hero section
+        document.getElementById('dashboard'),
+        document.getElementById('loading-demo'),
+        document.getElementById('content-area')
+      ].filter(Boolean); // Remove null elements
+      
       if (!contentArea) return;
       
       const sections = {
@@ -2535,11 +2574,145 @@
               </div>
             </div>
           `
-        }
+        },
+        
+        profile: {
+          title: '👤 User Profile - Gaming Identity',
+          content: `
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div class="bg-gaming-surface rounded-lg p-6">
+                <div class="text-center mb-6">
+                  <div class="w-24 h-24 bg-gradient-to-r from-gaming-accent to-gaming-blue rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <i data-lucide="user" class="w-12 h-12 text-white"></i>
+                  </div>
+                  <h3 class="text-xl font-bold text-gaming-accent">ProGamer2024</h3>
+                  <p class="text-sm text-gray-400">Elite Member</p>
+                </div>
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between">
+                    <span>Clan</span>
+                    <span class="text-gaming-purple font-bold">MLG Elite</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Rank</span>
+                    <span class="text-gaming-yellow font-bold">Diamond</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>MLG Balance</span>
+                    <span class="text-gaming-accent font-bold">${mlg.wallet.balance.mlg.toLocaleString()}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Member Since</span>
+                    <span class="text-gaming-blue font-bold">Jan 2024</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="lg:col-span-2 space-y-6">
+                <div class="bg-gaming-surface rounded-lg p-6">
+                  <h3 class="text-xl font-bold mb-4">🎮 Gaming Stats</h3>
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-gaming-accent">1,247</div>
+                      <div class="text-sm text-gray-400">Votes Cast</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-gaming-blue">89</div>
+                      <div class="text-sm text-gray-400">Content Created</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-gaming-purple">156</div>
+                      <div class="text-sm text-gray-400">Clan Activities</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-gaming-yellow">23</div>
+                      <div class="text-sm text-gray-400">DAO Proposals</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="bg-gaming-surface rounded-lg p-6">
+                  <h3 class="text-xl font-bold mb-4">🏆 Recent Achievements</h3>
+                  <div class="space-y-3">
+                    <div class="flex items-center justify-between p-3 bg-gaming-bg rounded-lg">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gaming-yellow rounded-full flex items-center justify-center">
+                          <span class="text-black font-bold text-sm">🏆</span>
+                        </div>
+                        <span>Top Voter of the Week</span>
+                      </div>
+                      <span class="text-gaming-yellow text-sm">2 days ago</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gaming-bg rounded-lg">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gaming-purple rounded-full flex items-center justify-center">
+                          <span class="text-white font-bold text-sm">⭐</span>
+                        </div>
+                        <span>Clan MVP</span>
+                      </div>
+                      <span class="text-gaming-purple text-sm">1 week ago</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gaming-bg rounded-lg">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gaming-accent rounded-full flex items-center justify-center">
+                          <span class="text-black font-bold text-sm">🎮</span>
+                        </div>
+                        <span>Content Creator</span>
+                      </div>
+                      <span class="text-gaming-accent text-sm">2 weeks ago</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `
+        },
+        
+        // Add section name aliases for navigation compatibility
+        'vote-vault': null, // Will be set below
+        'content-hub': null // Will be set below
       };
       
-      const selectedSection = sections[section];
+      // Set up aliases after sections object is defined
+      sections['vote-vault'] = sections.voting;
+      sections['content-hub'] = sections.content;
+      
+      // Handle section aliases and get actual section
+      let selectedSection = sections[section];
+      
+      // Handle dashboard vs dynamic sections
+      if (section === 'dashboard') {
+        // Show all static sections, hide dynamic content
+        staticSections.forEach(section => {
+          if (section) section.classList.remove('hidden');
+        });
+        if (dynamicContentSection) dynamicContentSection.classList.add('hidden');
+        
+        // Scroll to dashboard
+        const dashboardSection = document.getElementById('dashboard');
+        if (dashboardSection) {
+          dashboardSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Show notification
+        if (window.mlg) {
+          window.mlg.showNotification('Loaded Dashboard', 'success');
+        }
+        
+        // Update breadcrumb
+        const currentSection = document.getElementById('current-section');
+        if (currentSection) currentSection.textContent = 'Dashboard';
+        
+        return;
+      }
+      
       if (selectedSection) {
+        // Hide all static content, show dynamic content
+        staticSections.forEach(section => {
+          if (section) section.classList.add('hidden');
+        });
+        if (dynamicContentSection) dynamicContentSection.classList.remove('hidden');
+        
         contentArea.innerHTML = `
           <h2 class="text-3xl font-bold mb-8 text-center">${selectedSection.title}</h2>
           ${selectedSection.content}
@@ -2551,12 +2724,16 @@
         }
         
         // Scroll to content
-        contentArea.scrollIntoView({ behavior: 'smooth' });
+        dynamicContentSection.scrollIntoView({ behavior: 'smooth' });
         
         // Show notification
         if (window.mlg) {
           window.mlg.showNotification(`Loaded ${section.charAt(0).toUpperCase() + section.slice(1)} section`, 'success');
         }
+        
+        // Update breadcrumb
+        const currentSection = document.getElementById('current-section');
+        if (currentSection) currentSection.textContent = selectedSection.title.replace(/[🎮📊🏛️👤🗳️📱🎵]/g, '').trim();
       }
     }
     
@@ -2624,6 +2801,10 @@
           forward: () => window.history.forward(),
           replace: (path) => window.router.push(path)
         };
+        
+        // Initialize with dashboard view and ensure proper state
+        console.log('🏠 Setting up initial dashboard view...');
+        loadSection('dashboard');
       }
     });
     
