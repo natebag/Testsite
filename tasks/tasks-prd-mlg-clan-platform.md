@@ -417,13 +417,13 @@ When all sub-tasks in a parent task are complete:
 
 ## 🎮 MLG.CLAN VISION ALIGNMENT TASKS - Missing Core Features
 
-- [ ] 21.0 **MLG Branding & [MLG] Tag System** **[Agent: ui-production-builder]**
-  - [ ] 21.1 Implement automatic [MLG] username tagging for all clan members **[Agent: ui-production-builder]**
-  - [ ] 21.2 Add [MLG] branding to all profile headers and roster displays **[Agent: ui-production-builder]**
-  - [ ] 21.3 Create [MLG] branded event banners and tournament displays **[Agent: ui-production-builder]**
-  - [ ] 21.4 Add official MLG font styles matching brand guidelines **[Agent: ui-production-builder]**
-  - [ ] 21.5 Implement [MLG] tag validation and enforcement across platform **[Agent: ui-production-builder]**
-  - [ ] 21.6 Verify CLAUDE.md compliance and workflow adherence **[Agent: claude-md-compliance-checker]**
+- [x] 21.0 **MLG Branding & [MLG] Tag System** **[Agent: ui-production-builder]**
+  - [x] 21.1 Implement automatic [MLG] username tagging for all clan members **[Agent: ui-production-builder]**
+  - [x] 21.2 Add [MLG] branding to all profile headers and roster displays **[Agent: ui-production-builder]**
+  - [x] 21.3 Create [MLG] branded event banners and tournament displays **[Agent: ui-production-builder]**
+  - [x] 21.4 Add official MLG font styles matching brand guidelines **[Agent: ui-production-builder]**
+  - [x] 21.5 Implement [MLG] tag validation and enforcement across platform **[Agent: ui-production-builder]**
+  - [x] 21.6 Verify CLAUDE.md compliance and workflow adherence **[Agent: claude-md-compliance-checker]**
 
 - [ ] 22.0 **Clip Daily Limit & Upload Constraints** **[Agent: api-contract-designer]**
   - [ ] 22.1 Implement one clip per day limit per user with server validation **[Agent: api-contract-designer]**
