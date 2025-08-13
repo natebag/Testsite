@@ -1,0 +1,66 @@
+[Unit]
+Description=MLG.clan Gaming Platform
+Documentation=https://mlg.clan/docs
+After=network.target postgresql.service redis-server.service
+Wants=postgresql.service redis-server.service
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+Type=exec
+User=mlg-clan
+Group=mlg-clan
+WorkingDirectory=/opt/mlg-clan
+
+# Environment configuration
+Environment=NODE_ENV=production
+Environment=NODE_OPTIONS="--max-old-space-size=2048 --enable-source-maps"
+EnvironmentFile=-/opt/mlg-clan/.env
+
+# Main application command with cluster manager
+ExecStart=/usr/bin/node --experimental-loader ./scripts/auto-scaling/cluster-manager.js
+ExecReload=/bin/kill -HUP $MAINPID
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Memory and CPU limits
+MemoryLimit=4G
+CPUQuota=400%
+
+# Security settings
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/mlg-clan/logs /opt/mlg-clan/temp /tmp
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictNamespaces=true
+SystemCallArchitectures=native
+
+# Capabilities
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+# Restart configuration
+Restart=always
+RestartSec=5
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStartSec=60
+TimeoutStopSec=30
+
+# Health check
+ExecStartPost=/bin/sleep 10
+ExecStartPost=/usr/bin/curl -f http://localhost:3000/health || exit 1
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=mlg-clan
+
+[Install]
+WantedBy=multi-user.target
