@@ -57,7 +57,9 @@
       "Bash(npm ls:*)",
       "Bash(find:*)",
       "Bash(npm run type:check:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(rg:*)",
+      "Bash(npm run start:simple:*)"
     ],
     "deny": []
   }

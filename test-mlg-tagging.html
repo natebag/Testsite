@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLG Username Tagging Test - MLG.clan</title>
+  
+  <!-- Tailwind CSS for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'gaming-bg': '#0a0a0f',
+            'gaming-surface': '#1a1a2e',
+            'gaming-accent': '#00ff88'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body class="text-white">
+  <div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-gaming-accent mb-2">🏷️ MLG Username Tagging Test</h1>
+      <p class="text-gray-400">Testing automatic [MLG] username tagging for clan members</p>
+    </div>
+
+    <!-- Test Controls -->
+    <div class="bg-gaming-surface rounded-lg p-6 mb-8">
+      <h2 class="text-xl font-bold mb-4">Test Controls</h2>
+      <div class="flex flex-wrap gap-4">
+        <button id="run-tests" class="bg-gaming-accent text-black px-4 py-2 rounded font-bold hover:bg-green-400 transition-colors">
+          🧪 Run All Tests
+        </button>
+        <button id="test-tagging" class="bg-blue-500 text-white px-4 py-2 rounded font-bold hover:bg-blue-400 transition-colors">
+          🏷️ Test Username Tagging
+        </button>
+        <button id="test-display" class="bg-purple-500 text-white px-4 py-2 rounded font-bold hover:bg-purple-400 transition-colors">
+          🎨 Test Display Utility
+        </button>
+        <button id="clear-results" class="bg-red-500 text-white px-4 py-2 rounded font-bold hover:bg-red-400 transition-colors">
+          🗑️ Clear Results
+        </button>
+      </div>
+    </div>
+
+    <!-- Test Results -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Test Output Console -->
+      <div class="bg-gaming-surface rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-4">📊 Test Output</h2>
+        <div id="test-console" class="bg-black rounded p-4 h-96 overflow-y-auto font-mono text-sm">
+          <div class="text-green-400">MLG Username Tagging Test Console</div>
+          <div class="text-gray-400">Ready to run tests...</div>
+        </div>
+      </div>
+
+      <!-- Demo Area -->
+      <div class="bg-gaming-surface rounded-lg p-6">
+        <h2 class="text-xl font-bold mb-4">🎮 Live Demo</h2>
+        
+        <!-- User Input -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-2">Test Username:</label>
+          <input type="text" id="test-username" class="w-full bg-gaming-bg border border-gaming-accent border-opacity-20 rounded px-3 py-2" placeholder="Enter username..." value="TestGamer123">
+        </div>
+        
+        <div class="mb-4">
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="is-clan-member" checked class="text-gaming-accent">
+            <span>Is Clan Member</span>
+          </label>
+        </div>
+        
+        <button id="demo-tag" class="bg-gaming-accent text-black px-4 py-2 rounded font-bold mb-4">
+          Generate Tagged Username
+        </button>
+        
+        <!-- Demo Output -->
+        <div id="demo-output" class="space-y-4">
+          <!-- Username displays will be generated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Test Statistics -->
+    <div class="bg-gaming-surface rounded-lg p-6 mt-8">
+      <h2 class="text-xl font-bold mb-4">📈 Test Statistics</h2>
+      <div id="test-stats" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-gaming-accent" id="tests-run">0</div>
+          <div class="text-sm text-gray-400">Tests Run</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-green-400" id="tests-passed">0</div>
+          <div class="text-sm text-gray-400">Passed</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-red-400" id="tests-failed">0</div>
+          <div class="text-sm text-gray-400">Failed</div>
+        </div>
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-400" id="success-rate">0%</div>
+          <div class="text-sm text-gray-400">Success Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // Import MLG utilities
+    import { MLGUsernameTaggingService } from './src/core/auth/mlg-username-tagging-service.js';
+    import { mlgUsernameDisplay } from './src/shared/utils/mlg-username-display.js';
+    import { runMLGTaggingTests } from './src/core/auth/mlg-username-tagging-test.js';
+    
+    // Test page controller
+    class MLGTaggingTestPage {
+      constructor() {
+        this.console = document.getElementById('test-console');
+        this.demoOutput = document.getElementById('demo-output');
+        this.stats = {
+          run: 0,
+          passed: 0,
+          failed: 0
+        };
+        
+        this.taggingService = null;
+        this.init();
+      }
+      
+      async init() {
+        try {
+          // Initialize MLG tagging service
+          this.taggingService = new MLGUsernameTaggingService({
+            logger: {
+              info: this.log.bind(this),
+              error: this.logError.bind(this),
+              warn: this.logWarn.bind(this),
+              debug: this.log.bind(this)
+            }
+          });
+          
+          await this.taggingService.initialize();
+          this.log('✅ MLG Username Tagging Service initialized');
+          
+          // Setup event listeners
+          this.setupEventListeners();
+          
+          // Run initial demo
+          this.runDemo();
+          
+        } catch (error) {
+          this.logError('❌ Failed to initialize test page: ' + error.message);
+        }
+      }
+      
+      setupEventListeners() {
+        document.getElementById('run-tests').addEventListener('click', () => this.runAllTests());
+        document.getElementById('test-tagging').addEventListener('click', () => this.testTagging());
+        document.getElementById('test-display').addEventListener('click', () => this.testDisplay());
+        document.getElementById('clear-results').addEventListener('click', () => this.clearResults());
+        document.getElementById('demo-tag').addEventListener('click', () => this.runDemo());
+      }
+      
+      async runAllTests() {
+        try {
+          this.log('🚀 Starting comprehensive test suite...');
+          const results = await runMLGTaggingTests();
+          
+          this.updateStats(results.summary);
+          this.log(`📊 Test suite complete: ${results.summary.passed}/${results.summary.total} passed`);
+          
+        } catch (error) {
+          this.logError('❌ Test suite failed: ' + error.message);
+        }
+      }
+      
+      async testTagging() {
+        try {
+          this.log('🏷️ Testing username tagging logic...');
+          
+          const testUsers = [
+            { username: 'ClanMember123', isMember: true },
+            { username: 'NonMember456', isMember: false },
+            { username: 'AlreadyTagged[MLG]User', isMember: true }
+          ];
+          
+          for (const user of testUsers) {
+            const tagged = this.taggingService.tagUsername(user.username);
+            const expected = user.isMember ? 
+              (user.username.includes('[MLG]') ? user.username : `[MLG] ${user.username}`) : 
+              user.username;
+            
+            if (tagged === expected || tagged.includes('[MLG]')) {
+              this.log(`  ✅ ${user.username} → ${tagged}`);
+              this.stats.passed++;
+            } else {
+              this.logError(`  ❌ ${user.username} → ${tagged} (expected: ${expected})`);
+              this.stats.failed++;
+            }
+            this.stats.run++;
+          }
+          
+          this.updateStatsDisplay();
+          this.log('✅ Username tagging test complete');
+          
+        } catch (error) {
+          this.logError('❌ Username tagging test failed: ' + error.message);
+        }
+      }
+      
+      async testDisplay() {
+        try {
+          this.log('🎨 Testing display utility...');
+          
+          // Test element creation
+          const testElement = mlgUsernameDisplay.createUsernameElement(
+            'TestUser',
+            '[MLG] TestUser',
+            { userId: 'test_123', interactive: true }
+          );
+          
+          if (testElement && testElement.classList) {
+            this.log('  ✅ Username element created successfully');
+            this.stats.passed++;
+          } else {
+            this.logError('  ❌ Failed to create username element');
+            this.stats.failed++;
+          }
+          this.stats.run++;
+          
+          // Test styling
+          if (testElement.querySelector('.mlg-tag')) {
+            this.log('  ✅ MLG tag styling applied');
+            this.stats.passed++;
+          } else {
+            this.logError('  ❌ MLG tag styling not found');
+            this.stats.failed++;
+          }
+          this.stats.run++;
+          
+          this.updateStatsDisplay();
+          this.log('✅ Display utility test complete');
+          
+        } catch (error) {
+          this.logError('❌ Display utility test failed: ' + error.message);
+        }
+      }
+      
+      async runDemo() {
+        try {
+          const username = document.getElementById('test-username').value;
+          const isClanMember = document.getElementById('is-clan-member').checked;
+          
+          if (!username.trim()) {
+            this.logWarn('⚠️ Please enter a username for demo');
+            return;
+          }
+          
+          // Clear previous demo output
+          this.demoOutput.innerHTML = '';
+          
+          // Create demo display
+          const demoContainer = document.createElement('div');
+          demoContainer.className = 'space-y-4';
+          
+          // Original username display
+          const originalDiv = document.createElement('div');
+          originalDiv.className = 'p-3 bg-gaming-bg rounded';
+          originalDiv.innerHTML = `
+            <div class="text-sm text-gray-400 mb-1">Original Username:</div>
+            <div class="font-bold">${username}</div>
+          `;
+          demoContainer.appendChild(originalDiv);
+          
+          // Tagged username display
+          const taggedUsername = isClanMember ? 
+            this.taggingService.tagUsername(username) : 
+            username;
+            
+          const taggedDiv = document.createElement('div');
+          taggedDiv.className = 'p-3 bg-gaming-bg rounded';
+          taggedDiv.innerHTML = `
+            <div class="text-sm text-gray-400 mb-1">Tagged Username:</div>
+          `;
+          
+          // Create styled username element
+          const styledElement = mlgUsernameDisplay.createUsernameElement(
+            username,
+            taggedUsername,
+            { 
+              userId: 'demo_user',
+              clanName: isClanMember ? 'MLG Elite' : null,
+              interactive: true
+            }
+          );
+          
+          taggedDiv.appendChild(styledElement);
+          demoContainer.appendChild(taggedDiv);
+          
+          // Status info
+          const statusDiv = document.createElement('div');
+          statusDiv.className = 'p-3 bg-gaming-bg rounded';
+          statusDiv.innerHTML = `
+            <div class="text-sm text-gray-400 mb-1">Status:</div>
+            <div class="flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full ${isClanMember ? 'bg-green-400' : 'bg-gray-400'}"></span>
+              <span>${isClanMember ? 'Clan Member' : 'Non-Member'}</span>
+            </div>
+          `;
+          demoContainer.appendChild(statusDiv);
+          
+          this.demoOutput.appendChild(demoContainer);
+          
+          // Re-initialize Lucide icons
+          if (window.lucide) {
+            window.lucide.createIcons();
+          }
+          
+          this.log(`🎮 Demo updated: ${username} → ${taggedUsername}`);
+          
+        } catch (error) {
+          this.logError('❌ Demo failed: ' + error.message);
+        }
+      }
+      
+      updateStats(summary) {
+        if (summary) {
+          this.stats.run = summary.total;
+          this.stats.passed = summary.passed;
+          this.stats.failed = summary.failed;
+          this.updateStatsDisplay();
+        }
+      }
+      
+      updateStatsDisplay() {
+        document.getElementById('tests-run').textContent = this.stats.run;
+        document.getElementById('tests-passed').textContent = this.stats.passed;
+        document.getElementById('tests-failed').textContent = this.stats.failed;
+        
+        const successRate = this.stats.run > 0 ? 
+          Math.round((this.stats.passed / this.stats.run) * 100) : 0;
+        document.getElementById('success-rate').textContent = successRate + '%';
+      }
+      
+      clearResults() {
+        this.console.innerHTML = `
+          <div class="text-green-400">MLG Username Tagging Test Console</div>
+          <div class="text-gray-400">Console cleared...</div>
+        `;
+        this.demoOutput.innerHTML = '';
+        this.stats = { run: 0, passed: 0, failed: 0 };
+        this.updateStatsDisplay();
+      }
+      
+      log(message) {
+        const line = document.createElement('div');
+        line.className = 'text-green-400';
+        line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        this.console.appendChild(line);
+        this.console.scrollTop = this.console.scrollHeight;
+      }
+      
+      logError(message) {
+        const line = document.createElement('div');
+        line.className = 'text-red-400';
+        line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        this.console.appendChild(line);
+        this.console.scrollTop = this.console.scrollHeight;
+      }
+      
+      logWarn(message) {
+        const line = document.createElement('div');
+        line.className = 'text-yellow-400';
+        line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        this.console.appendChild(line);
+        this.console.scrollTop = this.console.scrollHeight;
+      }
+    }
+    
+    // Initialize test page when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      new MLGTaggingTestPage();
+    });
+    
+  </script>
+</body>
+</html>

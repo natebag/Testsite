@@ -17,7 +17,7 @@
  * @created 2025-08-12
  */
 
-import { createSecureServer } from 'https';
+import { createServer as createSecureServer } from 'https';
 import { createServer } from 'http';
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';

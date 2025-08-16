@@ -2,8 +2,11 @@
  * MLG.clan Main Stylesheet
  * 
  * Consolidated styles for the entire application
- * Optimized for build system processing
+ * Optimized for build system processing with official MLG typography
  */
+
+/* MLG Official Font Loading */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Play:wght@400;700&family=Exo+2:wght@300;400;500;600;700;800&display=swap');
 
 /* Import Performance Dashboard Styles */
 @import 'performance-dashboard.css';
@@ -24,6 +27,90 @@
 @import 'mobile-native-features.css';
 
 /* Tailwind CSS is loaded via CDN in HTML for now */
+
+/* MLG Official Typography Variables */
+:root {
+  /* MLG Brand Font Families */
+  --mlg-font-primary: 'Rajdhani', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --mlg-font-heading: 'Orbitron', 'Segoe UI', system-ui, sans-serif;
+  --mlg-font-display: 'Exo 2', 'Orbitron', system-ui, sans-serif;
+  --mlg-font-gaming: 'Play', 'Rajdhani', monospace, system-ui;
+  --mlg-font-mono: 'Fira Code', 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+  --mlg-font-system: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  
+  /* MLG Typography Scale */
+  --mlg-text-xs: 0.75rem;          /* 12px - micro text */
+  --mlg-text-sm: 0.875rem;         /* 14px - small text */
+  --mlg-text-base: 1rem;           /* 16px - body text */
+  --mlg-text-lg: 1.125rem;         /* 18px - large text */
+  --mlg-text-xl: 1.25rem;          /* 20px - extra large */
+  --mlg-text-2xl: 1.5rem;          /* 24px - 2x large */
+  --mlg-text-3xl: 1.875rem;        /* 30px - 3x large */
+  --mlg-text-4xl: 2.25rem;         /* 36px - 4x large */
+  --mlg-text-5xl: 3rem;            /* 48px - 5x large */
+  --mlg-text-6xl: 3.75rem;         /* 60px - 6x large */
+  --mlg-text-7xl: 4.5rem;          /* 72px - 7x large */
+  --mlg-text-8xl: 6rem;            /* 96px - 8x large */
+  
+  /* MLG Gaming Typography Scale */
+  --mlg-gaming-micro: 0.625rem;    /* 10px - ultra small stats */
+  --mlg-gaming-tiny: 0.75rem;      /* 12px - tiny labels */
+  --mlg-gaming-small: 0.875rem;    /* 14px - small info */
+  --mlg-gaming-body: 1rem;         /* 16px - body content */
+  --mlg-gaming-emphasis: 1.125rem; /* 18px - emphasized text */
+  --mlg-gaming-title: 1.375rem;    /* 22px - section titles */
+  --mlg-gaming-heading: 1.75rem;   /* 28px - page headings */
+  --mlg-gaming-hero: 2.25rem;      /* 36px - hero text */
+  --mlg-gaming-display: 3rem;      /* 48px - display text */
+  --mlg-gaming-massive: 4rem;      /* 64px - massive display */
+  
+  /* MLG Line Heights */
+  --mlg-leading-none: 1;
+  --mlg-leading-tight: 1.1;
+  --mlg-leading-snug: 1.25;
+  --mlg-leading-normal: 1.4;
+  --mlg-leading-relaxed: 1.6;
+  --mlg-leading-loose: 1.8;
+  
+  /* MLG Gaming Line Heights */
+  --mlg-gaming-leading-compact: 1.1;  /* For stats and data */
+  --mlg-gaming-leading-normal: 1.3;   /* For body text */
+  --mlg-gaming-leading-spacious: 1.5; /* For readable content */
+  
+  /* MLG Letter Spacing */
+  --mlg-tracking-tighter: -0.05em;
+  --mlg-tracking-tight: -0.025em;
+  --mlg-tracking-normal: 0em;
+  --mlg-tracking-wide: 0.025em;
+  --mlg-tracking-wider: 0.05em;
+  --mlg-tracking-widest: 0.1em;
+  
+  /* MLG Gaming Letter Spacing */
+  --mlg-gaming-tracking-stats: 0.02em;    /* For numbers/stats */
+  --mlg-gaming-tracking-ui: 0.03em;       /* For UI text */
+  --mlg-gaming-tracking-brand: 0.05em;    /* For branding */
+  --mlg-gaming-tracking-display: 0.08em;  /* For display text */
+  
+  /* MLG Font Weights */
+  --mlg-weight-light: 300;
+  --mlg-weight-normal: 400;
+  --mlg-weight-medium: 500;
+  --mlg-weight-semibold: 600;
+  --mlg-weight-bold: 700;
+  --mlg-weight-extrabold: 800;
+  --mlg-weight-black: 900;
+  
+  /* MLG Text Colors */
+  --mlg-text-primary: #ffffff;
+  --mlg-text-secondary: #e5e5e5;
+  --mlg-text-tertiary: #cccccc;
+  --mlg-text-muted: #999999;
+  --mlg-text-disabled: #666666;
+  --mlg-text-accent: #00ff88;
+  --mlg-text-brand: #00d4ff;
+  --mlg-text-warning: #fbbf24;
+  --mlg-text-error: #ef4444;
+  --mlg-text-success: #10b981;
 
 /* Core Variables */
 :root {
@@ -95,11 +182,15 @@ html {
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--mlg-font-primary);
   background: var(--gaming-bg);
   color: white;
   line-height: 1.6;
   overflow-x: hidden;
+  font-display: swap;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Gaming UI Components */
@@ -1082,6 +1173,579 @@ body {
   box-shadow: 0 0 0 1px rgba(0, 255, 136, 0.5) !important;
 }
 
+/* MLG Typography Classes */
+
+/* Primary Typography Classes */
+.mlg-font-primary {
+  font-family: var(--mlg-font-primary);
+}
+
+.mlg-font-heading {
+  font-family: var(--mlg-font-heading);
+  font-weight: var(--mlg-weight-bold);
+  letter-spacing: var(--mlg-gaming-tracking-brand);
+}
+
+.mlg-font-display {
+  font-family: var(--mlg-font-display);
+  font-weight: var(--mlg-weight-extrabold);
+  letter-spacing: var(--mlg-gaming-tracking-display);
+  text-transform: uppercase;
+}
+
+.mlg-font-gaming {
+  font-family: var(--mlg-font-gaming);
+  font-weight: var(--mlg-weight-semibold);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+}
+
+.mlg-font-mono {
+  font-family: var(--mlg-font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--mlg-gaming-tracking-stats);
+}
+
+/* MLG Text Size Classes */
+.mlg-text-xs {
+  font-size: var(--mlg-text-xs);
+  line-height: var(--mlg-leading-tight);
+}
+
+.mlg-text-sm {
+  font-size: var(--mlg-text-sm);
+  line-height: var(--mlg-leading-snug);
+}
+
+.mlg-text-base {
+  font-size: var(--mlg-text-base);
+  line-height: var(--mlg-leading-normal);
+}
+
+.mlg-text-lg {
+  font-size: var(--mlg-text-lg);
+  line-height: var(--mlg-leading-normal);
+}
+
+.mlg-text-xl {
+  font-size: var(--mlg-text-xl);
+  line-height: var(--mlg-leading-normal);
+}
+
+.mlg-text-2xl {
+  font-size: var(--mlg-text-2xl);
+  line-height: var(--mlg-leading-snug);
+}
+
+.mlg-text-3xl {
+  font-size: var(--mlg-text-3xl);
+  line-height: var(--mlg-leading-tight);
+}
+
+.mlg-text-4xl {
+  font-size: var(--mlg-text-4xl);
+  line-height: var(--mlg-leading-tight);
+}
+
+.mlg-text-5xl {
+  font-size: var(--mlg-text-5xl);
+  line-height: var(--mlg-leading-none);
+}
+
+.mlg-text-6xl {
+  font-size: var(--mlg-text-6xl);
+  line-height: var(--mlg-leading-none);
+}
+
+.mlg-text-7xl {
+  font-size: var(--mlg-text-7xl);
+  line-height: var(--mlg-leading-none);
+}
+
+.mlg-text-8xl {
+  font-size: var(--mlg-text-8xl);
+  line-height: var(--mlg-leading-none);
+}
+
+/* MLG Gaming Typography */
+.mlg-gaming-micro {
+  font-family: var(--mlg-font-mono);
+  font-size: var(--mlg-gaming-micro);
+  line-height: var(--mlg-gaming-leading-compact);
+  letter-spacing: var(--mlg-gaming-tracking-stats);
+  font-weight: var(--mlg-weight-medium);
+}
+
+.mlg-gaming-tiny {
+  font-family: var(--mlg-font-primary);
+  font-size: var(--mlg-gaming-tiny);
+  line-height: var(--mlg-gaming-leading-compact);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+  font-weight: var(--mlg-weight-medium);
+  text-transform: uppercase;
+}
+
+.mlg-gaming-small {
+  font-family: var(--mlg-font-primary);
+  font-size: var(--mlg-gaming-small);
+  line-height: var(--mlg-gaming-leading-normal);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+  font-weight: var(--mlg-weight-medium);
+}
+
+.mlg-gaming-body {
+  font-family: var(--mlg-font-primary);
+  font-size: var(--mlg-gaming-body);
+  line-height: var(--mlg-gaming-leading-normal);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+  font-weight: var(--mlg-weight-normal);
+}
+
+.mlg-gaming-emphasis {
+  font-family: var(--mlg-font-gaming);
+  font-size: var(--mlg-gaming-emphasis);
+  line-height: var(--mlg-gaming-leading-normal);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+  font-weight: var(--mlg-weight-semibold);
+}
+
+.mlg-gaming-title {
+  font-family: var(--mlg-font-heading);
+  font-size: var(--mlg-gaming-title);
+  line-height: var(--mlg-gaming-leading-compact);
+  letter-spacing: var(--mlg-gaming-tracking-brand);
+  font-weight: var(--mlg-weight-bold);
+  text-transform: uppercase;
+}
+
+.mlg-gaming-heading {
+  font-family: var(--mlg-font-heading);
+  font-size: var(--mlg-gaming-heading);
+  line-height: var(--mlg-gaming-leading-compact);
+  letter-spacing: var(--mlg-gaming-tracking-brand);
+  font-weight: var(--mlg-weight-bold);
+  text-transform: uppercase;
+}
+
+.mlg-gaming-hero {
+  font-family: var(--mlg-font-display);
+  font-size: var(--mlg-gaming-hero);
+  line-height: var(--mlg-gaming-leading-compact);
+  letter-spacing: var(--mlg-gaming-tracking-display);
+  font-weight: var(--mlg-weight-extrabold);
+  text-transform: uppercase;
+}
+
+.mlg-gaming-display {
+  font-family: var(--mlg-font-display);
+  font-size: var(--mlg-gaming-display);
+  line-height: var(--mlg-gaming-leading-compact);
+  letter-spacing: var(--mlg-gaming-tracking-display);
+  font-weight: var(--mlg-weight-extrabold);
+  text-transform: uppercase;
+}
+
+.mlg-gaming-massive {
+  font-family: var(--mlg-font-display);
+  font-size: var(--mlg-gaming-massive);
+  line-height: var(--mlg-gaming-leading-compact);
+  letter-spacing: var(--mlg-gaming-tracking-display);
+  font-weight: var(--mlg-weight-black);
+  text-transform: uppercase;
+}
+
+/* MLG Text Color Classes */
+.mlg-text-primary {
+  color: var(--mlg-text-primary);
+}
+
+.mlg-text-secondary {
+  color: var(--mlg-text-secondary);
+}
+
+.mlg-text-tertiary {
+  color: var(--mlg-text-tertiary);
+}
+
+.mlg-text-muted {
+  color: var(--mlg-text-muted);
+}
+
+.mlg-text-disabled {
+  color: var(--mlg-text-disabled);
+}
+
+.mlg-text-accent {
+  color: var(--mlg-text-accent);
+}
+
+.mlg-text-brand {
+  color: var(--mlg-text-brand);
+}
+
+.mlg-text-warning {
+  color: var(--mlg-text-warning);
+}
+
+.mlg-text-error {
+  color: var(--mlg-text-error);
+}
+
+.mlg-text-success {
+  color: var(--mlg-text-success);
+}
+
+/* MLG Gaming-Specific Typography */
+
+/* Tournament Bracket Typography */
+.mlg-tournament-text {
+  font-family: var(--mlg-font-heading);
+  font-size: var(--mlg-gaming-small);
+  line-height: var(--mlg-gaming-leading-compact);
+  letter-spacing: var(--mlg-gaming-tracking-stats);
+  font-weight: var(--mlg-weight-semibold);
+  color: var(--mlg-text-primary);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.mlg-tournament-team {
+  font-family: var(--mlg-font-gaming);
+  font-size: var(--mlg-gaming-body);
+  font-weight: var(--mlg-weight-bold);
+  color: var(--mlg-text-accent);
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+}
+
+.mlg-tournament-score {
+  font-family: var(--mlg-font-mono);
+  font-size: var(--mlg-gaming-emphasis);
+  font-weight: var(--mlg-weight-black);
+  letter-spacing: var(--mlg-gaming-tracking-stats);
+  color: var(--mlg-text-accent);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Leaderboard Typography */
+.mlg-leaderboard-rank {
+  font-family: var(--mlg-font-mono);
+  font-size: var(--mlg-gaming-title);
+  font-weight: var(--mlg-weight-black);
+  color: var(--mlg-text-accent);
+  letter-spacing: var(--mlg-gaming-tracking-stats);
+  font-variant-numeric: tabular-nums;
+}
+
+.mlg-leaderboard-player {
+  font-family: var(--mlg-font-gaming);
+  font-size: var(--mlg-gaming-body);
+  font-weight: var(--mlg-weight-semibold);
+  color: var(--mlg-text-primary);
+  line-height: var(--mlg-gaming-leading-normal);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+}
+
+.mlg-leaderboard-score {
+  font-family: var(--mlg-font-mono);
+  font-size: var(--mlg-gaming-emphasis);
+  font-weight: var(--mlg-weight-bold);
+  color: var(--mlg-text-accent);
+  letter-spacing: var(--mlg-gaming-tracking-stats);
+  font-variant-numeric: tabular-nums;
+}
+
+.mlg-leaderboard-change {
+  font-family: var(--mlg-font-primary);
+  font-size: var(--mlg-gaming-small);
+  font-weight: var(--mlg-weight-medium);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+}
+
+.mlg-leaderboard-change.up {
+  color: var(--mlg-text-success);
+}
+
+.mlg-leaderboard-change.down {
+  color: var(--mlg-text-error);
+}
+
+.mlg-leaderboard-change.same {
+  color: var(--mlg-text-muted);
+}
+
+/* Clan Management Typography */
+.mlg-clan-role {
+  font-family: var(--mlg-font-primary);
+  font-size: var(--mlg-gaming-small);
+  font-weight: var(--mlg-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--mlg-gaming-tracking-brand);
+}
+
+.mlg-clan-role-leader {
+  color: #ffd700;
+  font-weight: var(--mlg-weight-bold);
+}
+
+.mlg-clan-role-officer {
+  color: #c0c0c0;
+  font-weight: var(--mlg-weight-semibold);
+}
+
+.mlg-clan-role-member {
+  color: var(--mlg-text-secondary);
+}
+
+.mlg-clan-role-recruit {
+  color: var(--mlg-text-muted);
+}
+
+.mlg-clan-member-name {
+  font-family: var(--mlg-font-gaming);
+  font-size: var(--mlg-gaming-body);
+  font-weight: var(--mlg-weight-semibold);
+  color: var(--mlg-text-primary);
+  line-height: var(--mlg-gaming-leading-normal);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+}
+
+.mlg-clan-stats {
+  font-family: var(--mlg-font-mono);
+  font-size: var(--mlg-gaming-small);
+  font-weight: var(--mlg-weight-medium);
+  color: var(--mlg-text-accent);
+  letter-spacing: var(--mlg-gaming-tracking-stats);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Gaming Stats Typography */
+.mlg-stat-value {
+  font-family: var(--mlg-font-mono);
+  font-size: var(--mlg-gaming-emphasis);
+  font-weight: var(--mlg-weight-bold);
+  color: var(--mlg-text-accent);
+  letter-spacing: var(--mlg-gaming-tracking-stats);
+  line-height: var(--mlg-gaming-leading-compact);
+  font-variant-numeric: tabular-nums;
+}
+
+.mlg-stat-label {
+  font-family: var(--mlg-font-primary);
+  font-size: var(--mlg-gaming-small);
+  font-weight: var(--mlg-weight-medium);
+  color: var(--mlg-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+  line-height: var(--mlg-gaming-leading-normal);
+}
+
+.mlg-achievement-text {
+  font-family: var(--mlg-font-gaming);
+  font-size: var(--mlg-gaming-body);
+  font-weight: var(--mlg-weight-semibold);
+  color: var(--mlg-text-accent);
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+}
+
+/* Voting Typography */
+.mlg-voting-title {
+  font-family: var(--mlg-font-heading);
+  font-size: var(--mlg-gaming-title);
+  font-weight: var(--mlg-weight-bold);
+  color: var(--mlg-text-primary);
+  line-height: var(--mlg-gaming-leading-normal);
+  letter-spacing: var(--mlg-gaming-tracking-brand);
+  margin-bottom: 0.5rem;
+}
+
+.mlg-voting-description {
+  font-family: var(--mlg-font-primary);
+  font-size: var(--mlg-gaming-body);
+  font-weight: var(--mlg-weight-normal);
+  color: var(--mlg-text-secondary);
+  line-height: var(--mlg-gaming-leading-spacious);
+  margin-bottom: 1rem;
+}
+
+.mlg-voting-stats {
+  font-family: var(--mlg-font-primary);
+  font-size: var(--mlg-gaming-small);
+  font-weight: var(--mlg-weight-medium);
+  color: var(--mlg-text-muted);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+}
+
+.mlg-voting-countdown {
+  font-family: var(--mlg-font-mono);
+  font-size: var(--mlg-gaming-emphasis);
+  font-weight: var(--mlg-weight-bold);
+  color: var(--mlg-text-warning);
+  letter-spacing: var(--mlg-gaming-tracking-stats);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Username and Profile Typography */
+.mlg-username {
+  font-family: var(--mlg-font-gaming);
+  font-weight: var(--mlg-weight-semibold);
+  color: var(--mlg-text-primary);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+}
+
+.mlg-username-tagged {
+  font-family: var(--mlg-font-gaming);
+  font-weight: var(--mlg-weight-bold);
+  color: var(--mlg-text-accent);
+  letter-spacing: var(--mlg-gaming-tracking-brand);
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+.mlg-profile-title {
+  font-family: var(--mlg-font-heading);
+  font-size: var(--mlg-gaming-heading);
+  font-weight: var(--mlg-weight-bold);
+  color: var(--mlg-text-primary);
+  letter-spacing: var(--mlg-gaming-tracking-brand);
+  text-transform: uppercase;
+}
+
+.mlg-profile-subtitle {
+  font-family: var(--mlg-font-primary);
+  font-size: var(--mlg-gaming-body);
+  font-weight: var(--mlg-weight-medium);
+  color: var(--mlg-text-accent);
+  letter-spacing: var(--mlg-gaming-tracking-ui);
+}
+
+/* Brand Logo Typography */
+.mlg-logo-text {
+  font-family: var(--mlg-font-display);
+  font-weight: var(--mlg-weight-extrabold);
+  letter-spacing: var(--mlg-gaming-tracking-display);
+  text-transform: uppercase;
+  color: var(--mlg-text-accent);
+  text-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+}
+
+.mlg-tagline {
+  font-family: var(--mlg-font-primary);
+  font-size: var(--mlg-gaming-tiny);
+  font-weight: var(--mlg-weight-medium);
+  color: var(--mlg-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--mlg-gaming-tracking-brand);
+}
+
+/* Responsive Typography */
+
+/* Mobile Typography Adjustments */
+@media (max-width: 480px) {
+  :root {
+    --mlg-gaming-micro: 0.6rem;
+    --mlg-gaming-tiny: 0.7rem;
+    --mlg-gaming-small: 0.8rem;
+    --mlg-gaming-body: 0.9rem;
+    --mlg-gaming-emphasis: 1rem;
+    --mlg-gaming-title: 1.2rem;
+    --mlg-gaming-heading: 1.5rem;
+    --mlg-gaming-hero: 2rem;
+    --mlg-gaming-display: 2.5rem;
+    --mlg-gaming-massive: 3rem;
+  }
+  
+  .mlg-gaming-hero,
+  .mlg-gaming-display,
+  .mlg-gaming-massive {
+    line-height: var(--mlg-gaming-leading-compact);
+  }
+}
+
+/* Tablet Typography Adjustments */
+@media (min-width: 481px) and (max-width: 768px) {
+  :root {
+    --mlg-gaming-micro: 0.65rem;
+    --mlg-gaming-tiny: 0.75rem;
+    --mlg-gaming-small: 0.85rem;
+    --mlg-gaming-body: 0.95rem;
+    --mlg-gaming-emphasis: 1.1rem;
+    --mlg-gaming-title: 1.3rem;
+    --mlg-gaming-heading: 1.6rem;
+    --mlg-gaming-hero: 2.2rem;
+    --mlg-gaming-display: 2.8rem;
+    --mlg-gaming-massive: 3.5rem;
+  }
+}
+
+/* Large Desktop Typography Adjustments */
+@media (min-width: 1440px) {
+  :root {
+    --mlg-gaming-micro: 0.7rem;
+    --mlg-gaming-tiny: 0.8rem;
+    --mlg-gaming-small: 0.95rem;
+    --mlg-gaming-body: 1.05rem;
+    --mlg-gaming-emphasis: 1.2rem;
+    --mlg-gaming-title: 1.5rem;
+    --mlg-gaming-heading: 1.9rem;
+    --mlg-gaming-hero: 2.5rem;
+    --mlg-gaming-display: 3.2rem;
+    --mlg-gaming-massive: 4.5rem;
+  }
+}
+
+/* Ultra-wide Typography Adjustments */
+@media (min-width: 1920px) {
+  :root {
+    --mlg-gaming-massive: 5rem;
+  }
+}
+
+/* High Contrast Mode Typography */
+@media (prefers-contrast: high) {
+  .mlg-tournament-text,
+  .mlg-leaderboard-rank,
+  .mlg-stat-value {
+    text-shadow: none;
+    border: 2px solid var(--mlg-text-primary);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+  
+  .mlg-username-tagged,
+  .mlg-achievement-text,
+  .mlg-logo-text {
+    text-shadow: none;
+    font-weight: var(--mlg-weight-black);
+  }
+}
+
+/* Reduced Motion Typography */
+@media (prefers-reduced-motion: reduce) {
+  .mlg-username-tagged,
+  .mlg-achievement-text,
+  .mlg-logo-text {
+    text-shadow: none;
+  }
+}
+
+/* Font Loading Performance */
+.mlg-font-loading {
+  font-display: swap;
+  font-synthesis: none;
+}
+
+/* Font Optimization Classes */
+.mlg-text-crisp {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.mlg-text-performance {
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+
 /* Print styles */
 @media print {
   .tile,
@@ -1098,5 +1762,21 @@ body {
     background: white;
     border: 1px solid black;
     color: black;
+  }
+  
+  /* Print Typography Overrides */
+  .mlg-text-accent,
+  .mlg-text-brand,
+  .mlg-text-success,
+  .mlg-text-warning,
+  .mlg-text-error {
+    color: black !important;
+  }
+  
+  .mlg-username-tagged,
+  .mlg-achievement-text,
+  .mlg-logo-text {
+    text-shadow: none !important;
+    color: black !important;
   }
 }

@@ -20,6 +20,7 @@
 
 import Joi from 'joi';
 import { BaseDAO } from './BaseDAO.js';
+import { MLGUsernameTaggingService } from '../../auth/mlg-username-tagging-service.js';
 
 /**
  * Validation schemas for user operations
@@ -72,6 +73,44 @@ export class UserDAO extends BaseDAO {
     });
 
     this.profileSchema = USER_SCHEMAS.profile;
+    
+    // Initialize MLG tagging service
+    this.mlgTaggingService = new MLGUsernameTaggingService({
+      db: this.db,
+      cache: this.redis,
+      logger: this.logger
+    });
+    
+    // Initialize tagging service
+    this.initializeMLGTagging();
+  }
+
+  /**
+   * Initialize MLG tagging service
+   */
+  async initializeMLGTagging() {
+    try {
+      await this.mlgTaggingService.initialize();
+      this.logger.info('🏷️ MLG tagging service integrated with UserDAO');
+    } catch (error) {
+      this.logger.error('❌ Failed to initialize MLG tagging service:', error);
+    }
+  }
+
+  /**
+   * Get display username with MLG tagging
+   * @param {string} userId - User ID
+   * @param {string} username - Original username
+   * @param {Object} options - Display options
+   * @returns {Promise<string>} Display username with MLG tag if applicable
+   */
+  async getDisplayUsername(userId, username, options = {}) {
+    try {
+      return await this.mlgTaggingService.getDisplayUsername(userId, username, options);
+    } catch (error) {
+      this.logger.error('❌ Error getting display username:', error);
+      return username;
+    }
   }
 
   /**
@@ -652,6 +691,19 @@ export class UserDAO extends BaseDAO {
 
       const result = await this.executeQuery(query, params);
 
+      // Apply MLG tagging to search results
+      if (this.mlgTaggingService) {
+        for (const user of result.rows) {
+          const displayUsername = await this.getDisplayUsername(
+            user.id, 
+            user.display_name || user.username, 
+            { source: 'search_results' }
+          );
+          user.mlg_display_name = displayUsername;
+          user.is_clan_member = displayUsername !== (user.display_name || user.username);
+        }
+      }
+
       // Get total count
       const countQuery = `
         SELECT COUNT(*) as total
@@ -719,7 +771,18 @@ export class UserDAO extends BaseDAO {
       `;
 
       const result = await this.executeQuery(query, [id]);
-      const user = result.rows[0] || null;
+      let user = result.rows[0] || null;
+
+      // Apply MLG tagging to display name if user exists
+      if (user && this.mlgTaggingService) {
+        const displayUsername = await this.getDisplayUsername(
+          user.id, 
+          user.display_name || user.username, 
+          { source: 'profile_lookup' }
+        );
+        user.mlg_display_name = displayUsername;
+        user.is_clan_member = displayUsername !== (user.display_name || user.username);
+      }
 
       // Cache the result
       if (user && this.cacheEnabled && this.redis) {

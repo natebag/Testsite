@@ -19,6 +19,9 @@
   <!-- Standardized Module Loading System -->
   <script type="module" src="../../src/shared/router/page-loader.js"></script>
   <script type="module" src="../../src/shared/utils/api/mlg-api-client-consolidated.js"></script>
+  <script type="module" src="../../src/shared/components/mlg-branding-system.js"></script>
+  <script type="module" src="../../src/core/auth/mlg-username-tagging-service.js"></script>
+  <script type="module" src="../../src/shared/utils/mlg-branding-init.js"></script>
 
   <!-- Page Configuration -->
   <script>
@@ -235,21 +238,64 @@
     <div class="absolute inset-0 bg-gradient-to-r from-gaming-bg via-gaming-surface to-gaming-bg opacity-50"></div>
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       
-      <!-- Profile Banner -->
-      <div class="card-glow rounded-xl p-8 mb-8">
-        <div class="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
-          
-          <!-- Avatar -->
-          <div class="profile-avatar w-32 h-32 flex items-center justify-center">
-            <div class="w-28 h-28 bg-gaming-bg rounded-full flex items-center justify-center">
-              <i data-lucide="user" class="w-12 h-12 text-gaming-accent"></i>
+      <!-- MLG Branded Profile Header -->
+      <div id="mlg-profile-header" class="card-glow rounded-xl p-8 mb-8 mlg-branding" data-mlg-branding="header">
+        
+        <!-- MLG Header Branding -->
+        <div class="mlg-header-branding flex items-center justify-between mb-6">
+          <div class="mlg-brand-identity flex items-center space-x-4">
+            <div class="mlg-logo-section">
+              <div class="flex items-center space-x-3">
+                <span class="text-3xl animate-pulse">🏆</span>
+                <div class="mlg-brand-text">
+                  <h2 class="text-2xl font-bold text-gaming-accent tracking-wide">[MLG]</h2>
+                  <p class="text-xs text-gaming-blue uppercase tracking-widest">Major League Gaming</p>
+                </div>
+              </div>
+            </div>
+            <div class="mlg-motto hidden md:block">
+              <p class="text-sm text-gray-400 italic">"Elite Gaming Excellence"</p>
             </div>
           </div>
           
-          <!-- Profile Info -->
+          <div class="mlg-membership-badge">
+            <div class="bg-gradient-to-r from-gaming-accent to-gaming-blue px-4 py-2 rounded-lg border border-gaming-accent border-opacity-50">
+              <div class="flex items-center space-x-2">
+                <span class="text-black font-bold text-sm">ELITE MEMBER</span>
+                <span class="text-black text-xs">2024</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Profile Banner -->
+        <div class="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+          
+          <!-- Avatar with MLG Enhancement -->
+          <div class="relative">
+            <div class="profile-avatar w-32 h-32 flex items-center justify-center">
+              <div class="w-28 h-28 bg-gaming-bg rounded-full flex items-center justify-center">
+                <i data-lucide="user" class="w-12 h-12 text-gaming-accent"></i>
+              </div>
+            </div>
+            <!-- MLG Badge Overlay -->
+            <div class="absolute -top-2 -right-2">
+              <div class="bg-gaming-accent text-black px-2 py-1 rounded-full text-xs font-bold border-2 border-gaming-bg">
+                MLG
+              </div>
+            </div>
+          </div>
+          
+          <!-- Profile Info with MLG Tagging -->
           <div class="flex-1 text-center md:text-left">
             <div class="flex flex-col md:flex-row md:items-center md:space-x-4 mb-4">
-              <h1 class="text-4xl font-bold text-gaming-accent" id="profile-name">ProGamer2024</h1>
+              <div class="mlg-username-container flex items-center justify-center md:justify-start space-x-3">
+                <!-- MLG Tagged Username -->
+                <div class="mlg-username-display">
+                  <span class="bg-gaming-accent bg-opacity-20 text-gaming-accent px-3 py-1 rounded-lg text-sm font-bold mr-2 border border-gaming-accent border-opacity-50">[MLG]</span>
+                  <h1 class="text-4xl font-bold text-white inline" id="profile-name">ProGamer2024</h1>
+                </div>
+              </div>
               <div class="flex items-center justify-center md:justify-start space-x-2 mt-2 md:mt-0">
                 <div class="bg-gaming-purple px-3 py-1 rounded-full text-sm font-bold">Diamond</div>
                 <div class="status-online">
@@ -258,43 +304,77 @@
               </div>
             </div>
             
-            <p class="text-gray-300 mb-4 text-lg" id="profile-bio">
-              Professional esports player | MLG Elite Clan Member | Content Creator
-            </p>
+            <!-- MLG Bio with Branding -->
+            <div class="mlg-bio-section mb-4">
+              <p class="text-gray-300 text-lg" id="profile-bio">
+                Professional esports player | <span class="text-gaming-accent font-semibold">MLG Elite Clan Member</span> | Content Creator
+              </p>
+              <p class="text-gaming-blue text-sm mt-1">
+                🏆 Elite Gaming Community • Verified MLG Member
+              </p>
+            </div>
             
-            <!-- Quick Stats -->
+            <!-- Enhanced Quick Stats with MLG Styling -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div class="text-center">
+              <div class="text-center bg-gaming-surface bg-opacity-50 rounded-lg p-3 border border-gaming-accent border-opacity-20">
                 <div class="text-2xl font-bold text-gaming-accent" id="profile-level">47</div>
-                <div class="text-sm text-gray-400">Level</div>
+                <div class="text-sm text-gray-400">MLG Level</div>
               </div>
-              <div class="text-center">
+              <div class="text-center bg-gaming-surface bg-opacity-50 rounded-lg p-3 border border-gaming-blue border-opacity-20">
                 <div class="text-2xl font-bold text-gaming-blue" id="profile-wins">1,247</div>
-                <div class="text-sm text-gray-400">Wins</div>
+                <div class="text-sm text-gray-400">Tournament Wins</div>
               </div>
-              <div class="text-center">
+              <div class="text-center bg-gaming-surface bg-opacity-50 rounded-lg p-3 border border-gaming-purple border-opacity-20">
                 <div class="text-2xl font-bold text-gaming-purple" id="profile-tournaments">23</div>
-                <div class="text-sm text-gray-400">Tournaments</div>
+                <div class="text-sm text-gray-400">MLG Events</div>
               </div>
-              <div class="text-center">
+              <div class="text-center bg-gaming-surface bg-opacity-50 rounded-lg p-3 border border-gaming-yellow border-opacity-20">
                 <div class="text-2xl font-bold text-gaming-yellow" id="profile-earnings">$12.4K</div>
-                <div class="text-sm text-gray-400">Earnings</div>
+                <div class="text-sm text-gray-400">Prize Earnings</div>
               </div>
             </div>
           </div>
           
-          <!-- Action Buttons -->
+          <!-- Action Buttons with MLG Styling -->
           <div class="flex flex-col space-y-3">
-            <button id="edit-profile" class="bg-gaming-accent hover:bg-green-400 text-black px-6 py-2 rounded-lg font-bold transition-colors">
+            <button id="edit-profile" class="bg-gaming-accent hover:bg-green-400 text-black px-6 py-2 rounded-lg font-bold transition-colors border border-gaming-accent">
               <i data-lucide="edit" class="w-4 h-4 inline mr-2"></i>
               Edit Profile
             </button>
-            <button id="share-profile" class="bg-gaming-surface hover:bg-gaming-blue px-6 py-2 rounded-lg font-bold transition-colors">
+            <button id="share-profile" class="bg-gaming-surface hover:bg-gaming-blue px-6 py-2 rounded-lg font-bold transition-colors border border-gaming-blue border-opacity-50">
               <i data-lucide="share" class="w-4 h-4 inline mr-2"></i>
               Share Profile
             </button>
+            <button id="mlg-achievements" class="bg-gradient-to-r from-gaming-purple to-gaming-accent text-black px-6 py-2 rounded-lg font-bold transition-colors">
+              <span class="text-sm">🏆</span>
+              <span class="ml-2">MLG Achievements</span>
+            </button>
           </div>
           
+        </div>
+        
+        <!-- MLG Achievement Showcase -->
+        <div class="mlg-achievement-bar mt-6 pt-6 border-t border-gaming-accent border-opacity-20">
+          <div class="flex items-center justify-between">
+            <div class="mlg-achievement-title">
+              <h3 class="text-lg font-bold text-gaming-accent">🏆 MLG Achievements</h3>
+              <p class="text-sm text-gray-400">Elite tier accomplishments</p>
+            </div>
+            <div class="flex space-x-2">
+              <div class="achievement-badge bg-gaming-accent bg-opacity-20 p-2 rounded-lg border border-gaming-accent border-opacity-30" title="Tournament Champion">
+                <span class="text-gaming-accent">🏆</span>
+              </div>
+              <div class="achievement-badge bg-gaming-blue bg-opacity-20 p-2 rounded-lg border border-gaming-blue border-opacity-30" title="MLG Elite">
+                <span class="text-gaming-blue">⭐</span>
+              </div>
+              <div class="achievement-badge bg-gaming-purple bg-opacity-20 p-2 rounded-lg border border-gaming-purple border-opacity-30" title="Content Creator">
+                <span class="text-gaming-purple">🎬</span>
+              </div>
+              <div class="achievement-badge bg-gaming-yellow bg-opacity-20 p-2 rounded-lg border border-gaming-yellow border-opacity-30" title="Top Performer">
+                <span class="text-gaming-yellow">💎</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -344,32 +424,56 @@
             </div>
           </div>
 
-          <!-- Clan Membership -->
-          <div class="card-glow rounded-xl p-6">
+          <!-- MLG Clan Membership -->
+          <div class="card-glow rounded-xl p-6 mlg-branding" data-mlg-branding="profile">
             <h3 class="text-xl font-bold text-gaming-purple mb-4 flex items-center">
               <i data-lucide="users" class="w-5 h-5 mr-2"></i>
-              Clan Membership
+              <span class="text-gaming-accent">[MLG]</span>
+              <span class="ml-2">Clan Membership</span>
             </h3>
             <div class="text-center">
-              <div class="w-16 h-16 bg-gradient-to-r from-gaming-purple to-gaming-blue rounded-full mx-auto mb-3 flex items-center justify-center">
-                <i data-lucide="shield" class="w-8 h-8 text-white"></i>
-              </div>
-              <h4 class="font-bold text-lg text-gaming-purple">MLG Elite</h4>
-              <p class="text-sm text-gray-400 mb-4">Diamond Tier • Member since Mar 2024</p>
-              
-              <div class="grid grid-cols-2 gap-4 text-sm">
-                <div class="bg-gaming-surface rounded p-2">
-                  <div class="text-gaming-accent font-bold">Captain</div>
-                  <div class="text-gray-400">Role</div>
+              <!-- MLG Enhanced Clan Logo -->
+              <div class="relative inline-block mb-3">
+                <div class="w-16 h-16 bg-gradient-to-r from-gaming-purple to-gaming-blue rounded-full mx-auto flex items-center justify-center border-2 border-gaming-accent">
+                  <i data-lucide="shield" class="w-8 h-8 text-white"></i>
                 </div>
-                <div class="bg-gaming-surface rounded p-2">
-                  <div class="text-gaming-blue font-bold">#12</div>
+                <div class="absolute -top-1 -right-1 bg-gaming-accent text-black text-xs font-bold px-2 py-1 rounded-full border border-gaming-bg">
+                  MLG
+                </div>
+              </div>
+              
+              <!-- MLG Clan Identity -->
+              <div class="mlg-clan-identity mb-4">
+                <h4 class="font-bold text-lg text-gaming-accent">🏆 MLG Elite</h4>
+                <p class="text-sm text-gaming-blue font-semibold">Major League Gaming • Elite Division</p>
+                <p class="text-sm text-gray-400">Diamond Tier • Member since Mar 2024</p>
+              </div>
+              
+              <!-- Enhanced Role Display -->
+              <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                <div class="bg-gaming-surface rounded p-3 border border-gaming-accent border-opacity-30">
+                  <div class="text-gaming-accent font-bold text-lg">Captain</div>
+                  <div class="text-gray-400">MLG Role</div>
+                </div>
+                <div class="bg-gaming-surface rounded p-3 border border-gaming-blue border-opacity-30">
+                  <div class="text-gaming-blue font-bold text-lg">#12</div>
                   <div class="text-gray-400">Clan Rank</div>
                 </div>
               </div>
               
-              <button class="w-full bg-gaming-purple hover:bg-purple-600 px-4 py-2 rounded-lg font-bold mt-4 transition-colors">
-                View Clan Details
+              <!-- MLG Member Benefits -->
+              <div class="mlg-benefits bg-gaming-accent bg-opacity-10 rounded-lg p-3 mb-4 border border-gaming-accent border-opacity-30">
+                <h5 class="text-gaming-accent font-bold text-sm mb-2">🎯 MLG Member Benefits</h5>
+                <div class="text-xs text-gray-300 space-y-1">
+                  <div>✓ Tournament Priority Access</div>
+                  <div>✓ Exclusive MLG Events</div>
+                  <div>✓ Premium Support</div>
+                </div>
+              </div>
+              
+              <button class="w-full bg-gaming-purple hover:bg-purple-600 px-4 py-2 rounded-lg font-bold transition-colors border border-gaming-purple">
+                <span class="mr-2">🏆</span>
+                View MLG Clan Details
               </button>
             </div>
           </div>

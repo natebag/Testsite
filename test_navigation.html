@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Navigation Test</title>
+    <script>
+        // Simple test to verify navigation functions
+        window.addEventListener('load', function() {
+            console.log('Testing navigation functions...');
+            
+            // Check if key functions exist
+            const functionsToTest = [
+                'loadSection',
+                'navigateToSection', 
+                'handleNavigation',
+                'updateActiveNavigation'
+            ];
+            
+            functionsToTest.forEach(func => {
+                if (typeof window[func] === 'function') {
+                    console.log('✓ Function exists:', func);
+                } else {
+                    console.log('✗ Missing function:', func);
+                }
+            });
+            
+            // Check if required elements exist
+            const elementsToTest = [
+                'dynamic-content',
+                'dynamic-content-section',
+                'dashboard'
+            ];
+            
+            elementsToTest.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    console.log('✓ Element exists:', id);
+                } else {
+                    console.log('✗ Missing element:', id);
+                }
+            });
+            
+            console.log('Test completed. Check results above.');
+        });
+    </script>
+</head>
+<body>
+    <h1>Navigation Test Page</h1>
+    <p>Open browser console to see test results.</p>
+    
+    <!-- Include the main page via iframe for testing -->
+    <iframe src="public/pages/index.html" width="100%" height="600" style="border: 1px solid #ccc;"></iframe>
+</body>
+</html>

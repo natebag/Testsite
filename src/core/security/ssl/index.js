@@ -104,7 +104,7 @@ export const SSL_INTEGRATION_CONFIG = {
 /**
  * SSL Security Integration Manager
  */
-export class SSLSecurityIntegration {
+class SSLSecurityIntegration {
   constructor(options = {}) {
     this.config = { ...SSL_INTEGRATION_CONFIG, ...options };
     this.components = new Map();

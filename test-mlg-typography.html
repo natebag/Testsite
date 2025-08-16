@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG Typography System Test - Task 21.4</title>
+    
+    <!-- MLG Official Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Play:wght@400;700&family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="src/styles/main.css">
+    
+    <style>
+        /* Custom showcase styles */
+        .typography-showcase {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 2rem;
+        }
+        
+        .typography-section {
+            background: rgba(26, 26, 46, 0.8);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .typography-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .font-sample {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        .color-sample {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="typography-showcase">
+    <div class="container mx-auto max-w-6xl">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="mlg-gaming-display mlg-text-accent mb-4">MLG Typography System</h1>
+            <p class="mlg-gaming-body mlg-text-secondary">Task 21.4: Official MLG Font Styles & Brand Guidelines</p>
+            <div class="mlg-tagline mt-2">Professional Gaming Typography Scale</div>
+        </header>
+
+        <!-- Font Families Section -->
+        <section class="typography-section">
+            <h2 class="mlg-gaming-heading mlg-text-accent mb-6">MLG Font Families</h2>
+            <div class="typography-grid">
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Rajdhani - Primary</h3>
+                    <p class="mlg-font-primary text-lg">The quick brown fox jumps over the lazy dog</p>
+                    <p class="mlg-font-primary mlg-gaming-body">Perfect for body text, navigation, and UI elements</p>
+                    <p class="mlg-font-primary mlg-gaming-small mlg-text-muted">Clean, readable, gaming-focused</p>
+                </div>
+                
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Orbitron - Heading</h3>
+                    <p class="mlg-font-heading text-lg">The quick brown fox jumps over the lazy dog</p>
+                    <p class="mlg-font-heading mlg-gaming-body">Ideal for headings, section titles, and branding</p>
+                    <p class="mlg-font-heading mlg-gaming-small mlg-text-muted">Futuristic, bold, professional</p>
+                </div>
+                
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Exo 2 - Display</h3>
+                    <p class="mlg-font-display text-lg">THE QUICK BROWN FOX JUMPS</p>
+                    <p class="mlg-font-display mlg-gaming-body">Perfect for hero text and display elements</p>
+                    <p class="mlg-font-display mlg-gaming-small mlg-text-muted">POWERFUL, COMMANDING, COMPETITIVE</p>
+                </div>
+                
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Play - Gaming</h3>
+                    <p class="mlg-font-gaming text-lg">The quick brown fox jumps over the lazy dog</p>
+                    <p class="mlg-font-gaming mlg-gaming-body">Great for usernames, stats, and gaming content</p>
+                    <p class="mlg-font-gaming mlg-gaming-small mlg-text-muted">Playful, modern, competitive</p>
+                </div>
+                
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Fira Code - Mono</h3>
+                    <p class="mlg-font-mono text-lg">123456789 | Stats: 42.5K</p>
+                    <p class="mlg-font-mono mlg-gaming-body">Numbers, statistics, and data display</p>
+                    <p class="mlg-font-mono mlg-gaming-small mlg-text-muted">Precise, tabular, technical</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Typography Scale Section -->
+        <section class="typography-section">
+            <h2 class="mlg-gaming-heading mlg-text-accent mb-6">MLG Gaming Typography Scale</h2>
+            <div class="space-y-4">
+                <div class="font-sample">
+                    <span class="mlg-gaming-tiny mlg-text-muted">MICRO:</span>
+                    <span class="mlg-gaming-micro mlg-text-accent">Ultra Small Stats - 10px</span>
+                </div>
+                
+                <div class="font-sample">
+                    <span class="mlg-gaming-tiny mlg-text-muted">TINY:</span>
+                    <span class="mlg-gaming-tiny mlg-text-accent">TINY LABELS - 12px</span>
+                </div>
+                
+                <div class="font-sample">
+                    <span class="mlg-gaming-tiny mlg-text-muted">SMALL:</span>
+                    <span class="mlg-gaming-small mlg-text-accent">Small Info Text - 14px</span>
+                </div>
+                
+                <div class="font-sample">
+                    <span class="mlg-gaming-tiny mlg-text-muted">BODY:</span>
+                    <span class="mlg-gaming-body mlg-text-accent">Body Content Text - 16px</span>
+                </div>
+                
+                <div class="font-sample">
+                    <span class="mlg-gaming-tiny mlg-text-muted">EMPHASIS:</span>
+                    <span class="mlg-gaming-emphasis mlg-text-accent">Emphasized Text - 18px</span>
+                </div>
+                
+                <div class="font-sample">
+                    <span class="mlg-gaming-tiny mlg-text-muted">TITLE:</span>
+                    <span class="mlg-gaming-title mlg-text-accent">SECTION TITLES - 22px</span>
+                </div>
+                
+                <div class="font-sample">
+                    <span class="mlg-gaming-tiny mlg-text-muted">HEADING:</span>
+                    <span class="mlg-gaming-heading mlg-text-accent">PAGE HEADINGS - 28px</span>
+                </div>
+                
+                <div class="font-sample">
+                    <span class="mlg-gaming-tiny mlg-text-muted">HERO:</span>
+                    <span class="mlg-gaming-hero mlg-text-accent">HERO TEXT - 36px</span>
+                </div>
+                
+                <div class="font-sample">
+                    <span class="mlg-gaming-tiny mlg-text-muted">DISPLAY:</span>
+                    <span class="mlg-gaming-display mlg-text-accent">DISPLAY TEXT - 48px</span>
+                </div>
+                
+                <div class="font-sample">
+                    <span class="mlg-gaming-tiny mlg-text-muted">MASSIVE:</span>
+                    <span class="mlg-gaming-massive mlg-text-accent">MASSIVE - 64px</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gaming Content Examples -->
+        <section class="typography-section">
+            <h2 class="mlg-gaming-heading mlg-text-accent mb-6">Gaming Content Typography</h2>
+            <div class="typography-grid">
+                
+                <!-- Tournament Bracket -->
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Tournament Bracket</h3>
+                    <div class="mlg-tournament-text">Round 1 - Quarter Finals</div>
+                    <div class="mlg-tournament-team">[MLG] Team Alpha</div>
+                    <div class="mlg-tournament-score">247</div>
+                    <div class="mlg-tournament-text">VS</div>
+                    <div class="mlg-tournament-team">[MLG] Team Beta</div>
+                    <div class="mlg-tournament-score">193</div>
+                </div>
+                
+                <!-- Leaderboard -->
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Leaderboard</h3>
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="mlg-leaderboard-rank">#1</span>
+                        <span class="mlg-leaderboard-player">[MLG] ProGamer42</span>
+                        <span class="mlg-leaderboard-score">1,247</span>
+                        <span class="mlg-leaderboard-change up">▲ +5</span>
+                    </div>
+                    <div class="flex items-center gap-4 mb-2">
+                        <span class="mlg-leaderboard-rank">#2</span>
+                        <span class="mlg-leaderboard-player">[MLG] EliteShooter</span>
+                        <span class="mlg-leaderboard-score">1,156</span>
+                        <span class="mlg-leaderboard-change down">▼ -2</span>
+                    </div>
+                </div>
+                
+                <!-- Clan Management -->
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Clan Management</h3>
+                    <div class="mb-2">
+                        <span class="mlg-clan-member-name">[MLG] ClanLeader</span>
+                        <span class="mlg-clan-role mlg-clan-role-leader">LEADER</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="mlg-clan-member-name">[MLG] Officer1</span>
+                        <span class="mlg-clan-role mlg-clan-role-officer">OFFICER</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="mlg-clan-member-name">[MLG] Member123</span>
+                        <span class="mlg-clan-role mlg-clan-role-member">MEMBER</span>
+                    </div>
+                    <div class="mlg-clan-stats">Total Members: 47 | Online: 23</div>
+                </div>
+                
+                <!-- Gaming Stats -->
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Gaming Statistics</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <div class="mlg-stat-value">2,847</div>
+                            <div class="mlg-stat-label">Total Votes</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="mlg-stat-value">156</div>
+                            <div class="mlg-stat-label">Clips Uploaded</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="mlg-stat-value">89.5%</div>
+                            <div class="mlg-stat-label">Win Rate</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="mlg-stat-value">42</div>
+                            <div class="mlg-stat-label">Achievements</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Voting Interface -->
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Voting Interface</h3>
+                    <div class="mlg-voting-title">Best Gaming Clip of the Day</div>
+                    <div class="mlg-voting-description">Vote for your favorite gaming moment from today's submissions. Each vote helps determine the daily champion.</div>
+                    <div class="mlg-voting-stats">147 votes cast | 23 hours remaining</div>
+                    <div class="mlg-voting-countdown">Time Left: 23:45:12</div>
+                </div>
+                
+                <!-- Profile Display -->
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Profile Display</h3>
+                    <div class="mlg-profile-title">[MLG] ELITE GAMER</div>
+                    <div class="mlg-profile-subtitle">Professional Gaming Champion</div>
+                    <div class="mlg-username-tagged">[MLG] Tagged Username</div>
+                    <div class="mlg-username">RegularUsername</div>
+                    <div class="mlg-achievement-text">🏆 Tournament Champion</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Color Palette -->
+        <section class="typography-section">
+            <h2 class="mlg-gaming-heading mlg-text-accent mb-6">MLG Color Palette</h2>
+            <div class="typography-grid">
+                <div>
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Text Colors</h3>
+                    <div class="space-y-2">
+                        <div class="color-sample mlg-text-primary" style="background: rgba(255, 255, 255, 0.1);">Primary Text</div>
+                        <div class="color-sample mlg-text-secondary" style="background: rgba(229, 229, 229, 0.1);">Secondary Text</div>
+                        <div class="color-sample mlg-text-tertiary" style="background: rgba(204, 204, 204, 0.1);">Tertiary Text</div>
+                        <div class="color-sample mlg-text-muted" style="background: rgba(153, 153, 153, 0.1);">Muted Text</div>
+                        <div class="color-sample mlg-text-accent" style="background: rgba(0, 255, 136, 0.2);">Accent Text</div>
+                        <div class="color-sample mlg-text-brand" style="background: rgba(0, 212, 255, 0.2);">Brand Text</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Status Colors</h3>
+                    <div class="space-y-2">
+                        <div class="color-sample mlg-text-success" style="background: rgba(16, 185, 129, 0.2);">Success</div>
+                        <div class="color-sample mlg-text-warning" style="background: rgba(251, 191, 36, 0.2);">Warning</div>
+                        <div class="color-sample mlg-text-error" style="background: rgba(239, 68, 68, 0.2);">Error</div>
+                        <div class="color-sample mlg-text-disabled" style="background: rgba(102, 102, 102, 0.2);">Disabled</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Responsive Preview -->
+        <section class="typography-section">
+            <h2 class="mlg-gaming-heading mlg-text-accent mb-6">Responsive Typography</h2>
+            <div class="typography-grid">
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Mobile (480px)</h3>
+                    <div class="text-sm mlg-text-muted">Font sizes scaled down for readability</div>
+                    <div class="mlg-gaming-heading">Smaller Heading</div>
+                    <div class="mlg-gaming-body">Optimized body text</div>
+                </div>
+                
+                <div class="font-sample">
+                    <h3 class="mlg-gaming-title mlg-text-brand mb-3">Desktop (1440px+)</h3>
+                    <div class="text-sm mlg-text-muted">Enhanced scaling for large displays</div>
+                    <div class="mlg-gaming-heading">Larger Heading</div>
+                    <div class="mlg-gaming-body">Enhanced readability</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Branding Elements -->
+        <section class="typography-section">
+            <h2 class="mlg-gaming-heading mlg-text-accent mb-6">MLG Branding Elements</h2>
+            <div class="text-center">
+                <div class="mlg-logo-text text-6xl mb-4">🏆 MLG</div>
+                <div class="mlg-tagline">MAJOR LEAGUE GAMING</div>
+                <div class="mlg-gaming-body mlg-text-secondary mt-4">Elite Gaming Excellence</div>
+            </div>
+        </section>
+
+        <!-- Implementation Examples -->
+        <section class="typography-section">
+            <h2 class="mlg-gaming-heading mlg-text-accent mb-6">Implementation Classes</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="font-sample">
+                    <h4 class="mlg-gaming-title mlg-text-brand mb-2">Font Classes</h4>
+                    <code class="text-sm block">
+                        .mlg-font-primary<br>
+                        .mlg-font-heading<br>
+                        .mlg-font-display<br>
+                        .mlg-font-gaming<br>
+                        .mlg-font-mono
+                    </code>
+                </div>
+                
+                <div class="font-sample">
+                    <h4 class="mlg-gaming-title mlg-text-brand mb-2">Size Classes</h4>
+                    <code class="text-sm block">
+                        .mlg-gaming-micro<br>
+                        .mlg-gaming-tiny<br>
+                        .mlg-gaming-small<br>
+                        .mlg-gaming-body<br>
+                        .mlg-gaming-emphasis<br>
+                        .mlg-gaming-title<br>
+                        .mlg-gaming-heading<br>
+                        .mlg-gaming-hero<br>
+                        .mlg-gaming-display<br>
+                        .mlg-gaming-massive
+                    </code>
+                </div>
+                
+                <div class="font-sample">
+                    <h4 class="mlg-gaming-title mlg-text-brand mb-2">Color Classes</h4>
+                    <code class="text-sm block">
+                        .mlg-text-primary<br>
+                        .mlg-text-secondary<br>
+                        .mlg-text-accent<br>
+                        .mlg-text-brand<br>
+                        .mlg-text-success<br>
+                        .mlg-text-warning<br>
+                        .mlg-text-error
+                    </code>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center mt-12 py-8">
+            <div class="mlg-gaming-title mlg-text-accent mb-2">MLG Typography System</div>
+            <div class="mlg-gaming-small mlg-text-muted">Task 21.4 Complete - Official MLG Font Styles</div>
+            <div class="mlg-tagline mt-2">Professional Gaming Brand Typography</div>
+        </footer>
+    </div>
+</body>
+</html>

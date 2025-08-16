@@ -28,6 +28,9 @@
   <!-- Consolidated Wallet & Voting Integration -->
   <script type="module" src="../../src/shared/utils/wallet/mlg-wallet-init-consolidated.js"></script>
   <meta name="mlg-wallet-auto-init" content="true">
+
+  <!-- MLG Username Display Integration -->
+  <script type="module" src="../../src/shared/utils/mlg-username-display.js"></script>
   
   <style>
     /* Page-specific styles */
@@ -449,6 +452,15 @@
       async init() {
         console.log('🗳️ Initializing Voting Platform...');
         
+        // Initialize MLG Username Display Utility
+        try {
+          const { mlgUsernameDisplay } = await import('../../src/shared/utils/mlg-username-display.js');
+          window.mlgUsernameDisplay = mlgUsernameDisplay;
+          console.log('🏷️ MLG Username Display Utility loaded');
+        } catch (error) {
+          console.warn('⚠️ MLG Username Display Utility not available:', error);
+        }
+        
         this.initializeUI();
         this.setupEventListeners();
         
@@ -851,24 +863,106 @@
 
       generateVotersLeaderboard() {
         return [
-          { username: 'TokenMaster2024', votes: 1247, mlgBurned: 31175, rank: 1, verified: true },
-          { username: 'VoteKing', votes: 891, mlgBurned: 22275, rank: 2, verified: true },
-          { username: 'CryptoVoter', votes: 723, mlgBurned: 18075, rank: 3, verified: false },
-          { username: 'MLGBurner', votes: 654, mlgBurned: 16350, rank: 4, verified: true },
-          { username: 'VoteWhale', votes: 589, mlgBurned: 14725, rank: 5, verified: false },
-          { username: 'PowerVoter', votes: 512, mlgBurned: 12800, rank: 6, verified: true },
-          { username: 'BurnMaster', votes: 456, mlgBurned: 11400, rank: 7, verified: false },
-          { username: 'VoteHero', votes: 387, mlgBurned: 9675, rank: 8, verified: true }
+          { 
+            id: 'user_001',
+            username: 'TokenMaster2024', 
+            mlg_display_name: '[MLG] TokenMaster2024',
+            votes: 1247, 
+            mlgBurned: 31175, 
+            rank: 1, 
+            verified: true,
+            is_clan_member: true,
+            clan_name: 'MLG Elite'
+          },
+          { 
+            id: 'user_002',
+            username: 'VoteKing', 
+            mlg_display_name: '[MLG] VoteKing',
+            votes: 891, 
+            mlgBurned: 22275, 
+            rank: 2, 
+            verified: true,
+            is_clan_member: true,
+            clan_name: 'MLG Elite'
+          },
+          { 
+            id: 'user_003',
+            username: 'CryptoVoter', 
+            mlg_display_name: 'CryptoVoter',
+            votes: 723, 
+            mlgBurned: 18075, 
+            rank: 3, 
+            verified: false,
+            is_clan_member: false
+          },
+          { 
+            id: 'user_004',
+            username: 'MLGBurner', 
+            mlg_display_name: '[MLG] MLGBurner',
+            votes: 654, 
+            mlgBurned: 16350, 
+            rank: 4, 
+            verified: true,
+            is_clan_member: true,
+            clan_name: 'MLG Elite'
+          },
+          { 
+            id: 'user_005',
+            username: 'VoteWhale', 
+            mlg_display_name: 'VoteWhale',
+            votes: 589, 
+            mlgBurned: 14725, 
+            rank: 5, 
+            verified: false,
+            is_clan_member: false
+          },
+          { 
+            id: 'user_006',
+            username: 'PowerVoter', 
+            mlg_display_name: '[MLG] PowerVoter',
+            votes: 512, 
+            mlgBurned: 12800, 
+            rank: 6, 
+            verified: true,
+            is_clan_member: true,
+            clan_name: 'MLG Elite'
+          },
+          { 
+            id: 'user_007',
+            username: 'BurnMaster', 
+            mlg_display_name: 'BurnMaster',
+            votes: 456, 
+            mlgBurned: 11400, 
+            rank: 7, 
+            verified: false,
+            is_clan_member: false
+          },
+          { 
+            id: 'user_008',
+            username: 'VoteHero', 
+            mlg_display_name: '[MLG] VoteHero',
+            votes: 387, 
+            mlgBurned: 9675, 
+            rank: 8, 
+            verified: true,
+            is_clan_member: true,
+            clan_name: 'MLG Elite'
+          }
         ];
       }
 
-      updateVotersLeaderboard() {
+      async updateVotersLeaderboard() {
         const leaderboard = this.generateVotersLeaderboard();
         const container = document.getElementById('voters-leaderboard');
         
         if (!container) return;
 
-        container.innerHTML = leaderboard.map((voter, index) => {
+        // Clear container first
+        container.innerHTML = '';
+
+        // Create leaderboard entries with MLG tagging
+        for (let index = 0; index < leaderboard.length; index++) {
+          const voter = leaderboard[index];
           const rankColor = index === 0 ? 'text-yellow-400' : 
                            index === 1 ? 'text-gray-300' : 
                            index === 2 ? 'text-amber-600' : 'text-gray-400';
@@ -877,29 +971,91 @@
                           index === 1 ? '🥈' : 
                           index === 2 ? '🥉' : `#${index + 1}`;
 
-          return `
-            <div class="flex items-center justify-between p-3 bg-gaming-surface rounded-lg hover:bg-opacity-80 transition-all">
-              <div class="flex items-center space-x-3">
-                <div class="text-lg font-bold ${rankColor} min-w-[2rem] text-center">
-                  ${rankIcon}
-                </div>
-                <div>
-                  <div class="flex items-center space-x-2">
-                    <span class="font-semibold text-white">${voter.username}</span>
-                    ${voter.verified ? '<i data-lucide="check-circle" class="w-4 h-4 text-gaming-accent"></i>' : ''}
-                  </div>
-                  <div class="text-xs text-gray-400">
-                    ${voter.mlgBurned.toLocaleString()} MLG burned
-                  </div>
-                </div>
-              </div>
-              <div class="text-right">
-                <div class="text-lg font-bold text-gaming-accent">${voter.votes.toLocaleString()}</div>
-                <div class="text-xs text-gray-400">votes</div>
-              </div>
-            </div>
-          `;
-        }).join('');
+          // Create leaderboard entry element
+          const entryDiv = document.createElement('div');
+          entryDiv.className = 'flex items-center justify-between p-3 bg-gaming-surface rounded-lg hover:bg-opacity-80 transition-all';
+          
+          // Create left side (rank + username)
+          const leftDiv = document.createElement('div');
+          leftDiv.className = 'flex items-center space-x-3';
+          
+          // Rank icon
+          const rankDiv = document.createElement('div');
+          rankDiv.className = `text-lg font-bold ${rankColor} min-w-[2rem] text-center`;
+          rankDiv.textContent = rankIcon;
+          leftDiv.appendChild(rankDiv);
+          
+          // User info container
+          const userDiv = document.createElement('div');
+          
+          // Username with MLG tag using utility
+          const usernameContainer = document.createElement('div');
+          usernameContainer.className = 'flex items-center space-x-2';
+          
+          // Import and use MLG username display utility
+          if (window.mlgUsernameDisplay) {
+            const usernameElement = window.mlgUsernameDisplay.createUsernameElement(
+              voter.username,
+              voter.mlg_display_name,
+              {
+                userId: voter.id,
+                clanName: voter.clan_name,
+                interactive: true
+              }
+            );
+            usernameContainer.appendChild(usernameElement);
+          } else {
+            // Fallback to manual MLG tag display
+            const usernameSpan = document.createElement('span');
+            usernameSpan.className = 'font-semibold text-white';
+            if (voter.is_clan_member && voter.mlg_display_name.startsWith('[MLG]')) {
+              const tagSpan = document.createElement('span');
+              tagSpan.className = 'inline-block bg-gaming-accent bg-opacity-20 text-gaming-accent px-2 py-1 rounded text-xs font-bold mr-2';
+              tagSpan.textContent = 'MLG';
+              usernameSpan.appendChild(tagSpan);
+              usernameSpan.innerHTML += voter.username;
+            } else {
+              usernameSpan.textContent = voter.username;
+            }
+            usernameContainer.appendChild(usernameSpan);
+          }
+          
+          // Verification badge
+          if (voter.verified) {
+            const badge = document.createElement('i');
+            badge.setAttribute('data-lucide', 'check-circle');
+            badge.className = 'w-4 h-4 text-gaming-accent';
+            usernameContainer.appendChild(badge);
+          }
+          
+          userDiv.appendChild(usernameContainer);
+          
+          // MLG burned info
+          const burnedDiv = document.createElement('div');
+          burnedDiv.className = 'text-xs text-gray-400';
+          burnedDiv.textContent = `${voter.mlgBurned.toLocaleString()} MLG burned`;
+          userDiv.appendChild(burnedDiv);
+          
+          leftDiv.appendChild(userDiv);
+          entryDiv.appendChild(leftDiv);
+          
+          // Create right side (votes)
+          const rightDiv = document.createElement('div');
+          rightDiv.className = 'text-right';
+          
+          const votesDiv = document.createElement('div');
+          votesDiv.className = 'text-lg font-bold text-gaming-accent';
+          votesDiv.textContent = voter.votes.toLocaleString();
+          rightDiv.appendChild(votesDiv);
+          
+          const votesLabel = document.createElement('div');
+          votesLabel.className = 'text-xs text-gray-400';
+          votesLabel.textContent = 'votes';
+          rightDiv.appendChild(votesLabel);
+          
+          entryDiv.appendChild(rightDiv);
+          container.appendChild(entryDiv);
+        }
 
         // Re-initialize Lucide icons for the new content
         if (window.lucide) {

@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLG Event Banner System - Test & Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(26, 26, 46, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .demo-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 12px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .demo-subtitle {
+            font-size: 18px;
+            color: #9ca3af;
+            margin-bottom: 20px;
+        }
+
+        .demo-section {
+            margin-bottom: 40px;
+            padding: 24px;
+            background: rgba(26, 26, 46, 0.6);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-description {
+            font-size: 14px;
+            color: #e5e7eb;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .demo-grid {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .demo-grid.two-col {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .demo-grid.three-col {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .demo-item {
+            background: rgba(10, 10, 15, 0.8);
+            border: 1px solid rgba(107, 114, 128, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            position: relative;
+            min-height: 120px;
+        }
+
+        .demo-item-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .demo-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .demo-btn {
+            background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%);
+            color: #0a0a0f;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 300ms ease;
+            font-size: 14px;
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
+        }
+
+        .demo-btn.secondary {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+
+        .demo-btn.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #ff8800 100%);
+            color: #ffffff;
+        }
+
+        .demo-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 16px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        .demo-log {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #00ff88;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 16px;
+        }
+
+        .log-entry {
+            margin-bottom: 4px;
+        }
+
+        .log-timestamp {
+            color: #9ca3af;
+        }
+
+        .log-message {
+            color: #e5e7eb;
+        }
+
+        .log-error {
+            color: #ef4444;
+        }
+
+        .log-success {
+            color: #10b981;
+        }
+
+        .responsive-test {
+            border: 2px dashed #fbbf24;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .responsive-label {
+            color: #fbbf24;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .demo-grid.two-col,
+            .demo-grid.three-col {
+                grid-template-columns: 1fr;
+            }
+
+            .demo-controls {
+                flex-direction: column;
+            }
+
+            .demo-header {
+                padding: 20px;
+            }
+
+            .demo-title {
+                font-size: 28px;
+            }
+
+            .demo-subtitle {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- Header -->
+        <div class="demo-header">
+            <h1 class="demo-title">🏆 MLG Event Banner System</h1>
+            <p class="demo-subtitle">Professional Gaming Event Components - Task 21.3 Demo</p>
+            <div class="demo-status">
+                <div class="status-dot"></div>
+                <span>System Initialized</span>
+            </div>
+        </div>
+
+        <!-- Event Banner System Demo -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                📢 Event Banner System
+            </h2>
+            <p class="section-description">
+                Dynamic MLG-branded event banners with real-time updates, countdown timers, and interactive elements.
+            </p>
+            
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="createTournamentBanner()">Create Tournament Banner</button>
+                <button class="demo-btn" onclick="createAnnouncementBanner()">Create Announcement</button>
+                <button class="demo-btn" onclick="createLiveBanner()">Create Live Event</button>
+                <button class="demo-btn secondary" onclick="updateBannerStatus()">Update Status</button>
+                <button class="demo-btn danger" onclick="clearBanners()">Clear All</button>
+            </div>
+
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="demo-item-title">Event Banners</div>
+                    <div id="banner-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tournament Bracket Demo -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                🏆 Tournament Bracket Display
+            </h2>
+            <p class="section-description">
+                Interactive tournament brackets with real-time match updates, player information, and live indicators.
+            </p>
+            
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="createSingleElimination()">Single Elimination</button>
+                <button class="demo-btn" onclick="createDoubleElimination()">Double Elimination</button>
+                <button class="demo-btn" onclick="simulateMatchUpdate()">Simulate Match Update</button>
+                <button class="demo-btn secondary" onclick="zoomBracket()">Zoom Controls</button>
+            </div>
+
+            <div class="demo-item">
+                <div class="demo-item-title">Tournament Bracket</div>
+                <div id="bracket-container"></div>
+            </div>
+        </div>
+
+        <!-- Countdown Timer Demo -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                ⏰ Countdown Timer System
+            </h2>
+            <p class="section-description">
+                Professional countdown timers with multiple display formats, urgency indicators, and milestone notifications.
+            </p>
+            
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="createDigitalTimer()">Digital Timer</button>
+                <button class="demo-btn" onclick="createCompactTimer()">Compact Timer</button>
+                <button class="demo-btn" onclick="createCircularTimer()">Circular Timer</button>
+                <button class="demo-btn secondary" onclick="startCountdown()">Start Timer</button>
+                <button class="demo-btn danger" onclick="resetTimers()">Reset All</button>
+            </div>
+
+            <div class="demo-grid three-col">
+                <div class="demo-item">
+                    <div class="demo-item-title">Digital Format</div>
+                    <div id="timer-digital"></div>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-item-title">Compact Format</div>
+                    <div id="timer-compact"></div>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-item-title">Circular Format</div>
+                    <div id="timer-circular"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Status Indicators Demo -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                🔴 Live Status Indicators
+            </h2>
+            <p class="section-description">
+                Real-time status indicators with multiple styles, animations, and priority levels for live events and tournaments.
+            </p>
+            
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="createStatusIndicators()">Create Indicators</button>
+                <button class="demo-btn" onclick="simulateLiveEvent()">Simulate Live Event</button>
+                <button class="demo-btn" onclick="cycleStatuses()">Cycle Statuses</button>
+                <button class="demo-btn secondary" onclick="testNotifications()">Test Notifications</button>
+            </div>
+
+            <div class="demo-grid two-col">
+                <div class="demo-item">
+                    <div class="demo-item-title">Status Dots</div>
+                    <div id="status-dots"></div>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-item-title">Status Pills</div>
+                    <div id="status-pills"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Announcement Demo -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                📣 Event Announcement System
+            </h2>
+            <p class="section-description">
+                Multi-channel announcement system with priority queuing, animated displays, and comprehensive notification management.
+            </p>
+            
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="createToastAnnouncement()">Toast Notification</button>
+                <button class="demo-btn" onclick="createBannerAnnouncement()">Banner Announcement</button>
+                <button class="demo-btn" onclick="createModalAnnouncement()">Modal Announcement</button>
+                <button class="demo-btn" onclick="createEmergencyAlert()">Emergency Alert</button>
+                <button class="demo-btn danger" onclick="clearAnnouncements()">Clear All</button>
+            </div>
+
+            <div class="demo-item">
+                <div class="demo-item-title">Announcement Queue</div>
+                <div id="announcement-queue"></div>
+            </div>
+        </div>
+
+        <!-- Integration Manager Demo -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                🔗 Integration Manager
+            </h2>
+            <p class="section-description">
+                Central integration system coordinating all event components with real-time data synchronization and performance monitoring.
+            </p>
+            
+            <div class="demo-controls">
+                <button class="demo-btn" onclick="initializeIntegration()">Initialize Integration</button>
+                <button class="demo-btn" onclick="createCompleteEvent()">Create Complete Event</button>
+                <button class="demo-btn" onclick="simulateEventFlow()">Simulate Event Flow</button>
+                <button class="demo-btn secondary" onclick="showSystemStats()">System Statistics</button>
+            </div>
+
+            <div class="demo-grid two-col">
+                <div class="demo-item">
+                    <div class="demo-item-title">System Status</div>
+                    <div id="integration-status"></div>
+                </div>
+                <div class="demo-item">
+                    <div class="demo-item-title">Performance Metrics</div>
+                    <div id="performance-metrics"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Responsive Design Test -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                📱 Responsive Design Test
+            </h2>
+            <p class="section-description">
+                Testing responsive behavior across different screen sizes and device orientations.
+            </p>
+            
+            <div class="responsive-test">
+                <div class="responsive-label">Mobile View Test (Resize window to test)</div>
+                <div id="responsive-container"></div>
+            </div>
+        </div>
+
+        <!-- Event Log -->
+        <div class="demo-section">
+            <h2 class="section-title">
+                📋 Event Log
+            </h2>
+            <div class="demo-log" id="event-log">
+                <div class="log-entry">
+                    <span class="log-timestamp">[00:00:00]</span>
+                    <span class="log-message log-success">MLG Event Banner System Demo Initialized</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Event Log Functionality
+        function logEvent(message, type = 'message') {
+            const log = document.getElementById('event-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="log-message log-${type}">${message}</span>
+            `;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Demo Variables
+        let bannerCount = 0;
+        let timerCount = 0;
+        let statusCount = 0;
+        let announcementCount = 0;
+        let integrationManager = null;
+
+        // Event Banner Functions
+        window.createTournamentBanner = function() {
+            bannerCount++;
+            const container = document.getElementById('banner-container');
+            
+            const banner = document.createElement('div');
+            banner.className = 'mlg-event-banner mlg-type-tournament';
+            banner.style.cssText = `
+                background: linear-gradient(135deg, #1a1a2e 0%, #8b5cf6 10%, #1a1a2e 100%);
+                border: 2px solid #8b5cf6;
+                border-radius: 12px;
+                padding: 16px;
+                margin-bottom: 12px;
+                color: #ffffff;
+                position: relative;
+                overflow: hidden;
+            `;
+            
+            banner.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%); color: #0a0a0f; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">MLG</div>
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0; font-size: 18px;">🏆 MLG Championship Tournament #${bannerCount}</h3>
+                        <p style="margin: 4px 0 0 0; font-size: 14px; opacity: 0.8;">Elite gaming competition starting soon</p>
+                    </div>
+                    <div style="background: rgba(139, 92, 246, 0.2); border: 1px solid #8b5cf6; border-radius: 6px; padding: 6px 12px; font-size: 12px;">
+                        🎮 64 Players
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(banner);
+            logEvent(`Tournament banner created: #${bannerCount}`, 'success');
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (banner.parentNode) {
+                    banner.style.opacity = '0';
+                    banner.style.transform = 'translateX(100%)';
+                    setTimeout(() => banner.remove(), 300);
+                }
+            }, 10000);
+        };
+
+        window.createAnnouncementBanner = function() {
+            const container = document.getElementById('banner-container');
+            
+            const banner = document.createElement('div');
+            banner.className = 'mlg-event-banner mlg-type-announcement';
+            banner.style.cssText = `
+                background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fbbf24 100%);
+                border: 2px solid #fbbf24;
+                border-radius: 12px;
+                padding: 16px;
+                margin-bottom: 12px;
+                color: #0a0a0f;
+                position: relative;
+                overflow: hidden;
+                animation: pulse 2s infinite alternate;
+            `;
+            
+            banner.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="font-size: 24px;">📢</div>
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0; font-size: 18px;">Important Announcement</h3>
+                        <p style="margin: 4px 0 0 0; font-size: 14px; opacity: 0.8;">Tournament registration now open for all players</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #0a0a0f;">×</button>
+                </div>
+            `;
+            
+            container.appendChild(banner);
+            logEvent('Announcement banner created', 'success');
+        };
+
+        window.createLiveBanner = function() {
+            const container = document.getElementById('banner-container');
+            
+            const banner = document.createElement('div');
+            banner.className = 'mlg-event-banner mlg-type-live';
+            banner.style.cssText = `
+                background: linear-gradient(135deg, #ef4444 0%, #ff8800 50%, #ef4444 100%);
+                border: 2px solid #ef4444;
+                border-radius: 12px;
+                padding: 16px;
+                margin-bottom: 12px;
+                color: #ffffff;
+                position: relative;
+                overflow: hidden;
+                animation: live-pulse 2s infinite alternate;
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+            `;
+            
+            banner.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.2); padding: 4px 8px; border-radius: 12px;">
+                        <div style="width: 8px; height: 8px; background: #ffffff; border-radius: 50%; animation: blink 1s infinite;"></div>
+                        <span style="font-size: 12px; font-weight: bold;">LIVE</span>
+                    </div>
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0; font-size: 18px;">🔴 Live Tournament - Finals</h3>
+                        <p style="margin: 4px 0 0 0; font-size: 14px; opacity: 0.9;">Championship match in progress</p>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.2); border-radius: 6px; padding: 6px 12px; font-size: 12px;">
+                        👥 1,247 Viewers
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(banner);
+            logEvent('Live event banner created', 'success');
+        };
+
+        window.updateBannerStatus = function() {
+            const banners = document.querySelectorAll('#banner-container .mlg-event-banner');
+            if (banners.length > 0) {
+                const randomBanner = banners[Math.floor(Math.random() * banners.length)];
+                randomBanner.style.borderColor = '#10b981';
+                randomBanner.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 50%, #10b981 100%)';
+                logEvent('Banner status updated to completed', 'success');
+            } else {
+                logEvent('No banners to update', 'error');
+            }
+        };
+
+        window.clearBanners = function() {
+            const container = document.getElementById('banner-container');
+            container.innerHTML = '';
+            logEvent('All banners cleared', 'message');
+        };
+
+        // Tournament Bracket Functions
+        window.createSingleElimination = function() {
+            const container = document.getElementById('bracket-container');
+            container.innerHTML = `
+                <div style="background: rgba(10, 10, 15, 0.8); border: 2px solid #00ff88; border-radius: 12px; padding: 20px; color: #ffffff;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(0, 255, 136, 0.3);">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%); color: #0a0a0f; padding: 6px 12px; border-radius: 6px; font-size: 14px; font-weight: bold;">MLG</div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 20px;">Championship Tournament</h3>
+                                <p style="margin: 0; font-size: 14px; color: #9ca3af;">Single Elimination • Quarter Finals</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="demo-btn" style="font-size: 12px; padding: 6px 12px;" onclick="zoomBracket()">🔍-</button>
+                            <button class="demo-btn" style="font-size: 12px; padding: 6px 12px;" onclick="zoomBracket()">🔍+</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 40px; overflow-x: auto; padding: 20px 0;">
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <h4 style="text-align: center; color: #00ff88; margin-bottom: 8px;">Quarter Finals</h4>
+                            ${createMatchCard('Player1', 'Player2', '2', '1', 'completed')}
+                            ${createMatchCard('Player3', 'Player4', '0', '2', 'completed')}
+                            ${createMatchCard('Player5', 'Player6', '2', '0', 'live')}
+                            ${createMatchCard('Player7', 'Player8', '-', '-', 'upcoming')}
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 32px; margin-top: 40px;">
+                            <h4 style="text-align: center; color: #00ff88; margin-bottom: 8px;">Semi Finals</h4>
+                            ${createMatchCard('Player1', 'Player4', '-', '-', 'upcoming')}
+                            ${createMatchCard('TBD', 'TBD', '-', '-', 'upcoming')}
+                        </div>
+                        <div style="display: flex; flex-direction: column; justify-content: center;">
+                            <h4 style="text-align: center; color: #00ff88; margin-bottom: 8px;">Finals</h4>
+                            ${createMatchCard('TBD', 'TBD', '-', '-', 'upcoming')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            logEvent('Single elimination bracket created', 'success');
+        };
+
+        window.createDoubleElimination = function() {
+            const container = document.getElementById('bracket-container');
+            container.innerHTML = `
+                <div style="background: rgba(10, 10, 15, 0.8); border: 2px solid #8b5cf6; border-radius: 12px; padding: 20px; color: #ffffff;">
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="margin: 0 0 8px 0; font-size: 20px; color: #8b5cf6;">Double Elimination Tournament</h3>
+                        <p style="margin: 0; font-size: 14px; color: #9ca3af;">Winners and Losers Brackets</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 32px;">
+                        <div style="background: rgba(0, 0, 0, 0.3); border-radius: 8px; padding: 16px;">
+                            <h4 style="color: #10b981; margin-bottom: 16px;">🏆 Winners Bracket</h4>
+                            <div style="display: flex; gap: 32px; overflow-x: auto;">
+                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                    ${createMatchCard('Player A', 'Player B', '2', '0', 'completed')}
+                                    ${createMatchCard('Player C', 'Player D', '2', '1', 'completed')}
+                                </div>
+                                <div style="display: flex; flex-direction: column; justify-content: center;">
+                                    ${createMatchCard('Player A', 'Player C', '1', '2', 'live')}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.3); border-radius: 8px; padding: 16px;">
+                            <h4 style="color: #f59e0b; margin-bottom: 16px;">💥 Losers Bracket</h4>
+                            <div style="display: flex; gap: 32px; overflow-x: auto;">
+                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                    ${createMatchCard('Player B', 'Player D', '-', '-', 'upcoming')}
+                                </div>
+                                <div style="display: flex; flex-direction: column; justify-content: center;">
+                                    ${createMatchCard('TBD', 'Player A', '-', '-', 'upcoming')}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(139, 92, 246, 0.1); border: 2px solid #8b5cf6; border-radius: 8px; padding: 16px; text-align: center;">
+                            <h4 style="color: #8b5cf6; margin-bottom: 8px;">🏆 Grand Final</h4>
+                            ${createMatchCard('TBD', 'TBD', '-', '-', 'upcoming')}
+                        </div>
+                    </div>
+                </div>
+            `;
+            logEvent('Double elimination bracket created', 'success');
+        };
+
+        function createMatchCard(player1, player2, score1, score2, status) {
+            const statusColors = {
+                upcoming: '#6b7280',
+                live: '#ef4444',
+                completed: '#10b981'
+            };
+            
+            const statusIcons = {
+                upcoming: '⏰',
+                live: '🔴',
+                completed: '✅'
+            };
+
+            return `
+                <div style="background: rgba(26, 26, 46, 0.8); border: 2px solid ${statusColors[status]}; border-radius: 8px; padding: 12px; min-width: 200px; position: relative; ${status === 'live' ? 'animation: live-pulse 2s infinite alternate; box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);' : ''}">
+                    ${status === 'live' ? '<div style="position: absolute; top: 8px; right: 8px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; animation: blink 1s infinite;"></div>' : ''}
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="font-size: 12px; color: ${statusColors[status]}; display: flex; align-items: center; gap: 4px;">
+                            ${statusIcons[status]} ${status.toUpperCase()}
+                        </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-weight: bold; ${score1 > score2 && status === 'completed' ? 'color: #10b981;' : ''}">${player1}</span>
+                        <span style="font-family: 'Courier New', monospace; font-weight: bold; ${score1 > score2 && status === 'completed' ? 'color: #10b981;' : ''}">${score1}</span>
+                    </div>
+                    <div style="text-align: center; color: #9ca3af; font-size: 12px; margin: 4px 0;">VS</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold; ${score2 > score1 && status === 'completed' ? 'color: #10b981;' : ''}">${player2}</span>
+                        <span style="font-family: 'Courier New', monospace; font-weight: bold; ${score2 > score1 && status === 'completed' ? 'color: #10b981;' : ''}">${score2}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.simulateMatchUpdate = function() {
+            logEvent('Simulating live match update...', 'message');
+            // This would update bracket match in real scenario
+            setTimeout(() => {
+                logEvent('Match score updated: Player5 vs Player6 (2-1)', 'success');
+            }, 1000);
+        };
+
+        window.zoomBracket = function() {
+            logEvent('Bracket zoom controls activated', 'message');
+        };
+
+        // Countdown Timer Functions
+        window.createDigitalTimer = function() {
+            const container = document.getElementById('timer-digital');
+            const targetTime = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours from now
+            
+            container.innerHTML = `
+                <div style="background: rgba(26, 26, 46, 0.8); border: 2px solid #00ff88; border-radius: 12px; padding: 16px; text-align: center;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px;">
+                        <div style="background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%); color: #0a0a0f; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold;">MLG</div>
+                        <span style="font-size: 14px; color: #00ff88; font-weight: bold;">TOURNAMENT STARTS IN</span>
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 12px;">
+                        <div style="background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 8px; padding: 8px; min-width: 50px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #ffffff; font-family: 'Courier New', monospace;" id="timer-hours">02</div>
+                            <div style="font-size: 10px; color: #9ca3af; text-transform: uppercase;">Hours</div>
+                        </div>
+                        <div style="font-size: 24px; color: #00ff88; margin: 0 4px;">:</div>
+                        <div style="background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 8px; padding: 8px; min-width: 50px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #ffffff; font-family: 'Courier New', monospace;" id="timer-minutes">00</div>
+                            <div style="font-size: 10px; color: #9ca3af; text-transform: uppercase;">Minutes</div>
+                        </div>
+                        <div style="font-size: 24px; color: #00ff88; margin: 0 4px;">:</div>
+                        <div style="background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.3); border-radius: 8px; padding: 8px; min-width: 50px;">
+                            <div style="font-size: 24px; font-weight: bold; color: #ffffff; font-family: 'Courier New', monospace;" id="timer-seconds">00</div>
+                            <div style="font-size: 10px; color: #9ca3af; text-transform: uppercase;">Seconds</div>
+                        </div>
+                    </div>
+                    <div style="background: rgba(107, 114, 128, 0.3); height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div style="background: linear-gradient(90deg, #00ff88 0%, #00d4ff 100%); height: 100%; width: 75%; border-radius: 4px; position: relative;">
+                            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.2) 50%, transparent 60%); animation: shine 2s infinite;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            logEvent('Digital countdown timer created', 'success');
+            startTimerAnimation('digital');
+        };
+
+        window.createCompactTimer = function() {
+            const container = document.getElementById('timer-compact');
+            
+            container.innerHTML = `
+                <div style="background: rgba(26, 26, 46, 0.8); border: 2px solid #8b5cf6; border-radius: 8px; padding: 12px; text-align: center;">
+                    <div style="font-size: 12px; color: #8b5cf6; font-weight: bold; margin-bottom: 8px;">EVENT STARTS IN</div>
+                    <div style="font-family: 'Courier New', monospace; font-size: 20px; font-weight: bold; color: #ffffff;">
+                        <span id="compact-hours">02</span>h 
+                        <span id="compact-minutes">00</span>m 
+                        <span id="compact-seconds">00</span>s
+                    </div>
+                </div>
+            `;
+            
+            logEvent('Compact countdown timer created', 'success');
+            startTimerAnimation('compact');
+        };
+
+        window.createCircularTimer = function() {
+            const container = document.getElementById('timer-circular');
+            
+            container.innerHTML = `
+                <div style="background: rgba(26, 26, 46, 0.8); border: 2px solid #fbbf24; border-radius: 12px; padding: 16px; text-align: center;">
+                    <div style="background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%); color: #0a0a0f; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 12px; display: inline-block;">MLG</div>
+                    <div style="display: flex; justify-content: center; gap: 12px;">
+                        <div style="position: relative; width: 60px; height: 60px;">
+                            <svg style="width: 100%; height: 100%; transform: rotate(-90deg);" viewBox="0 0 36 36">
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(251, 191, 36, 0.3)" stroke-width="3"/>
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#fbbf24" stroke-width="3" stroke-dasharray="75, 100"/>
+                            </svg>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; font-weight: bold; color: #ffffff;">
+                                <div id="circular-hours">2</div>
+                                <div style="font-size: 8px; color: #9ca3af;">HR</div>
+                            </div>
+                        </div>
+                        <div style="position: relative; width: 50px; height: 50px;">
+                            <svg style="width: 100%; height: 100%; transform: rotate(-90deg);" viewBox="0 0 36 36">
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="rgba(251, 191, 36, 0.3)" stroke-width="3"/>
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#fbbf24" stroke-width="3" stroke-dasharray="0, 100"/>
+                            </svg>
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10px; font-weight: bold; color: #ffffff;">
+                                <div id="circular-minutes">0</div>
+                                <div style="font-size: 7px; color: #9ca3af;">MIN</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            logEvent('Circular countdown timer created', 'success');
+            startTimerAnimation('circular');
+        };
+
+        function startTimerAnimation(type) {
+            let seconds = 7200; // 2 hours in seconds
+            
+            const interval = setInterval(() => {
+                seconds--;
+                
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                
+                if (type === 'digital') {
+                    const hoursEl = document.getElementById('timer-hours');
+                    const minutesEl = document.getElementById('timer-minutes');
+                    const secondsEl = document.getElementById('timer-seconds');
+                    
+                    if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+                    if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+                    if (secondsEl) secondsEl.textContent = secs.toString().padStart(2, '0');
+                } else if (type === 'compact') {
+                    const hoursEl = document.getElementById('compact-hours');
+                    const minutesEl = document.getElementById('compact-minutes');
+                    const secondsEl = document.getElementById('compact-seconds');
+                    
+                    if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+                    if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+                    if (secondsEl) secondsEl.textContent = secs.toString().padStart(2, '0');
+                } else if (type === 'circular') {
+                    const hoursEl = document.getElementById('circular-hours');
+                    const minutesEl = document.getElementById('circular-minutes');
+                    
+                    if (hoursEl) hoursEl.textContent = hours.toString();
+                    if (minutesEl) minutesEl.textContent = minutes.toString();
+                }
+                
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    logEvent(`${type} timer expired!`, 'success');
+                }
+            }, 1000);
+        }
+
+        window.startCountdown = function() {
+            logEvent('All countdown timers started', 'success');
+        };
+
+        window.resetTimers = function() {
+            document.getElementById('timer-digital').innerHTML = '';
+            document.getElementById('timer-compact').innerHTML = '';
+            document.getElementById('timer-circular').innerHTML = '';
+            logEvent('All timers reset', 'message');
+        };
+
+        // Status Indicator Functions
+        window.createStatusIndicators = function() {
+            const dotsContainer = document.getElementById('status-dots');
+            const pillsContainer = document.getElementById('status-pills');
+            
+            // Create status dots
+            dotsContainer.innerHTML = `
+                <div style="display: flex; flex-wrap: wrap; gap: 12px; padding: 16px;">
+                    ${createStatusDot('offline', '⚫')}
+                    ${createStatusDot('idle', '⚪')}
+                    ${createStatusDot('live', '🔴')}
+                    ${createStatusDot('scheduled', '📅')}
+                    ${createStatusDot('completed', '✅')}
+                </div>
+            `;
+            
+            // Create status pills
+            pillsContainer.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 8px; padding: 16px;">
+                    ${createStatusPill('Live Tournament', 'live')}
+                    ${createStatusPill('Upcoming Match', 'scheduled')}
+                    ${createStatusPill('Registration Open', 'idle')}
+                    ${createStatusPill('Event Completed', 'completed')}
+                </div>
+            `;
+            
+            logEvent('Status indicators created', 'success');
+        };
+
+        function createStatusDot(status, icon) {
+            const colors = {
+                offline: '#6b7280',
+                idle: '#9ca3af',
+                live: '#ef4444',
+                scheduled: '#00d4ff',
+                completed: '#10b981'
+            };
+            
+            return `
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
+                    <div style="width: 16px; height: 16px; background: ${colors[status]}; border-radius: 50%; position: relative; ${status === 'live' ? 'animation: pulse 2s infinite;' : ''}">
+                        ${status === 'live' ? '<div style="position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; background: #ef4444; border-radius: 50%; opacity: 0.3; animation: ping 1s infinite;"></div>' : ''}
+                    </div>
+                    <span style="font-size: 10px; color: #9ca3af; text-transform: uppercase;">${status}</span>
+                </div>
+            `;
+        }
+
+        function createStatusPill(text, status) {
+            const colors = {
+                live: '#ef4444',
+                scheduled: '#00d4ff',
+                idle: '#9ca3af',
+                completed: '#10b981'
+            };
+            
+            return `
+                <div style="background: rgba(${status === 'live' ? '239, 68, 68' : status === 'scheduled' ? '0, 212, 255' : status === 'completed' ? '16, 185, 129' : '156, 163, 175'}, 0.2); border: 1px solid ${colors[status]}; border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; ${status === 'live' ? 'animation: live-pulse 2s infinite alternate;' : ''}">
+                    <div style="width: 8px; height: 8px; background: ${colors[status]}; border-radius: 50%; ${status === 'live' ? 'animation: blink 1s infinite;' : ''}"></div>
+                    <span style="font-size: 14px; color: #ffffff; font-weight: 500;">${text}</span>
+                    <span style="font-size: 12px; color: ${colors[status]}; text-transform: uppercase; font-weight: bold; margin-left: auto;">${status}</span>
+                </div>
+            `;
+        }
+
+        window.simulateLiveEvent = function() {
+            logEvent('Simulating live event status changes...', 'message');
+            setTimeout(() => {
+                logEvent('Event status changed to LIVE', 'success');
+            }, 1000);
+        };
+
+        window.cycleStatuses = function() {
+            logEvent('Cycling through all status types', 'message');
+        };
+
+        window.testNotifications = function() {
+            // Create a test notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(26, 26, 46, 0.95);
+                border: 2px solid #00ff88;
+                border-radius: 12px;
+                padding: 16px;
+                color: #ffffff;
+                min-width: 300px;
+                z-index: 10000;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                animation: slideIn 300ms ease-out;
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                    <div style="font-size: 20px;">🎮</div>
+                    <div style="flex: 1;">
+                        <h4 style="margin: 0 0 4px 0; font-size: 14px; font-weight: bold;">Test Notification</h4>
+                        <p style="margin: 0; font-size: 13px; color: #e5e7eb;">This is a test notification message</p>
+                        <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">${new Date().toLocaleTimeString()}</div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: #9ca3af; font-size: 18px; cursor: pointer;">×</button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            logEvent('Test notification displayed', 'success');
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOut 300ms ease-in';
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 5000);
+        };
+
+        // Announcement Functions
+        window.createToastAnnouncement = function() {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(26, 26, 46, 0.95);
+                border: 2px solid #8b5cf6;
+                border-radius: 12px;
+                color: #ffffff;
+                min-width: 320px;
+                z-index: 10001;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                animation: slideIn 300ms ease-out;
+                margin-bottom: 12px;
+            `;
+            
+            toast.innerHTML = `
+                <div style="padding: 16px; display: flex; align-items: flex-start; gap: 12px;">
+                    <div style="font-size: 20px; color: #8b5cf6;">🏆</div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 14px; font-weight: bold; margin-bottom: 4px;">Tournament Alert</div>
+                        <div style="font-size: 13px; color: #e5e7eb; margin-bottom: 4px;">New tournament registration is now open!</div>
+                        <div style="font-size: 11px; color: #9ca3af;">${new Date().toLocaleTimeString()}</div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: #9ca3af; font-size: 18px; cursor: pointer;">×</button>
+                </div>
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: rgba(139, 92, 246, 0.2);">
+                    <div style="height: 100%; background: #8b5cf6; width: 100%; animation: countdown 5s linear; transform-origin: left;"></div>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            logEvent('Toast announcement created', 'success');
+            
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 5000);
+        };
+
+        window.createBannerAnnouncement = function() {
+            const banner = document.createElement('div');
+            banner.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(10, 10, 15, 0.95) 100%);
+                border-bottom: 3px solid #fbbf24;
+                color: #ffffff;
+                padding: 16px 24px;
+                z-index: 10000;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                animation: slideDown 300ms ease-out;
+            `;
+            
+            banner.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 16px; max-width: 1200px; margin: 0 auto;">
+                    <div style="background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%); color: #0a0a0f; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold;">MLG</div>
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0; font-size: 18px;">📢 System Announcement</h3>
+                        <p style="margin: 4px 0 0 0; font-size: 14px; opacity: 0.8;">Platform maintenance scheduled for tonight at 2:00 AM UTC</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button style="background: rgba(251, 191, 36, 0.2); border: 1px solid #fbbf24; border-radius: 6px; padding: 6px 12px; color: #fbbf24; font-size: 12px; font-weight: bold; cursor: pointer;">Learn More</button>
+                        <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: #9ca3af; font-size: 20px; cursor: pointer; padding: 4px;">×</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(banner);
+            logEvent('Banner announcement created', 'success');
+            
+            setTimeout(() => {
+                if (banner.parentNode) banner.remove();
+            }, 8000);
+        };
+
+        window.createModalAnnouncement = function() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 15000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                animation: fadeIn 300ms ease-out;
+            `;
+            
+            modal.innerHTML = `
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px);" onclick="this.parentElement.remove()"></div>
+                <div style="background: linear-gradient(135deg, rgba(26, 26, 46, 0.95) 0%, rgba(10, 10, 15, 0.95) 100%); border: 2px solid #10b981; border-radius: 16px; color: #ffffff; max-width: 500px; width: 100%; position: relative; backdrop-filter: blur(20px); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); animation: zoomIn 300ms ease-out;">
+                    <div style="display: flex; align-items: center; gap: 16px; padding: 24px 24px 0 24px;">
+                        <div style="background: linear-gradient(135deg, #00ff88 0%, #00d4ff 100%); color: #0a0a0f; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: bold;">MLG</div>
+                        <div style="flex: 1;">
+                            <h2 style="font-size: 24px; font-weight: bold; margin: 0 0 4px 0;">🎉 Achievement Unlocked!</h2>
+                            <div style="font-size: 14px; color: #10b981; text-transform: uppercase; letter-spacing: 1px; font-weight: bold;">Tournament Winner</div>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: none; border: none; color: #9ca3af; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">×</button>
+                    </div>
+                    <div style="padding: 24px; text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px; color: #10b981;">🏆</div>
+                        <div style="font-size: 16px; color: #e5e7eb; line-height: 1.5; margin: 0;">Congratulations! You've won the championship tournament and earned 1000 MLG tokens!</div>
+                    </div>
+                    <div style="display: flex; gap: 12px; justify-content: center; padding: 0 24px 24px 24px;">
+                        <button style="background: #10b981; border: none; border-radius: 8px; color: #ffffff; font-size: 14px; font-weight: bold; padding: 12px 24px; cursor: pointer;">Claim Rewards</button>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; border-radius: 8px; font-size: 14px; font-weight: bold; padding: 12px 24px; cursor: pointer;">Close</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            logEvent('Modal announcement created', 'success');
+        };
+
+        window.createEmergencyAlert = function() {
+            const alert = document.createElement('div');
+            alert.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                border: 3px solid #ffffff;
+                border-radius: 12px;
+                color: #ffffff;
+                padding: 24px;
+                z-index: 20000;
+                min-width: 400px;
+                text-align: center;
+                animation: emergencyPulse 1s infinite alternate, shake 0.5s ease-in-out;
+                box-shadow: 0 0 50px rgba(239, 68, 68, 0.8);
+            `;
+            
+            alert.innerHTML = `
+                <div style="font-size: 48px; margin-bottom: 16px; animation: bounce 1s infinite;">🚨</div>
+                <h2 style="margin: 0 0 12px 0; font-size: 24px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px;">EMERGENCY ALERT</h2>
+                <p style="margin: 0 0 20px 0; font-size: 16px; line-height: 1.4;">Critical system issue detected. All tournaments have been temporarily suspended.</p>
+                <button onclick="this.parentElement.remove()" style="background: #ffffff; color: #ef4444; border: none; border-radius: 6px; padding: 12px 24px; font-weight: bold; cursor: pointer; font-size: 14px; text-transform: uppercase;">ACKNOWLEDGE</button>
+            `;
+            
+            document.body.appendChild(alert);
+            logEvent('Emergency alert created', 'error');
+            
+            // Create backdrop
+            const backdrop = document.createElement('div');
+            backdrop.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.9);
+                z-index: 19999;
+            `;
+            document.body.appendChild(backdrop);
+            
+            alert.addEventListener('click', () => {
+                backdrop.remove();
+            });
+        };
+
+        window.clearAnnouncements = function() {
+            // Remove all fixed position announcements
+            const announcements = document.querySelectorAll('[style*="position: fixed"]');
+            announcements.forEach(el => {
+                if (el.style.zIndex >= 10000) {
+                    el.remove();
+                }
+            });
+            logEvent('All announcements cleared', 'message');
+        };
+
+        // Integration Manager Functions
+        window.initializeIntegration = function() {
+            const statusContainer = document.getElementById('integration-status');
+            statusContainer.innerHTML = `
+                <div style="padding: 16px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <div style="width: 12px; height: 12px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite;"></div>
+                        <span style="font-weight: bold; color: #10b981;">System Online</span>
+                    </div>
+                    <div style="font-size: 14px; color: #e5e7eb; margin-bottom: 8px;">Integration Status:</div>
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        ${createSystemStatus('Event Banner System', 'connected')}
+                        ${createSystemStatus('Tournament Brackets', 'connected')}
+                        ${createSystemStatus('Countdown Timers', 'connected')}
+                        ${createSystemStatus('Status Indicators', 'connected')}
+                        ${createSystemStatus('Announcements', 'connected')}
+                        ${createSystemStatus('WebSocket Connection', 'connecting')}
+                    </div>
+                </div>
+            `;
+            
+            logEvent('Integration manager initialized', 'success');
+        };
+
+        function createSystemStatus(name, status) {
+            const statusColors = {
+                connected: '#10b981',
+                connecting: '#fbbf24',
+                disconnected: '#ef4444'
+            };
+            
+            const statusIcons = {
+                connected: '✅',
+                connecting: '⏳',
+                disconnected: '❌'
+            };
+            
+            return `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0;">
+                    <span style="font-size: 12px; color: #9ca3af;">${name}</span>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <span style="font-size: 10px;">${statusIcons[status]}</span>
+                        <span style="font-size: 10px; color: ${statusColors[status]}; text-transform: uppercase; font-weight: bold;">${status}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.createCompleteEvent = function() {
+            logEvent('Creating complete event with all components...', 'message');
+            
+            // Create event banner
+            createTournamentBanner();
+            
+            // Create countdown timer
+            setTimeout(() => {
+                createDigitalTimer();
+                logEvent('Event countdown timer initialized', 'success');
+            }, 500);
+            
+            // Create status indicators
+            setTimeout(() => {
+                createStatusIndicators();
+                logEvent('Event status indicators created', 'success');
+            }, 1000);
+            
+            // Create tournament bracket
+            setTimeout(() => {
+                createSingleElimination();
+                logEvent('Tournament bracket generated', 'success');
+            }, 1500);
+            
+            // Create announcement
+            setTimeout(() => {
+                createToastAnnouncement();
+                logEvent('Event announcement sent', 'success');
+            }, 2000);
+            
+            setTimeout(() => {
+                logEvent('Complete event created successfully!', 'success');
+            }, 2500);
+        };
+
+        window.simulateEventFlow = function() {
+            logEvent('Simulating complete event lifecycle...', 'message');
+            
+            let step = 0;
+            const steps = [
+                () => {
+                    createBannerAnnouncement();
+                    logEvent('Step 1: Event announced', 'success');
+                },
+                () => {
+                    createDigitalTimer();
+                    logEvent('Step 2: Countdown started', 'success');
+                },
+                () => {
+                    simulateLiveEvent();
+                    logEvent('Step 3: Event went live', 'success');
+                },
+                () => {
+                    createSingleElimination();
+                    logEvent('Step 4: Tournament bracket created', 'success');
+                },
+                () => {
+                    simulateMatchUpdate();
+                    logEvent('Step 5: Match updates received', 'success');
+                },
+                () => {
+                    createModalAnnouncement();
+                    logEvent('Step 6: Tournament completed!', 'success');
+                }
+            ];
+            
+            const interval = setInterval(() => {
+                if (step < steps.length) {
+                    steps[step]();
+                    step++;
+                } else {
+                    clearInterval(interval);
+                    logEvent('Event lifecycle simulation completed', 'success');
+                }
+            }, 2000);
+        };
+
+        window.showSystemStats = function() {
+            const metricsContainer = document.getElementById('performance-metrics');
+            const stats = {
+                'Active Events': Math.floor(Math.random() * 10) + 1,
+                'Total Banners': bannerCount,
+                'Active Timers': timerCount,
+                'Status Indicators': statusCount,
+                'Memory Usage': '42.3 MB',
+                'Uptime': '2h 34m',
+                'WebSocket Messages': Math.floor(Math.random() * 1000) + 500,
+                'Cache Hit Rate': '87.2%'
+            };
+            
+            metricsContainer.innerHTML = `
+                <div style="padding: 16px;">
+                    <div style="font-size: 14px; color: #e5e7eb; margin-bottom: 12px;">System Performance:</div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        ${Object.entries(stats).map(([key, value]) => `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0;">
+                                <span style="font-size: 12px; color: #9ca3af;">${key}</span>
+                                <span style="font-size: 12px; color: #ffffff; font-weight: bold;">${value}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            logEvent('System statistics displayed', 'message');
+        };
+
+        // Responsive Design Test
+        window.addEventListener('resize', () => {
+            const container = document.getElementById('responsive-container');
+            const width = window.innerWidth;
+            let size = 'Desktop';
+            
+            if (width <= 480) size = 'Mobile (XS)';
+            else if (width <= 768) size = 'Tablet (SM)';
+            else if (width <= 1024) size = 'Laptop (MD)';
+            else if (width <= 1280) size = 'Desktop (LG)';
+            else size = 'Large Desktop (XL)';
+            
+            container.innerHTML = `
+                <div style="background: rgba(26, 26, 46, 0.8); border: 1px solid rgba(251, 191, 36, 0.5); border-radius: 8px; padding: 16px; text-align: center;">
+                    <div style="font-size: 16px; font-weight: bold; color: #fbbf24; margin-bottom: 8px;">Current Viewport: ${size}</div>
+                    <div style="font-size: 14px; color: #9ca3af;">Width: ${width}px</div>
+                    <div style="margin-top: 12px;">
+                        ${width <= 768 ? createCompactTimer() : createDigitalTimer()}
+                    </div>
+                </div>
+            `;
+        });
+
+        // Add CSS animations
+        const animationStyle = document.createElement('style');
+        animationStyle.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            
+            @keyframes slideDown {
+                from { transform: translateY(-100%); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes zoomIn {
+                from { transform: scale(0.8); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+            
+            @keyframes live-pulse {
+                from { box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+                to { box-shadow: 0 0 30px rgba(239, 68, 68, 0.6), 0 0 40px rgba(239, 68, 68, 0.3); }
+            }
+            
+            @keyframes blink {
+                0%, 50% { opacity: 1; }
+                51%, 100% { opacity: 0.3; }
+            }
+            
+            @keyframes countdown {
+                from { transform: scaleX(1); }
+                to { transform: scaleX(0); }
+            }
+            
+            @keyframes shine {
+                from { transform: translateX(-100%); }
+                to { transform: translateX(100%); }
+            }
+            
+            @keyframes ping {
+                75%, 100% { transform: scale(2); opacity: 0; }
+            }
+            
+            @keyframes emergencyPulse {
+                from { box-shadow: 0 0 30px rgba(239, 68, 68, 0.5); }
+                to { box-shadow: 0 0 60px rgba(239, 68, 68, 1); }
+            }
+            
+            @keyframes shake {
+                0%, 100% { transform: translate(-50%, -50%) translateX(0); }
+                25% { transform: translate(-50%, -50%) translateX(-5px); }
+                75% { transform: translate(-50%, -50%) translateX(5px); }
+            }
+            
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(animationStyle);
+
+        // Initialize demo
+        logEvent('MLG Event Banner System Demo Ready', 'success');
+        logEvent('Try the demo buttons to test each component!', 'message');
+        
+        // Auto-trigger initial demo
+        setTimeout(() => {
+            logEvent('Auto-creating initial demo components...', 'message');
+            createTournamentBanner();
+            setTimeout(() => createDigitalTimer(), 1000);
+            setTimeout(() => createStatusIndicators(), 2000);
+            setTimeout(() => initializeIntegration(), 3000);
+        }, 2000);
+    </script>
+</body>
+</html>

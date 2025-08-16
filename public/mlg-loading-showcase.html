@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLG Loading System Showcase - Interactive Demo</title>
+  
+  <!-- MLG Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Play:wght@400;700&family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    :root {
+      --mlg-primary: #00ff88;
+      --mlg-secondary: #8b5cf6;
+      --mlg-accent: #3b82f6;
+      --mlg-warning: #fbbf24;
+      --mlg-error: #ef4444;
+      --mlg-success: #10b981;
+      --mlg-bg-dark: #0a0a0f;
+      --mlg-bg-surface: #1a1a2e;
+      --xbox-green: #107c10;
+    }
+    
+    body {
+      font-family: 'Rajdhani', system-ui, sans-serif;
+      background: linear-gradient(135deg, var(--mlg-bg-dark) 0%, #0f0f1a 100%);
+      color: white;
+      min-height: 100vh;
+    }
+    
+    .showcase-header {
+      background: linear-gradient(90deg, var(--mlg-primary), var(--mlg-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    
+    .category-header {
+      font-family: 'Exo 2', sans-serif;
+      color: var(--mlg-primary);
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+      border-bottom: 2px solid var(--mlg-primary);
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .demo-container {
+      background: var(--mlg-bg-surface);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 1rem 0;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 255, 136, 0.1);
+    }
+    
+    .loader-button {
+      background: linear-gradient(45deg, var(--mlg-primary), var(--xbox-green));
+      color: black;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-family: 'Play', monospace;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .loader-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+    }
+    
+    .loader-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s;
+    }
+    
+    .loader-button:hover::before {
+      left: 100%;
+    }
+    
+    .wallet-button {
+      background: linear-gradient(45deg, var(--mlg-secondary), #9333ea);
+    }
+    
+    .vote-button {
+      background: linear-gradient(45deg, var(--mlg-error), #ff8800);
+    }
+    
+    .upload-button {
+      background: linear-gradient(45deg, var(--mlg-accent), #06b6d4);
+    }
+    
+    .transition-button {
+      background: linear-gradient(45deg, var(--mlg-warning), #f59e0b);
+    }
+    
+    .demo-stage {
+      min-height: 300px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px dashed rgba(0, 255, 136, 0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .stage-placeholder {
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 1.5rem;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+    }
+    
+    .control-panel {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .progress-control {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .progress-slider {
+      flex: 1;
+      height: 8px;
+      background: rgba(0, 255, 136, 0.2);
+      border-radius: 4px;
+      appearance: none;
+      outline: none;
+    }
+    
+    .progress-slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: var(--mlg-primary);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--mlg-primary);
+    }
+    
+    .metrics-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--mlg-bg-surface);
+      border: 1px solid var(--mlg-primary);
+      border-radius: 8px;
+      padding: 1rem;
+      min-width: 250px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.875rem;
+      z-index: 1000;
+    }
+    
+    .metric-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.5rem 0;
+      color: var(--mlg-primary);
+    }
+    
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
+      50% { box-shadow: 0 0 40px rgba(0, 255, 136, 0.8); }
+    }
+    
+    .active-demo {
+      animation: glow-pulse 2s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="container mx-auto px-6 py-8 max-w-7xl">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1 class="showcase-header text-6xl mb-4">MLG Loading System</h1>
+      <p class="text-xl text-gray-400">Interactive Showcase of All Loading Styles & Animations</p>
+      <p class="text-sm text-gray-500 mt-2">🎮 Click any button to see the loading animation in action!</p>
+    </div>
+
+    <!-- Demo Stage -->
+    <div id="demo-stage" class="demo-stage">
+      <div class="stage-placeholder">
+        <p>SELECT A LOADING STYLE</p>
+        <p class="text-sm mt-2">Animation will appear here</p>
+      </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+      <h3 class="text-lg font-bold mb-3" style="color: var(--mlg-primary);">⚙️ Animation Controls</h3>
+      <div class="progress-control">
+        <label class="text-sm">Progress:</label>
+        <input type="range" id="progress-slider" class="progress-slider" min="0" max="100" value="0">
+        <span id="progress-value" class="text-sm font-mono">0%</span>
+      </div>
+      <div class="flex gap-2 mt-3">
+        <button id="btn-clear" class="loader-button" style="background: var(--mlg-error);">Clear Stage</button>
+        <button id="btn-update-progress" class="loader-button">Update Progress</button>
+        <button id="btn-complete" class="loader-button" style="background: var(--mlg-success);">Complete</button>
+      </div>
+    </div>
+
+    <!-- Gaming Loaders -->
+    <div class="demo-container">
+      <h2 class="category-header text-2xl font-bold">🎮 Gaming Loaders</h2>
+      <div class="flex flex-wrap">
+        <button class="loader-button" data-type="spinner" data-message="Loading Game Assets...">
+          Spinner Loader
+        </button>
+        <button class="loader-button" data-type="progress" data-message="Downloading Map Data...">
+          Progress Bar
+        </button>
+        <button class="loader-button" data-type="pulse" data-message="Connecting to Server...">
+          Pulse Animation
+        </button>
+        <button class="loader-button" data-type="dashboard" data-message="Loading Dashboard...">
+          Dashboard Loader
+        </button>
+        <button class="loader-button" data-type="xbox" data-message="Xbox Style Loading...">
+          Xbox Ring
+        </button>
+        <button class="loader-button" data-type="gaming-wave" data-message="Wave Animation...">
+          Wave Loader
+        </button>
+      </div>
+    </div>
+
+    <!-- Wallet Loaders -->
+    <div class="demo-container">
+      <h2 class="category-header text-2xl font-bold">💳 Wallet Integration Loaders</h2>
+      <div class="flex flex-wrap">
+        <button class="loader-button wallet-button" data-type="wallet-phantom" data-message="Connecting to Phantom...">
+          Phantom Connect
+        </button>
+        <button class="loader-button wallet-button" data-type="wallet-transaction" data-message="Signing Transaction...">
+          Transaction Sign
+        </button>
+        <button class="loader-button wallet-button" data-type="wallet-balance" data-message="Fetching Balance...">
+          Balance Check
+        </button>
+        <button class="loader-button wallet-button" data-type="wallet-network" data-message="Switching Network...">
+          Network Switch
+        </button>
+        <button class="loader-button wallet-button" data-type="wallet-approval" data-message="Awaiting Approval...">
+          Token Approval
+        </button>
+      </div>
+    </div>
+
+    <!-- Voting Loaders -->
+    <div class="demo-container">
+      <h2 class="category-header text-2xl font-bold">🗳️ Voting System Loaders</h2>
+      <div class="flex flex-wrap">
+        <button class="loader-button vote-button" data-type="vote-burn" data-message="Burning Tokens...">
+          Token Burn 🔥
+        </button>
+        <button class="loader-button vote-button" data-type="vote-confirmation" data-message="Confirming Vote...">
+          Vote Confirmation
+        </button>
+        <button class="loader-button vote-button" data-type="vote-limit" data-message="Vote Limit Reached!">
+          Vote Limit
+        </button>
+        <button class="loader-button vote-button" data-type="vote-counting" data-message="Counting Votes...">
+          Vote Counting
+        </button>
+        <button class="loader-button vote-button" data-type="vote-results" data-message="Loading Results...">
+          Results Loading
+        </button>
+      </div>
+    </div>
+
+    <!-- Upload Loaders -->
+    <div class="demo-container">
+      <h2 class="category-header text-2xl font-bold">📤 Upload & Content Loaders</h2>
+      <div class="flex flex-wrap">
+        <button class="loader-button upload-button" data-type="upload-single" data-message="Uploading File...">
+          Single Upload
+        </button>
+        <button class="loader-button upload-button" data-type="upload-queue" data-message="Processing Queue...">
+          Upload Queue
+        </button>
+        <button class="loader-button upload-button" data-type="upload-complete" data-message="Upload Complete!">
+          Upload Complete
+        </button>
+        <button class="loader-button upload-button" data-type="upload-processing" data-message="Processing Video...">
+          Media Processing
+        </button>
+        <button class="loader-button upload-button" data-type="upload-thumbnail" data-message="Generating Thumbnail...">
+          Thumbnail Gen
+        </button>
+      </div>
+    </div>
+
+    <!-- Page Transitions -->
+    <div class="demo-container">
+      <h2 class="category-header text-2xl font-bold">🎬 Page Transitions</h2>
+      <div class="flex flex-wrap">
+        <button class="loader-button transition-button" data-type="transition-blade" data-transition="blade">
+          Blade Transition
+        </button>
+        <button class="loader-button transition-button" data-type="transition-guide" data-transition="guide">
+          Guide Transition
+        </button>
+        <button class="loader-button transition-button" data-type="transition-particle" data-transition="particle">
+          Particle Effect
+        </button>
+        <button class="loader-button transition-button" data-type="transition-holographic" data-transition="holographic">
+          Holographic
+        </button>
+        <button class="loader-button transition-button" data-type="transition-glitch" data-transition="glitch">
+          Glitch Effect
+        </button>
+        <button class="loader-button transition-button" data-type="transition-fade" data-transition="fade">
+          Fade Transition
+        </button>
+      </div>
+    </div>
+
+    <!-- Special Effects -->
+    <div class="demo-container">
+      <h2 class="category-header text-2xl font-bold">✨ Special Loading Effects</h2>
+      <div class="flex flex-wrap">
+        <button class="loader-button" data-type="tournament" data-message="Loading Tournament..." style="background: linear-gradient(45deg, gold, #fbbf24);">
+          Tournament Load
+        </button>
+        <button class="loader-button" data-type="clan-battle" data-message="Preparing Battle..." style="background: linear-gradient(45deg, #dc2626, #7c2d12);">
+          Clan Battle
+        </button>
+        <button class="loader-button" data-type="achievement" data-message="Unlocking Achievement..." style="background: linear-gradient(45deg, #10b981, #059669);">
+          Achievement
+        </button>
+        <button class="loader-button" data-type="leaderboard" data-message="Updating Rankings..." style="background: linear-gradient(45deg, #6366f1, #4f46e5);">
+          Leaderboard
+        </button>
+        <button class="loader-button" data-type="matchmaking" data-message="Finding Match..." style="background: linear-gradient(45deg, #f97316, #ea580c);">
+          Matchmaking
+        </button>
+      </div>
+    </div>
+
+    <!-- Combined Examples -->
+    <div class="demo-container">
+      <h2 class="category-header text-2xl font-bold">🎯 Real-World Scenarios</h2>
+      <div class="flex flex-wrap">
+        <button id="scenario-login" class="loader-button" style="background: linear-gradient(45deg, var(--mlg-primary), var(--mlg-secondary));">
+          Complete Login Flow
+        </button>
+        <button id="scenario-vote" class="loader-button" style="background: linear-gradient(45deg, var(--mlg-error), var(--mlg-warning));">
+          Full Voting Process
+        </button>
+        <button id="scenario-upload" class="loader-button" style="background: linear-gradient(45deg, var(--mlg-accent), var(--mlg-success));">
+          Content Upload Flow
+        </button>
+        <button id="scenario-tournament" class="loader-button" style="background: linear-gradient(45deg, gold, var(--mlg-primary));">
+          Tournament Join
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metrics Panel -->
+  <div class="metrics-panel">
+    <h3 class="text-lg font-bold mb-2" style="color: var(--mlg-primary);">📊 Live Metrics</h3>
+    <div class="metric-item">
+      <span>Active Loader:</span>
+      <span id="metric-active">None</span>
+    </div>
+    <div class="metric-item">
+      <span>Type:</span>
+      <span id="metric-type">-</span>
+    </div>
+    <div class="metric-item">
+      <span>Duration:</span>
+      <span id="metric-duration">0s</span>
+    </div>
+    <div class="metric-item">
+      <span>Total Shown:</span>
+      <span id="metric-total">0</span>
+    </div>
+  </div>
+
+  <!-- Loading System Scripts -->
+  <script type="module">
+    // Import loading system components
+    import { MLGLoadingSystem } from '../src/shared/components/mlg-loading-system.js';
+    import { GamingLoadingStates } from '../src/shared/components/gaming-loading-states.js';
+    import { WalletLoadingStates } from '../src/shared/components/wallet-loading-states.js';
+    import { VoteBurnLoading } from '../src/shared/components/vote-burn-loading.js';
+    import { XboxPageTransitions } from '../src/shared/components/xbox-page-transitions.js';
+    
+    // Initialize loading system
+    let loadingSystem;
+    let currentLoader = null;
+    let startTime = null;
+    let totalLoaders = 0;
+    let durationInterval = null;
+    
+    async function initializeShowcase() {
+      try {
+        // Make component classes available globally for loading system
+        window.GamingLoadingStates = GamingLoadingStates;
+        window.WalletLoadingStates = WalletLoadingStates;
+        window.VoteBurnLoading = VoteBurnLoading;
+        window.XboxPageTransitions = XboxPageTransitions;
+        
+        // Initialize loading system
+        loadingSystem = new MLGLoadingSystem({
+          enablePerformanceMode: true,
+          enableDebugMode: true,
+          enableAnalytics: false
+        });
+        
+        // Setup button handlers
+        setupButtonHandlers();
+        setupControlHandlers();
+        setupScenarioHandlers();
+        
+        console.log('✅ MLG Loading Showcase initialized');
+        
+      } catch (error) {
+        console.error('❌ Failed to initialize showcase:', error);
+      }
+    }
+    
+    function setupButtonHandlers() {
+      // Get all loader buttons
+      const buttons = document.querySelectorAll('.loader-button[data-type]');
+      
+      buttons.forEach(button => {
+        button.addEventListener('click', (e) => {
+          const type = button.getAttribute('data-type');
+          const message = button.getAttribute('data-message') || 'Loading...';
+          const transition = button.getAttribute('data-transition');
+          
+          showLoader(type, message, transition);
+        });
+      });
+    }
+    
+    function setupControlHandlers() {
+      // Clear button
+      document.getElementById('btn-clear').addEventListener('click', () => {
+        clearStage();
+      });
+      
+      // Progress update
+      document.getElementById('btn-update-progress').addEventListener('click', () => {
+        const progress = document.getElementById('progress-slider').value;
+        updateCurrentProgress(progress);
+      });
+      
+      // Complete button
+      document.getElementById('btn-complete').addEventListener('click', () => {
+        completeCurrentLoader();
+      });
+      
+      // Progress slider
+      document.getElementById('progress-slider').addEventListener('input', (e) => {
+        document.getElementById('progress-value').textContent = e.target.value + '%';
+      });
+    }
+    
+    function setupScenarioHandlers() {
+      // Login flow scenario
+      document.getElementById('scenario-login').addEventListener('click', async () => {
+        await runLoginScenario();
+      });
+      
+      // Voting scenario
+      document.getElementById('scenario-vote').addEventListener('click', async () => {
+        await runVotingScenario();
+      });
+      
+      // Upload scenario
+      document.getElementById('scenario-upload').addEventListener('click', async () => {
+        await runUploadScenario();
+      });
+      
+      // Tournament scenario
+      document.getElementById('scenario-tournament').addEventListener('click', async () => {
+        await runTournamentScenario();
+      });
+    }
+    
+    function showLoader(type, message, transition) {
+      // Clear existing loader
+      clearStage();
+      
+      const stage = document.getElementById('demo-stage');
+      stage.classList.add('active-demo');
+      
+      // Handle transitions differently
+      if (transition) {
+        showTransition(transition, message);
+        return;
+      }
+      
+      // Show loader
+      currentLoader = loadingSystem.show(type, stage, {
+        message: message,
+        size: 'large',
+        color: 'primary'
+      });
+      
+      // Update metrics
+      startTime = Date.now();
+      totalLoaders++;
+      updateMetrics(type);
+      
+      // Start duration timer
+      durationInterval = setInterval(() => {
+        if (startTime) {
+          const duration = Math.floor((Date.now() - startTime) / 1000);
+          document.getElementById('metric-duration').textContent = duration + 's';
+        }
+      }, 100);
+    }
+    
+    function showTransition(type, message) {
+      const stage = document.getElementById('demo-stage');
+      
+      // Create sample content for transition
+      const newContent = `
+        <div style="text-align: center; padding: 2rem;">
+          <h2 style="font-size: 2rem; color: var(--mlg-primary); margin-bottom: 1rem;">
+            ${message}
+          </h2>
+          <p style="color: #999;">Transition completed successfully!</p>
+        </div>
+      `;
+      
+      loadingSystem.transition(type, stage, newContent, {
+        duration: 1500,
+        easing: 'ease-in-out'
+      });
+      
+      // Update metrics
+      updateMetrics('transition-' + type);
+    }
+    
+    function clearStage() {
+      const stage = document.getElementById('demo-stage');
+      stage.classList.remove('active-demo');
+      
+      if (currentLoader) {
+        loadingSystem.hide(currentLoader);
+        currentLoader = null;
+      }
+      
+      if (durationInterval) {
+        clearInterval(durationInterval);
+        durationInterval = null;
+      }
+      
+      stage.innerHTML = `
+        <div class="stage-placeholder">
+          <p>SELECT A LOADING STYLE</p>
+          <p class="text-sm mt-2">Animation will appear here</p>
+        </div>
+      `;
+      
+      // Reset metrics
+      document.getElementById('metric-active').textContent = 'None';
+      document.getElementById('metric-type').textContent = '-';
+      document.getElementById('metric-duration').textContent = '0s';
+      startTime = null;
+    }
+    
+    function updateCurrentProgress(progress) {
+      if (currentLoader) {
+        loadingSystem.updateProgress(currentLoader, progress, `Progress: ${progress}%`);
+      }
+    }
+    
+    function completeCurrentLoader() {
+      if (currentLoader) {
+        loadingSystem.updateProgress(currentLoader, 100, 'Complete!');
+        setTimeout(() => {
+          clearStage();
+        }, 1000);
+      }
+    }
+    
+    function updateMetrics(type) {
+      document.getElementById('metric-active').textContent = 'Active';
+      document.getElementById('metric-type').textContent = type;
+      document.getElementById('metric-total').textContent = totalLoaders;
+    }
+    
+    // Scenario implementations
+    async function runLoginScenario() {
+      clearStage();
+      const stage = document.getElementById('demo-stage');
+      
+      // Step 1: Wallet connection
+      currentLoader = loadingSystem.show('wallet-phantom', stage, {
+        message: 'Connecting to Phantom Wallet...'
+      });
+      
+      await simulateProgress(0, 40, 50);
+      
+      // Step 2: Network check
+      clearStage();
+      currentLoader = loadingSystem.show('wallet-network', stage, {
+        message: 'Checking Network Status...'
+      });
+      
+      await simulateProgress(40, 70, 30);
+      
+      // Step 3: Loading dashboard
+      clearStage();
+      currentLoader = loadingSystem.show('dashboard', stage, {
+        message: 'Loading Your Dashboard...'
+      });
+      
+      await simulateProgress(70, 100, 40);
+      
+      // Complete
+      setTimeout(() => {
+        clearStage();
+        showSuccessMessage('Login Complete! Welcome back!');
+      }, 500);
+    }
+    
+    async function runVotingScenario() {
+      clearStage();
+      const stage = document.getElementById('demo-stage');
+      
+      // Step 1: Token burn
+      currentLoader = loadingSystem.show('vote-burn', stage, {
+        message: 'Burning 100 tokens for extra votes...'
+      });
+      
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // Step 2: Vote confirmation
+      clearStage();
+      currentLoader = loadingSystem.show('vote-confirmation', stage, {
+        message: 'Confirming your vote...'
+      });
+      
+      await simulateProgress(0, 100, 50);
+      
+      // Complete
+      setTimeout(() => {
+        clearStage();
+        showSuccessMessage('Vote cast successfully! 🗳️');
+      }, 500);
+    }
+    
+    async function runUploadScenario() {
+      clearStage();
+      const stage = document.getElementById('demo-stage');
+      
+      // Step 1: File upload
+      currentLoader = loadingSystem.show('upload-single', stage, {
+        message: 'Uploading clip.mp4 (45MB)...'
+      });
+      
+      await simulateProgress(0, 60, 60);
+      
+      // Step 2: Processing
+      clearStage();
+      currentLoader = loadingSystem.show('upload-processing', stage, {
+        message: 'Processing video...'
+      });
+      
+      await simulateProgress(60, 90, 40);
+      
+      // Step 3: Complete
+      clearStage();
+      currentLoader = loadingSystem.show('upload-complete', stage, {
+        message: 'Upload Complete!'
+      });
+      
+      setTimeout(() => {
+        clearStage();
+        showSuccessMessage('Content uploaded successfully! 📤');
+      }, 2000);
+    }
+    
+    async function runTournamentScenario() {
+      clearStage();
+      const stage = document.getElementById('demo-stage');
+      
+      // Step 1: Matchmaking
+      currentLoader = loadingSystem.show('matchmaking', stage, {
+        message: 'Finding tournament match...'
+      });
+      
+      await simulateProgress(0, 50, 40);
+      
+      // Step 2: Loading tournament
+      clearStage();
+      currentLoader = loadingSystem.show('tournament', stage, {
+        message: 'Joining tournament bracket...'
+      });
+      
+      await simulateProgress(50, 100, 30);
+      
+      // Complete
+      setTimeout(() => {
+        clearStage();
+        showSuccessMessage('Tournament joined! Good luck! 🏆');
+      }, 500);
+    }
+    
+    async function simulateProgress(start, end, steps) {
+      const increment = (end - start) / steps;
+      
+      for (let i = 0; i <= steps; i++) {
+        const progress = Math.min(start + (increment * i), end);
+        
+        if (currentLoader) {
+          loadingSystem.updateProgress(currentLoader, Math.round(progress), `${Math.round(progress)}%`);
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+    }
+    
+    function showSuccessMessage(message) {
+      const stage = document.getElementById('demo-stage');
+      stage.innerHTML = `
+        <div style="text-align: center; animation: fadeIn 0.5s;">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+          <h2 style="font-size: 2rem; color: var(--mlg-success); font-family: 'Orbitron', sans-serif;">
+            ${message}
+          </h2>
+        </div>
+      `;
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initializeShowcase);
+  </script>
+  
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</body>
+</html>

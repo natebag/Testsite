@@ -217,7 +217,7 @@ app.get('/api/health', (req, res) => {
 
 // Serve main application
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'pages', 'index.html'));
 });
 
 // Serve demos and examples

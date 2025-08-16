@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MLG Branding Test - Task 21.2</title>
+  
+  <!-- External Dependencies -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  
+  <!-- MLG Branding System -->
+  <script type="module" src="./src/shared/components/mlg-branding-system.js"></script>
+  <script type="module" src="./src/core/auth/mlg-username-tagging-service.js"></script>
+  <script type="module" src="./src/shared/utils/mlg-branding-init.js"></script>
+
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'gaming-bg': '#0a0a0f',
+            'gaming-surface': '#1a1a2e',
+            'gaming-accent': '#00ff88',
+            'gaming-purple': '#8b5cf6',
+            'gaming-blue': '#3b82f6',
+            'gaming-yellow': '#fbbf24',
+            'gaming-red': '#ef4444'
+          },
+          animation: {
+            'pulse-neon': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow': 'glow 2s ease-in-out infinite alternate',
+            'float': 'float 6s ease-in-out infinite'
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .card-glow {
+      background: rgba(26, 26, 46, 0.95);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      backdrop-filter: blur(15px);
+      transition: all 0.3s ease;
+    }
+    
+    .card-glow:hover {
+      border-color: rgba(0, 255, 136, 0.5);
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    @keyframes glow {
+      from { box-shadow: 0 0 10px #00ff88; }
+      to { box-shadow: 0 0 20px #00ff88, 0 0 30px #00ff88; }
+    }
+  </style>
+</head>
+<body class="bg-gaming-bg text-white min-h-screen p-4">
+  
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Test Header -->
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-gaming-accent mb-2">🏆 MLG Branding Test</h1>
+      <p class="text-gaming-blue text-lg">Task 21.2 - MLG Branding System Validation</p>
+      <p class="text-gray-400 text-sm">Testing responsive design and Xbox 360 aesthetic compatibility</p>
+    </header>
+    
+    <!-- Test Profile Header -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-gaming-accent mb-6">Profile Header Test</h2>
+      
+      <div id="test-profile-header" class="card-glow rounded-xl p-8 mlg-branding" data-mlg-branding="header">
+        <!-- MLG Header Branding -->
+        <div class="mlg-header-branding flex flex-col md:flex-row items-center justify-between mb-6 space-y-4 md:space-y-0">
+          <div class="mlg-brand-identity flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
+            <div class="mlg-logo-section">
+              <div class="flex items-center space-x-3">
+                <span class="text-3xl animate-pulse">🏆</span>
+                <div class="mlg-brand-text text-center md:text-left">
+                  <h2 class="text-2xl font-bold text-gaming-accent tracking-wide">[MLG]</h2>
+                  <p class="text-xs text-gaming-blue uppercase tracking-widest">Major League Gaming</p>
+                </div>
+              </div>
+            </div>
+            <div class="mlg-motto">
+              <p class="text-sm text-gray-400 italic text-center md:text-left">"Elite Gaming Excellence"</p>
+            </div>
+          </div>
+          
+          <div class="mlg-membership-badge">
+            <div class="bg-gradient-to-r from-gaming-accent to-gaming-blue px-4 py-2 rounded-lg border border-gaming-accent border-opacity-50">
+              <div class="flex items-center space-x-2">
+                <span class="text-black font-bold text-sm">ELITE MEMBER</span>
+                <span class="text-black text-xs">2024</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Profile Content -->
+        <div class="flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-8">
+          <div class="relative">
+            <div class="w-24 h-24 bg-gaming-accent bg-opacity-20 rounded-full flex items-center justify-center border-2 border-gaming-accent">
+              <i data-lucide="user" class="w-12 h-12 text-gaming-accent"></i>
+            </div>
+            <div class="absolute -top-2 -right-2">
+              <div class="bg-gaming-accent text-black px-2 py-1 rounded-full text-xs font-bold border-2 border-gaming-bg">
+                MLG
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex-1 text-center lg:text-left">
+            <div class="mlg-username-display mb-4">
+              <span class="bg-gaming-accent bg-opacity-20 text-gaming-accent px-3 py-1 rounded-lg text-sm font-bold mr-2 border border-gaming-accent border-opacity-50">[MLG]</span>
+              <span class="text-2xl font-bold text-white">TestPlayer2024</span>
+            </div>
+            <p class="text-gray-300 mb-4">
+              Professional esports player | <span class="text-gaming-accent font-semibold">MLG Elite Clan Member</span> | Content Creator
+            </p>
+            <p class="text-gaming-blue text-sm">
+              🏆 Elite Gaming Community • Verified MLG Member
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Test Roster Display -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-gaming-accent mb-6">Roster Display Test</h2>
+      
+      <div id="test-roster" class="card-glow rounded-xl p-6 mlg-branding" data-mlg-branding="roster">
+        <!-- Roster Header -->
+        <div class="mlg-roster-header flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 p-4 bg-gaming-surface bg-opacity-50 rounded-lg border border-gaming-accent border-opacity-30 space-y-4 sm:space-y-0">
+          <div class="mlg-roster-branding flex items-center space-x-3">
+            <div class="mlg-brand-badge bg-gaming-accent text-black px-3 py-1 rounded-lg text-sm font-bold">
+              🏆 MLG
+            </div>
+            <div>
+              <h3 class="text-xl font-bold text-gaming-accent">Clan Members (5)</h3>
+              <p class="text-sm text-gaming-blue">Major League Gaming • Elite Roster</p>
+            </div>
+          </div>
+          <div class="mlg-roster-stats flex items-center space-x-4">
+            <div class="text-center">
+              <div class="text-lg font-bold text-gaming-accent">5</div>
+              <div class="text-xs text-gray-400">Total</div>
+            </div>
+            <div class="w-px h-8 bg-gaming-accent bg-opacity-30"></div>
+            <div class="text-center">
+              <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                <span class="text-lg font-bold text-green-400">3</span>
+              </div>
+              <div class="text-xs text-gray-400">Online</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Member List -->
+        <div class="space-y-3">
+          <!-- Member 1 -->
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gaming-surface rounded-lg border border-gaming-accent border-opacity-10 space-y-3 sm:space-y-0">
+            <div class="flex items-center space-x-3">
+              <div class="relative">
+                <div class="w-12 h-12 bg-gaming-accent bg-opacity-20 rounded-full flex items-center justify-center border-2 border-gaming-accent border-opacity-30">
+                  <i data-lucide="user" class="w-6 h-6 text-gaming-accent"></i>
+                </div>
+                <div class="absolute -bottom-1 -right-1 bg-gaming-accent text-black text-xs font-bold px-1 rounded-full border border-gaming-bg">MLG</div>
+                <div class="absolute -top-1 -left-1 w-4 h-4 bg-green-400 rounded-full border-2 border-gaming-surface animate-pulse"></div>
+              </div>
+              <div>
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                  <span class="bg-gradient-to-r from-gaming-accent to-gaming-blue text-black px-2 py-1 rounded-lg text-xs font-bold border border-gaming-accent border-opacity-50">🏆 MLG</span>
+                  <span class="text-gaming-accent font-bold">ElitePlayer1</span>
+                  <span class="px-3 py-1 rounded-lg text-xs font-bold border bg-gradient-to-r from-gaming-yellow to-gaming-accent text-black border-gaming-yellow">👑 Owner</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+                  <span class="flex items-center space-x-1">
+                    <span class="text-gaming-accent">🏆</span>
+                    <span>Rep: <span class="text-gaming-accent font-semibold">15,750</span></span>
+                  </span>
+                  <span class="text-gray-500">•</span>
+                  <span class="flex items-center space-x-1">
+                    <span class="text-gaming-blue">📅</span>
+                    <span>Joined: Jan 2024</span>
+                  </span>
+                  <span class="text-gray-500">•</span>
+                  <span class="text-gaming-purple font-semibold">MLG Member</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-green-400 text-sm font-bold">Online</div>
+          </div>
+          
+          <!-- Member 2 -->
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gaming-surface rounded-lg border border-gaming-accent border-opacity-10 space-y-3 sm:space-y-0">
+            <div class="flex items-center space-x-3">
+              <div class="relative">
+                <div class="w-12 h-12 bg-gaming-accent bg-opacity-20 rounded-full flex items-center justify-center border-2 border-gaming-accent border-opacity-30">
+                  <i data-lucide="user" class="w-6 h-6 text-gaming-accent"></i>
+                </div>
+                <div class="absolute -bottom-1 -right-1 bg-gaming-accent text-black text-xs font-bold px-1 rounded-full border border-gaming-bg">MLG</div>
+              </div>
+              <div>
+                <div class="flex flex-wrap items-center gap-2 mb-1">
+                  <span class="bg-gradient-to-r from-gaming-accent to-gaming-blue text-black px-2 py-1 rounded-lg text-xs font-bold border border-gaming-accent border-opacity-50">🏆 MLG</span>
+                  <span class="text-gaming-accent font-bold">ProGamer99</span>
+                  <span class="px-3 py-1 rounded-lg text-xs font-bold border bg-gaming-surface text-gaming-accent border-gaming-accent">🎯 Member</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+                  <span class="flex items-center space-x-1">
+                    <span class="text-gaming-accent">🏆</span>
+                    <span>Rep: <span class="text-gaming-accent font-semibold">8,240</span></span>
+                  </span>
+                  <span class="text-gray-500">•</span>
+                  <span class="flex items-center space-x-1">
+                    <span class="text-gaming-blue">📅</span>
+                    <span>Joined: Mar 2024</span>
+                  </span>
+                  <span class="text-gray-500">•</span>
+                  <span class="text-gaming-purple font-semibold">MLG Member</span>
+                </div>
+              </div>
+            </div>
+            <div class="text-gray-500 text-sm">Offline</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Test Profile Cards -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-gaming-accent mb-6">Profile Card Test</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Profile Card 1 -->
+        <div class="card-glow rounded-xl p-6 mlg-branding" data-mlg-branding="profile">
+          <div class="relative">
+            <div class="absolute top-2 right-2 bg-gaming-accent text-black px-2 py-1 rounded-lg text-xs font-bold">
+              MLG
+            </div>
+            <div class="text-center">
+              <div class="w-16 h-16 bg-gaming-accent bg-opacity-20 rounded-full mx-auto mb-3 flex items-center justify-center border-2 border-gaming-accent">
+                <i data-lucide="user" class="w-8 h-8 text-gaming-accent"></i>
+              </div>
+              <div class="mb-2">
+                <span class="bg-gaming-accent bg-opacity-20 text-gaming-accent px-2 py-1 rounded text-xs font-bold mr-2">[MLG]</span>
+                <span class="font-bold text-gaming-accent">TestUser1</span>
+              </div>
+              <p class="text-sm text-gray-400 mb-3">Elite Gaming Member</p>
+              <div class="bg-gaming-accent bg-opacity-10 rounded-lg p-2 border border-gaming-accent border-opacity-30">
+                <div class="text-gaming-accent font-bold text-sm">🎯 MLG Benefits Active</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Profile Card 2 -->
+        <div class="card-glow rounded-xl p-6 mlg-branding" data-mlg-branding="card">
+          <div class="relative">
+            <div class="absolute top-2 right-2 bg-gaming-accent text-black px-2 py-1 rounded-lg text-xs font-bold">
+              MLG
+            </div>
+            <div class="text-center">
+              <div class="w-16 h-16 bg-gaming-blue bg-opacity-20 rounded-full mx-auto mb-3 flex items-center justify-center border-2 border-gaming-blue">
+                <i data-lucide="shield" class="w-8 h-8 text-gaming-blue"></i>
+              </div>
+              <div class="mb-2">
+                <span class="bg-gaming-accent bg-opacity-20 text-gaming-accent px-2 py-1 rounded text-xs font-bold mr-2">[MLG]</span>
+                <span class="font-bold text-gaming-blue">ClanLeader</span>
+              </div>
+              <p class="text-sm text-gray-400 mb-3">Tournament Champion</p>
+              <div class="bg-gaming-blue bg-opacity-10 rounded-lg p-2 border border-gaming-blue border-opacity-30">
+                <div class="text-gaming-blue font-bold text-sm">🏆 Elite Status</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Profile Card 3 -->
+        <div class="card-glow rounded-xl p-6 mlg-branding md:col-span-2 lg:col-span-1" data-mlg-branding="profile">
+          <div class="relative">
+            <div class="absolute top-2 right-2 bg-gaming-accent text-black px-2 py-1 rounded-lg text-xs font-bold">
+              MLG
+            </div>
+            <div class="text-center">
+              <div class="w-16 h-16 bg-gaming-purple bg-opacity-20 rounded-full mx-auto mb-3 flex items-center justify-center border-2 border-gaming-purple">
+                <i data-lucide="star" class="w-8 h-8 text-gaming-purple"></i>
+              </div>
+              <div class="mb-2">
+                <span class="bg-gaming-accent bg-opacity-20 text-gaming-accent px-2 py-1 rounded text-xs font-bold mr-2">[MLG]</span>
+                <span class="font-bold text-gaming-purple">StreamerPro</span>
+              </div>
+              <p class="text-sm text-gray-400 mb-3">Content Creator</p>
+              <div class="bg-gaming-purple bg-opacity-10 rounded-lg p-2 border border-gaming-purple border-opacity-30">
+                <div class="text-gaming-purple font-bold text-sm">🎬 Creator Status</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Responsive Test Info -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-gaming-accent mb-6">Responsive Design Test</h2>
+      <div class="card-glow rounded-xl p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-center">
+          <div class="bg-gaming-surface bg-opacity-50 p-4 rounded-lg">
+            <div class="text-gaming-accent text-lg font-bold">Mobile</div>
+            <div class="text-sm text-gray-400">&lt; 768px</div>
+            <div class="text-xs text-gaming-blue mt-2">Stack layout, full width cards</div>
+          </div>
+          <div class="bg-gaming-surface bg-opacity-50 p-4 rounded-lg">
+            <div class="text-gaming-blue text-lg font-bold">Tablet</div>
+            <div class="text-sm text-gray-400">768px - 1023px</div>
+            <div class="text-xs text-gaming-blue mt-2">2-column grid, adapted headers</div>
+          </div>
+          <div class="bg-gaming-surface bg-opacity-50 p-4 rounded-lg">
+            <div class="text-gaming-purple text-lg font-bold">Desktop</div>
+            <div class="text-sm text-gray-400">1024px - 1279px</div>
+            <div class="text-xs text-gaming-blue mt-2">3-column grid, full features</div>
+          </div>
+          <div class="bg-gaming-surface bg-opacity-50 p-4 rounded-lg">
+            <div class="text-gaming-yellow text-lg font-bold">Large</div>
+            <div class="text-sm text-gray-400">&gt; 1280px</div>
+            <div class="text-xs text-gaming-blue mt-2">Optimized spacing, enhanced visuals</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Xbox 360 Theme Test -->
+    <section class="mb-12">
+      <h2 class="text-2xl font-bold text-gaming-accent mb-6">Xbox 360 Theme Compatibility</h2>
+      <div class="card-glow rounded-xl p-6">
+        <div class="text-center mb-6">
+          <button id="xbox-theme-toggle" class="bg-gaming-accent hover:bg-green-400 text-black px-6 py-3 rounded-lg font-bold transition-colors">
+            Toggle Xbox 360 Theme
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="text-center">
+            <div class="text-gaming-accent text-lg font-bold mb-2">Color Scheme</div>
+            <div class="text-sm text-gray-400">Gaming green, Xbox-inspired palette</div>
+          </div>
+          <div class="text-center">
+            <div class="text-gaming-blue text-lg font-bold mb-2">Typography</div>
+            <div class="text-sm text-gray-400">Segoe UI, Xbox dashboard style</div>
+          </div>
+          <div class="text-center">
+            <div class="text-gaming-purple text-lg font-bold mb-2">Animations</div>
+            <div class="text-sm text-gray-400">Smooth transitions, glow effects</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+  </div>
+  
+  <script>
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+    
+    // Xbox theme toggle
+    document.getElementById('xbox-theme-toggle').addEventListener('click', () => {
+      document.body.classList.toggle('xbox-theme');
+      const isXboxTheme = document.body.classList.contains('xbox-theme');
+      
+      if (window.MLGBranding && window.MLGBranding.system) {
+        window.MLGBranding.system.emit('theme_changed', { theme: isXboxTheme ? 'xbox' : 'default' });
+      }
+      
+      console.log('Xbox theme toggled:', isXboxTheme ? 'ON' : 'OFF');
+    });
+    
+    // Test responsive behavior
+    function logViewportSize() {
+      const width = window.innerWidth;
+      let breakpoint = 'Large';
+      
+      if (width < 768) breakpoint = 'Mobile';
+      else if (width < 1024) breakpoint = 'Tablet';
+      else if (width < 1280) breakpoint = 'Desktop';
+      
+      console.log(`Viewport: ${width}px (${breakpoint})`);
+    }
+    
+    window.addEventListener('resize', logViewportSize);
+    logViewportSize(); // Initial log
+    
+    // MLG Branding ready event
+    window.addEventListener('mlg:branding:ready', (event) => {
+      console.log('🏆 MLG Branding System Ready!', event.detail);
+      
+      // Test branding utilities
+      if (window.MLGBranding) {
+        console.log('MLG Branding Stats:', {
+          system: window.MLGBranding.system?.getStatistics(),
+          tagging: window.MLGBranding.tagging?.getStatistics()
+        });
+      }
+    });
+    
+    console.log('🧪 MLG Branding Test Page Loaded');
+    console.log('Task 21.2: MLG branding implementation test');
+  </script>
+  
+</body>
+</html>

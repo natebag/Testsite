@@ -29,6 +29,14 @@
   <!-- API Client -->
   <script type="module" src="../../src/shared/utils/api/mlg-api-client-consolidated.js"></script>
 
+  <!-- MLG Username Display Integration -->
+  <script type="module" src="../../src/shared/utils/mlg-username-display.js"></script>
+  
+  <!-- MLG Branding System -->
+  <script type="module" src="../../src/shared/components/mlg-branding-system.js"></script>
+  <script type="module" src="../../src/core/auth/mlg-username-tagging-service.js"></script>
+  <script type="module" src="../../src/shared/utils/mlg-branding-init.js"></script>
+
   <!-- Tailwind Configuration -->
   <script>
     tailwind.config = {
@@ -657,6 +665,15 @@
       async init() {
         console.log('🏛️ Initializing Clan Platform...');
         
+        // Initialize MLG Username Display Utility
+        try {
+          const { mlgUsernameDisplay } = await import('../../src/shared/utils/mlg-username-display.js');
+          window.mlgUsernameDisplay = mlgUsernameDisplay;
+          console.log('🏷️ MLG Username Display Utility loaded');
+        } catch (error) {
+          console.warn('⚠️ MLG Username Display Utility not available:', error);
+        }
+        
         this.initializeUI();
         this.setupEventListeners();
         
@@ -671,6 +688,11 @@
         if (typeof lucide !== 'undefined') {
           lucide.createIcons();
         }
+        
+        // Initialize clan member roster display if container exists
+        setTimeout(() => {
+          this.displayClanMemberRoster();
+        }, 1000);
       }
       
       setupEventListeners() {
@@ -1493,6 +1515,291 @@
           const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
           const highlightedText = originalText.replace(regex, '<span class="bg-gaming-yellow text-black px-1 rounded">$1</span>');
           nameElement.innerHTML = highlightedText;
+        }
+      }
+
+      /**
+       * Generate clan member roster with MLG tagging
+       * @param {string} clanId - Clan ID to display members for
+       * @returns {Array} Array of clan members with MLG tagging
+       */
+      generateClanMemberRoster(clanId = 'mlg_elite') {
+        return [
+          {
+            id: 'member_001',
+            user_id: 'user_001',
+            username: 'TokenMaster2024',
+            mlg_display_name: '[MLG] TokenMaster2024',
+            display_name: 'TokenMaster2024',
+            role: 'owner',
+            reputation_score: 2847,
+            joined_at: '2024-01-15',
+            is_clan_member: true,
+            is_online: true,
+            avatar_url: null,
+            clan_name: 'MLG Elite'
+          },
+          {
+            id: 'member_002',
+            user_id: 'user_002',
+            username: 'VoteKing',
+            mlg_display_name: '[MLG] VoteKing',
+            display_name: 'VoteKing',
+            role: 'admin',
+            reputation_score: 2156,
+            joined_at: '2024-01-20',
+            is_clan_member: true,
+            is_online: true,
+            avatar_url: null,
+            clan_name: 'MLG Elite'
+          },
+          {
+            id: 'member_003',
+            user_id: 'user_004',
+            username: 'MLGBurner',
+            mlg_display_name: '[MLG] MLGBurner',
+            display_name: 'MLGBurner',
+            role: 'moderator',
+            reputation_score: 1823,
+            joined_at: '2024-02-01',
+            is_clan_member: true,
+            is_online: false,
+            avatar_url: null,
+            clan_name: 'MLG Elite'
+          },
+          {
+            id: 'member_004',
+            user_id: 'user_006',
+            username: 'PowerVoter',
+            mlg_display_name: '[MLG] PowerVoter',
+            display_name: 'PowerVoter',
+            role: 'member',
+            reputation_score: 1567,
+            joined_at: '2024-02-10',
+            is_clan_member: true,
+            is_online: true,
+            avatar_url: null,
+            clan_name: 'MLG Elite'
+          },
+          {
+            id: 'member_005',
+            user_id: 'user_008',
+            username: 'VoteHero',
+            mlg_display_name: '[MLG] VoteHero',
+            display_name: 'VoteHero',
+            role: 'member',
+            reputation_score: 1234,
+            joined_at: '2024-02-15',
+            is_clan_member: true,
+            is_online: false,
+            avatar_url: null,
+            clan_name: 'MLG Elite'
+          },
+          {
+            id: 'member_006',
+            user_id: 'user_009',
+            username: 'EliteGamer',
+            mlg_display_name: '[MLG] EliteGamer',
+            display_name: 'EliteGamer',
+            role: 'member',
+            reputation_score: 987,
+            joined_at: '2024-03-01',
+            is_clan_member: true,
+            is_online: true,
+            avatar_url: null,
+            clan_name: 'MLG Elite'
+          }
+        ];
+      }
+
+      /**
+       * Display clan member roster with MLG tagging
+       * @param {string} clanId - Clan ID
+       * @param {string} containerId - Container element ID
+       */
+      async displayClanMemberRoster(clanId = 'mlg_elite', containerId = 'clan-member-roster') {
+        try {
+          const container = document.getElementById(containerId);
+          if (!container) {
+            console.warn(`⚠️ Container ${containerId} not found for clan roster`);
+            return;
+          }
+
+          const members = this.generateClanMemberRoster(clanId);
+          
+          // Clear container
+          container.innerHTML = '';
+
+          // Create MLG branded header
+          const header = document.createElement('div');
+          header.className = 'mlg-roster-header flex items-center justify-between mb-6 p-4 bg-gaming-surface bg-opacity-50 rounded-lg border border-gaming-accent border-opacity-30';
+          header.innerHTML = `
+            <div class="mlg-roster-branding flex items-center space-x-3">
+              <div class="mlg-brand-badge bg-gaming-accent text-black px-3 py-1 rounded-lg text-sm font-bold">
+                🏆 MLG
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gaming-accent">Clan Members (${members.length})</h3>
+                <p class="text-sm text-gaming-blue">Major League Gaming • Elite Roster</p>
+              </div>
+            </div>
+            <div class="mlg-roster-stats flex items-center space-x-4">
+              <div class="text-center">
+                <div class="text-lg font-bold text-gaming-accent">${members.length}</div>
+                <div class="text-xs text-gray-400">Total</div>
+              </div>
+              <div class="w-px h-8 bg-gaming-accent bg-opacity-30"></div>
+              <div class="text-center">
+                <div class="flex items-center space-x-2">
+                  <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  <span class="text-lg font-bold text-green-400">${members.filter(m => m.is_online).length}</span>
+                </div>
+                <div class="text-xs text-gray-400">Online</div>
+              </div>
+            </div>
+          `;
+          container.appendChild(header);
+
+          // Create member list
+          const memberList = document.createElement('div');
+          memberList.className = 'space-y-3';
+
+          for (const member of members) {
+            const memberDiv = document.createElement('div');
+            memberDiv.className = 'flex items-center justify-between p-4 bg-gaming-surface rounded-lg hover:bg-opacity-80 transition-all border border-gaming-accent border-opacity-10 hover:border-opacity-30 mlg-member-item';
+            
+            // Left side - avatar, username, role
+            const leftDiv = document.createElement('div');
+            leftDiv.className = 'flex items-center space-x-3';
+            
+            // Avatar with MLG enhancement and online status
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'relative';
+            avatarDiv.innerHTML = `
+              <div class="w-12 h-12 bg-gaming-accent bg-opacity-20 rounded-full flex items-center justify-center border-2 border-gaming-accent border-opacity-30">
+                <i data-lucide="user" class="w-6 h-6 text-gaming-accent"></i>
+              </div>
+              ${member.is_clan_member ? '<div class="absolute -bottom-1 -right-1 bg-gaming-accent text-black text-xs font-bold px-1 rounded-full border border-gaming-bg">MLG</div>' : ''}
+              ${member.is_online ? '<div class="absolute -top-1 -left-1 w-4 h-4 bg-green-400 rounded-full border-2 border-gaming-surface animate-pulse"></div>' : ''}
+            `;
+            leftDiv.appendChild(avatarDiv);
+            
+            // User info
+            const userInfoDiv = document.createElement('div');
+            
+            // Enhanced MLG username display
+            const usernameContainer = document.createElement('div');
+            usernameContainer.className = 'flex items-center space-x-2';
+            
+            if (window.mlgUsernameDisplay) {
+              const usernameElement = window.mlgUsernameDisplay.createUsernameElement(
+                member.username,
+                member.mlg_display_name,
+                {
+                  userId: member.user_id,
+                  clanName: member.clan_name,
+                  interactive: true
+                }
+              );
+              usernameContainer.appendChild(usernameElement);
+            } else {
+              // Enhanced fallback display with MLG branding
+              const usernameSpan = document.createElement('span');
+              usernameSpan.className = 'font-semibold text-white';
+              if (member.is_clan_member && member.mlg_display_name.startsWith('[MLG]')) {
+                const tagSpan = document.createElement('span');
+                tagSpan.className = 'inline-block bg-gradient-to-r from-gaming-accent to-gaming-blue text-black px-2 py-1 rounded-lg text-xs font-bold mr-2 border border-gaming-accent border-opacity-50';
+                tagSpan.innerHTML = '🏆 MLG';
+                usernameSpan.appendChild(tagSpan);
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = member.username;
+                nameSpan.className = 'text-gaming-accent font-bold';
+                usernameSpan.appendChild(nameSpan);
+              } else {
+                usernameSpan.textContent = member.username;
+              }
+              usernameContainer.appendChild(usernameSpan);
+            }
+            
+            // Enhanced MLG role badge
+            const roleBadge = document.createElement('span');
+            const roleColors = {
+              owner: 'bg-gradient-to-r from-gaming-yellow to-gaming-accent text-black border-gaming-yellow',
+              admin: 'bg-gradient-to-r from-gaming-red to-gaming-purple text-white border-gaming-red',
+              moderator: 'bg-gradient-to-r from-gaming-blue to-gaming-purple text-white border-gaming-blue',
+              member: 'bg-gaming-surface text-gaming-accent border-gaming-accent'
+            };
+            roleBadge.className = `px-3 py-1 rounded-lg text-xs font-bold border ${roleColors[member.role] || roleColors.member} mlg-role-badge`;
+            roleBadge.innerHTML = `
+              ${member.role === 'owner' ? '👑' : member.role === 'admin' ? '⚡' : member.role === 'moderator' ? '🛡️' : '🎯'} 
+              ${member.role.charAt(0).toUpperCase() + member.role.slice(1)}
+            `;
+            usernameContainer.appendChild(roleBadge);
+            
+            userInfoDiv.appendChild(usernameContainer);
+            
+            // Enhanced member info with MLG styling
+            const memberInfoDiv = document.createElement('div');
+            memberInfoDiv.className = 'text-sm text-gray-400 mt-1';
+            const joinDate = new Date(member.joined_at).toLocaleDateString();
+            const memberSince = member.is_clan_member ? 'MLG Member' : 'Guest';
+            memberInfoDiv.innerHTML = `
+              <div class="flex items-center space-x-4">
+                <span class="flex items-center space-x-1">
+                  <span class="text-gaming-accent">🏆</span>
+                  <span>Rep: <span class="text-gaming-accent font-semibold">${member.reputation_score.toLocaleString()}</span></span>
+                </span>
+                <span class="text-gray-500">•</span>
+                <span class="flex items-center space-x-1">
+                  <span class="text-gaming-blue">📅</span>
+                  <span>Joined: ${joinDate}</span>
+                </span>
+                <span class="text-gray-500">•</span>
+                <span class="text-gaming-purple font-semibold">${memberSince}</span>
+              </div>
+            `;
+            userInfoDiv.appendChild(memberInfoDiv);
+            
+            leftDiv.appendChild(userInfoDiv);
+            memberDiv.appendChild(leftDiv);
+            
+            // Right side - actions
+            const rightDiv = document.createElement('div');
+            rightDiv.className = 'flex items-center space-x-2';
+            
+            // View profile button
+            const profileBtn = document.createElement('button');
+            profileBtn.className = 'p-2 text-gaming-accent hover:bg-gaming-accent hover:bg-opacity-20 rounded transition-colors';
+            profileBtn.innerHTML = '<i data-lucide="user" class="w-4 h-4"></i>';
+            profileBtn.setAttribute('title', 'View Profile');
+            profileBtn.addEventListener('click', () => {
+              console.log('👤 View profile for:', member.username);
+              // Navigate to profile or show profile modal
+            });
+            rightDiv.appendChild(profileBtn);
+            
+            // Online status indicator
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `text-xs ${member.is_online ? 'text-green-400' : 'text-gray-500'}`;
+            statusDiv.textContent = member.is_online ? 'Online' : 'Offline';
+            rightDiv.appendChild(statusDiv);
+            
+            memberDiv.appendChild(rightDiv);
+            memberList.appendChild(memberDiv);
+          }
+
+          container.appendChild(memberList);
+
+          // Re-initialize Lucide icons
+          if (window.lucide) {
+            window.lucide.createIcons();
+          }
+
+          console.log(`🏷️ Displayed ${members.length} clan members with MLG tagging`);
+
+        } catch (error) {
+          console.error('❌ Error displaying clan member roster:', error);
         }
       }
       

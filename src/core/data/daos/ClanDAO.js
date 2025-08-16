@@ -20,6 +20,7 @@
 
 import Joi from 'joi';
 import { BaseDAO } from './BaseDAO.js';
+import { MLGUsernameTaggingService } from '../../auth/mlg-username-tagging-service.js';
 
 /**
  * Validation schemas for clan operations
@@ -94,6 +95,28 @@ export class ClanDAO extends BaseDAO {
 
     this.memberSchema = CLAN_SCHEMAS.member;
     this.invitationSchema = CLAN_SCHEMAS.invitation;
+    
+    // Initialize MLG tagging service
+    this.mlgTaggingService = new MLGUsernameTaggingService({
+      db: this.db,
+      cache: this.redis,
+      logger: this.logger
+    });
+    
+    // Initialize tagging service
+    this.initializeMLGTagging();
+  }
+
+  /**
+   * Initialize MLG tagging service
+   */
+  async initializeMLGTagging() {
+    try {
+      await this.mlgTaggingService.initialize();
+      this.logger.info('🏷️ MLG tagging service integrated with ClanDAO');
+    } catch (error) {
+      this.logger.error('❌ Failed to initialize MLG tagging service:', error);
+    }
   }
 
   /**
@@ -512,6 +535,19 @@ export class ClanDAO extends BaseDAO {
       params.push(limit, offset);
 
       const result = await this.executeQuery(query, params);
+
+      // Apply MLG tagging to all clan member usernames
+      if (this.mlgTaggingService) {
+        for (const member of result.rows) {
+          const displayUsername = await this.mlgTaggingService.getDisplayUsername(
+            member.user_id, 
+            member.display_name || member.username, 
+            { clanId: clanId, source: 'clan_roster' }
+          );
+          member.mlg_display_name = displayUsername;
+          member.is_tagged = displayUsername !== (member.display_name || member.username);
+        }
+      }
 
       // Get total count
       const countQuery = `

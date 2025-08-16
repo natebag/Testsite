@@ -49,6 +49,23 @@ export default {
       'max-2xl': {'max': '1535px'}
     },
     extend: {
+      fontFamily: {
+        // MLG Official Fonts
+        'mlg-primary': ['Rajdhani', 'Segoe UI', 'system-ui', '-apple-system', 'sans-serif'],
+        'mlg-heading': ['Orbitron', 'Segoe UI', 'system-ui', 'sans-serif'],
+        'mlg-display': ['Exo 2', 'Orbitron', 'system-ui', 'sans-serif'],
+        'mlg-gaming': ['Play', 'Rajdhani', 'monospace', 'system-ui'],
+        'mlg-mono': ['Fira Code', 'SF Mono', 'Monaco', 'Cascadia Code', 'monospace'],
+        
+        // Gaming font aliases
+        'gaming': ['Play', 'Rajdhani', 'system-ui'],
+        'competitive': ['Orbitron', 'Segoe UI', 'sans-serif'],
+        'display': ['Exo 2', 'Orbitron', 'system-ui'],
+        
+        // Backwards compatibility
+        'sans': ['Rajdhani', 'Segoe UI', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        'mono': ['Fira Code', 'SF Mono', 'Monaco', 'Cascadia Code', 'Consolas', 'monospace']
+      },
       colors: {
         'gaming-bg': '#0a0a0f',
         'gaming-surface': '#1a1a2e',
@@ -66,7 +83,21 @@ export default {
         'tile-hover': 'rgba(0, 255, 136, 0.1)',
         'burn-red': '#ff4444',
         'burn-orange': '#ff8800',
-        'burn-yellow': '#ffaa00'
+        'burn-yellow': '#ffaa00',
+        
+        // MLG Brand Colors
+        'mlg': {
+          'text-primary': '#ffffff',
+          'text-secondary': '#e5e5e5',
+          'text-tertiary': '#cccccc',
+          'text-muted': '#999999',
+          'text-disabled': '#666666',
+          'text-accent': '#00ff88',
+          'text-brand': '#00d4ff',
+          'text-warning': '#fbbf24',
+          'text-error': '#ef4444',
+          'text-success': '#10b981'
+        }
       },
       animation: {
         'pulse-neon': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
