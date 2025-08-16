@@ -26,16 +26,6 @@
       }
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
   "env": {
     "NODE_ENV": "production",
     "NODE_VERSION": "20"
@@ -85,8 +75,8 @@
   ],
   "rewrites": [
     {
-      "source": "/api/health",
-      "destination": "/api/health"
+      "source": "/api/(.*)",
+      "destination": "/server.js"
     }
   ],
   "regions": ["iad1"],
