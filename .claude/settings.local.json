@@ -59,7 +59,13 @@
       "Bash(npm run type:check:*)",
       "Bash(git log:*)",
       "Bash(rg:*)",
-      "Bash(npm run start:simple:*)"
+      "Bash(npm run start:simple:*)",
+      "WebSearch",
+      "Bash(git push:*)",
+      "Bash(npm view:*)",
+      "Bash(npm outdated)",
+      "Bash(npm --version)",
+      "Bash(npx stylelint:*)"
     ],
     "deny": []
   }

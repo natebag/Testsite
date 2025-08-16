@@ -24,7 +24,7 @@
 import { EventEmitter } from 'events';
 import { MLGTagEnforcementSystem } from './mlg-tag-enforcement-system.js';
 import { MLGUsernameTaggingService } from './mlg-username-tagging-service.js';
-import { MLGUsernameDisplay } from '../shared/utils/mlg-username-display.js';
+import { MLGUsernameDisplay } from '../../shared/utils/mlg-username-display.js';
 
 /**
  * Platform Integration Configuration

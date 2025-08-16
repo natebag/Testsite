@@ -21,11 +21,11 @@
  */
 
 import { EventEmitter } from 'events';
-import { getCacheManager } from '../cache/cache-manager.js';
-import { getUserCache } from '../cache/strategies/userCache.js';
-import { getClanCache } from '../cache/strategies/clanCache.js';
-import { getContentCache } from '../cache/strategies/contentCache.js';
-import { getVotingCache } from '../cache/strategies/votingCache.js';
+import { getCacheManager } from '../../core/cache/cache-manager.js';
+import { getUserCache } from '../../core/cache/strategies/userCache.js';
+import { getClanCache } from '../../core/cache/strategies/clanCache.js';
+import { getContentCache } from '../../core/cache/strategies/contentCache.js';
+import { getVotingCache } from '../../core/cache/strategies/votingCache.js';
 
 export class GamingOptimizations extends EventEmitter {
   constructor(options = {}) {

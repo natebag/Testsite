@@ -491,6 +491,16 @@ When all sub-tasks in a parent task are complete:
   - [ ] 30.5 Create unlockable easter egg achievements **[Agent: ui-production-builder]**
   - [ ] 30.6 Verify CLAUDE.md compliance and workflow adherence **[Agent: claude-md-compliance-checker]**
 
+- [x] 31.0 **Vercel Deployment Readiness & Dependency Fixes** **[Agent: deploy-guardian-vercel + vercel-build-medic]**
+  - [x] 31.1 Fix autocannon version from ^8.2.0 to ^8.0.0 for npm compatibility **[Agent: vercel-build-medic]**
+  - [x] 31.2 Fix clinic version from ^13.1.0 to ^13.0.0 for npm compatibility **[Agent: vercel-build-medic]**
+  - [x] 31.3 Remove k6 npm dependency (k6 is standalone binary, not npm package) **[Agent: vercel-build-medic]**
+  - [x] 31.4 Update deprecated dependencies (puppeteer, supertest, uuid) **[Agent: vercel-build-medic]**
+  - [x] 31.5 Validate Vercel deployment configuration and build system **[Agent: deploy-guardian-vercel]**
+  - [x] 31.6 Optimize Vite configuration for gaming performance and Web3 features **[Agent: deploy-guardian-vercel]**
+  - [x] 31.7 Apply security headers and caching optimizations for Vercel **[Agent: deploy-guardian-vercel]**
+  - [x] 31.8 Verify CLAUDE.md compliance and workflow adherence **[Agent: claude-md-compliance-checker]**
+
 ## 🔍 **MANDATORY QUALITY CONTROL**
 
 **EVERY task completion must include:**

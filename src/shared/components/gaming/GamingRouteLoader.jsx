@@ -7,7 +7,7 @@
 
 import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { GamingLoadingState } from './GamingLoadingState.jsx';
-import { GamingErrorBoundary } from './GamingErrorBoundary.jsx';
+import GamingErrorBoundary from './GamingErrorBoundary.jsx';
 
 // Gaming-optimized route loader with preloading capabilities
 class GamingRouteLoader {

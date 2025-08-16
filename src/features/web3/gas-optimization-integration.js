@@ -35,7 +35,7 @@ import {
 import { 
   getGasOptimizationUI, 
   initializeGasOptimizationUI 
-} from '../../../shared/components/gas-optimization-ui.js';
+} from '../../shared/components/gas-optimization-ui.js';
 
 /**
  * Integration Configuration
@@ -951,7 +951,6 @@ export async function optimizeClanOperation(operationType, options = {}) {
 }
 
 export {
-  GasOptimizationIntegration,
   TRANSACTION_PRIORITIES,
   CONGESTION_LEVELS,
   FEE_CATEGORIES,
