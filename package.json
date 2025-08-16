@@ -86,7 +86,7 @@
     "@vitejs/plugin-legacy": "^7.2.1",
     "@vitejs/plugin-react": "^5.0.0",
     "artillery": "^2.0.17",
-    "autocannon": "^8.2.0",
+    "autocannon": "^8.0.0",
     "autoprefixer": "^10.4.21",
     "babel-jest": "^30.0.5",
     "buffer": "^6.0.3",
